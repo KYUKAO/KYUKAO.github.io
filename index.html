@@ -16,7 +16,7 @@
         .glass-card:hover { border-color: var(--pink); }
         .text-pink { color: var(--pink); }
         .tag { background: rgba(255, 45, 117, 0.1); color: var(--pink); padding: 2px 10px; font-size: 0.75rem; border: 1px solid rgba(255, 45, 117, 0.2); font-weight: 600; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.5rem; }
-        .btn-contact { border: 1px solid var(--pink); color: var(--pink); font-family: 'Syncopate', sans-serif; font-size: 10px; padding: 12px 30px; letter-spacing: 0.2em; transition: all 0.3s; margin-top: 2rem; display: inline-block; }
+        .btn-contact { border: 1px solid var(--pink); color: var(--pink); font-family: 'Syncopate', sans-serif; font-size: 10px; padding: 12px 30px; letter-spacing: 0.2em; transition: all 0.3s; margin-top: 2rem; display: inline-block; text-decoration: none; }
         .btn-contact:hover { background: var(--pink); color: white; box-shadow: 0 0 20px rgba(255, 45, 117, 0.4); }
     </style>
 </head>
@@ -25,37 +25,36 @@
 
     <!-- HEADER -->
     <header class="py-32 text-center px-6">
-        <p class="font-sync text-[10px] tracking-[0.5em] mb-4 text-slate-500 uppercase">Technical Artist · Level Designer</p>
+        <p class="font-sync text-[10px] tracking-[0.5em] mb-4 text-slate-500 uppercase italic">Technical Artist · Level Designer</p>
         <h1 class="text-6xl md:text-8xl font-black mb-8 italic tracking-tighter uppercase text-white">HANQING <span class="text-pink">LI</span></h1>
         <div class="flex flex-wrap justify-center gap-8 text-[11px] font-sync tracking-widest text-slate-400 uppercase">
             <span>TEL: 13061878150</span>
             <span>EMAIL: kyuandart@sina.com</span>
         </div>
-        <!-- CONTACT BUTTON ADDED BACK -->
-        <a href="https://www.linkedin.com/in/hanqing-li-000069223" target="_blank" class="btn-contact uppercase">Contact Me</a>
+        <a href="https://www.linkedin.com/in/hanqing-li-000069223" target="_blank" class="btn-contact">Contact Me</a>
     </header>
 
     <main class="max-w-5xl mx-auto px-6 pb-32">
         
         <!-- EDUCATION -->
         <section class="mb-24">
-            <h2 class="section-title text-white">EDUCATION</h2>
+            <h2 class="section-title">EDUCATION</h2>
             <div class="glass-card">
                 <div class="flex flex-col md:flex-row justify-between mb-4 items-start">
-                    <h3 class="text-xl font-bold text-white uppercase italic">Shanghai University</h3>
+                    <h3 class="text-xl font-bold text-white uppercase italic tracking-tight">Shanghai University</h3>
                     <span class="text-slate-500 font-sync text-xs uppercase pt-1">Sep 2019 - Aug 2023</span>
                 </div>
                 <p class="text-pink text-sm italic font-semibold mb-4">Bachelor of Fine Arts (Broadcasting and Television Playwright-director)</p>
-                <p class="text-sm leading-relaxed"><strong class="text-slate-200">Core Courses:</strong> Image Technology and Art, Visual Plastic Arts, Film and Video Shoot, Film and Video Editor, Analysis on Audio-visual Element, New Digital Media Foundation and Application, TV and Film Music, New Media Image, Studio Production.</p>
+                <p class="text-sm leading-relaxed"><strong class="text-slate-200 uppercase tracking-tighter">Core Courses:</strong> Image Technology and Art, Visual Plastic Arts, Film and Video Shoot, Film and Video Editor, Analysis on Audio-visual Element, New Digital Media Foundation and Application, TV and Film Music, New Media Image, Studio Production.</p>
             </div>
             <div class="glass-card">
                 <div class="flex flex-col md:flex-row justify-between mb-4 items-start">
-                    <h3 class="text-xl font-bold text-white uppercase italic">Shanghai Vancouver Film School</h3>
+                    <h3 class="text-xl font-bold text-white uppercase italic tracking-tight">Shanghai Vancouver Film School</h3>
                     <span class="text-slate-500 font-sync text-xs uppercase pt-1">Sep 2021 - Aug 2022</span>
                 </div>
                 <p class="text-pink text-sm italic font-semibold mb-4">Game Design</p>
-                <p class="text-sm mb-4"><strong class="text-slate-200">Core Courses:</strong> Game Mechanics, Level Design, Art Fundamentals, Game Art, Unity C#, Unreal, 3D Modeling, Procedure Materials, Programming.</p>
-                <p class="text-sm font-bold border-t border-white/5 pt-4 mt-4 tracking-wide italic uppercase"><span class="text-pink">AWARDS:</span> Full Scholarship to 2021 Talent SHVFS Game Design</p>
+                <p class="text-sm mb-4"><strong class="text-slate-200 uppercase tracking-tighter">Core Courses:</strong> Game Mechanics, Level Design, Art Fundamentals, Game Art, Unity C#, Unreal, 3D Modeling, Procedure Materials, Programming, Level Design.</p>
+                <p class="text-sm font-bold border-t border-white/5 pt-4 mt-4 tracking-wide italic uppercase"><span class="text-pink">Awards:</span> Full Scholarship to 2021 Talent SHVFS Game Design</p>
             </div>
         </section>
 
@@ -63,100 +62,126 @@
         <section class="mb-24">
             <h2 class="section-title">WORK EXPERIENCES</h2>
             
+            <!-- Tencent -->
             <div class="glass-card">
                 <div class="flex flex-col md:flex-row justify-between mb-4 items-start">
-                    <h3 class="text-xl font-bold text-white uppercase italic">Tencent</h3>
+                    <h3 class="text-xl font-bold text-white uppercase italic tracking-tight">Tencent</h3>
                     <span class="text-slate-500 font-sync text-xs uppercase pt-1">Dec 2025 - Now</span>
                 </div>
                 <p class="text-pink text-sm italic font-semibold mb-6 uppercase tracking-wider">(Intern) Technical Artist for Golden Spatula (Teamfight Tactics China Edition)</p>
                 <ul class="space-y-4 text-sm list-disc ml-4">
-                    <li><strong class="text-slate-200">Custom Shader Development:</strong> Designed and implemented custom shaders in Unity using HLSL/CG and ASE for VFX and PBR environment assets. Collaborated closely with artists to improve visual quality and performance.</li>
-                    <li><strong class="text-slate-200">AI Pipeline & Automated Testing:</strong> Engineered a multi-agent collaborative workflow to automate Python-based TA tool generation, using MCP for autonomous testing to ensure stability.</li>
-                    <li><strong class="text-slate-200">AI-to-Character Animation Pipeline:</strong> Architected an end-to-end pipeline from AI video generation to project-ready character animation; increased production efficiency by 80%.</li>
+                    <li><strong class="text-slate-100">Custom Shader Development:</strong> Designed and implemented custom shaders in Unity using HLSL/CG and ASE for VFX and PBR environment assets. Collaborated closely with artists to improve visual quality and performance.</li>
+                    <li><strong class="text-slate-100">AI Pipeline & Automated Testing:</strong> Engineered a multi-agent collaborative workflow to automate Python-based TA tool generation, using MCP for autonomous testing and verification to ensure production-grade stability.</li>
+                    <li><strong class="text-slate-100">AI-to-Character Animation Pipeline:</strong> Architected an end-to-end pipeline from AI video generation to project-ready character animation by developing a custom retargeting toolset; increased production efficiency by 80%.</li>
                 </ul>
             </div>
 
+            <!-- Perfect World -->
             <div class="glass-card">
                 <div class="flex flex-col md:flex-row justify-between mb-4 items-start">
-                    <h3 class="text-xl font-bold text-white uppercase italic">Perfect World</h3>
+                    <h3 class="text-xl font-bold text-white uppercase italic tracking-tight">Perfect World</h3>
                     <span class="text-slate-500 font-sync text-xs uppercase pt-1">May 2024 - Oct 2025</span>
                 </div>
                 <p class="text-pink text-sm italic font-semibold mb-2 uppercase tracking-wider">Level Designer for Tower Of Fantasy (UE4 Open-world MMORPG)</p>
                 <p class="text-[10px] font-sync text-slate-500 mb-6 uppercase tracking-widest italic border-b border-white/5 pb-2">Project: https://www.youtube.com/watch?v=5CtQmstePSU</p>
                 <ul class="space-y-4 text-sm list-disc ml-4">
-                    <li><strong class="text-slate-200">Tool Design & Development:</strong> Engineered proprietary level editing tools (NPC randomization, one-click actor placement), reducing manual labor by 30%.</li>
-                    <li><strong class="text-slate-200">UE4 Blueprint Development:</strong> Independently managed full lifecycle of 19 open-world exploration gameplay features.</li>
-                    <li><strong class="text-slate-200">Gameplay Framework Design:</strong> Designed scalable infrastructure using Data Assets (DA) and Data Tables (DT).</li>
-                    <li><strong class="text-slate-200">Art Asset Integration:</strong> Designed gameplay visuals and integrated art assets with core logic.</li>
-                    <li><strong class="text-slate-200">Cross-Team Collaboration:</strong> Optimized open world performance (LOD, texture compression, special shadings).</li>
+                    <li><strong class="text-slate-100">Tool Design & Development:</strong> Engineered proprietary level editing tools for open-world mass production. Key features include NPC group randomization and one-click actor placement, reducing manual labor by 30%.</li>
+                    <li><strong class="text-slate-100">UE4 Blueprint Development:</strong> Independently managed the full lifecycle of 19 open-world exploration gameplay features across versions 4.2-5.4 via Unreal Blueprints.</li>
+                    <li><strong class="text-slate-100">Gameplay Framework Design:</strong> Designed scalable gameplay infrastructure including core data assets (DA) and data tables (DT), establishing a unified template.</li>
+                    <li><strong class="text-slate-100">Art Asset Design & Integration:</strong> Designed gameplay visuals (models, animations, VFX, interaction logic) and independently integrated art assets.</li>
+                    <li><strong class="text-slate-100">Cross-Team Collaboration:</strong> Collaborated with Art and Engineering to optimize performance (LOD, texture compression, special shadings) to maintain target frame rates.</li>
                 </ul>
             </div>
 
+            <!-- NeoCast -->
             <div class="glass-card">
                 <div class="flex flex-col md:flex-row justify-between mb-4 items-start">
-                    <h3 class="text-xl font-bold text-white uppercase italic">NeoCast</h3>
+                    <h3 class="text-xl font-bold text-white uppercase italic tracking-tight">NeoCast</h3>
                     <span class="text-slate-500 font-sync text-xs uppercase pt-1">Mar 2024 - May 2024</span>
                 </div>
                 <p class="text-pink text-sm italic font-semibold mb-6 uppercase tracking-wider">Technical Artist for Nezha (AR Interactive Mini-game)</p>
                 <ul class="space-y-4 text-sm list-disc ml-4">
-                    <li><strong class="text-slate-200">Environment Art:</strong> Crafted 360° panoramic environments for AR glasses with optimized post-processing.</li>
-                    <li><strong class="text-slate-200">Performance Optimization:</strong> Conducted profiling to identify bottlenecks; collaborated with Rokid’s technical team.</li>
-                    <li><strong class="text-slate-200">Shader Development:</strong> Developed custom shader solutions utilizing ASE, CG, and HLSL.</li>
+                    <li><strong class="text-slate-100">Environment Art:</strong> Crafted stationary 360° panoramic environments for AR glasses, focusing on scene modeling and optimized post-processing.</li>
+                    <li><strong class="text-slate-100">Performance Optimization:</strong> Conducted profiling analysis to identify bottlenecks; collaborated with Rokid’s technical team for stable frame rates.</li>
+                    <li><strong class="text-slate-100">Shader Development:</strong> Developed custom shader solutions utilizing ASE, CG, and HLSL for stylized rendering.</li>
                 </ul>
             </div>
 
+            <!-- Neckom Games -->
             <div class="glass-card">
                 <div class="flex flex-col md:flex-row justify-between mb-4 items-start">
-                    <h3 class="text-xl font-bold text-white uppercase italic">Neckom Games</h3>
+                    <h3 class="text-xl font-bold text-white uppercase italic tracking-tight">Neckom Games</h3>
                     <span class="text-slate-500 font-sync text-xs uppercase pt-1">Dec 2023 - Feb 2024</span>
                 </div>
-                <p class="text-pink text-sm italic font-semibold mb-6 uppercase tracking-wider">Level Designer for Showa American Story (ARPG)</p>
-                <p class="text-sm"><strong class="text-slate-200">Level Creation:</strong> Made 2D layouts of levels, designed special mechanics and architectures to make white box.</p>
+                <p class="text-pink text-sm italic font-semibold mb-4 uppercase tracking-wider">Level Designer for Showa American Story (ARPG)</p>
+                <p class="text-sm ml-4"><strong class="text-slate-100">Level Creation:</strong> Made 2D layouts of levels, designed special mechanics and architectures to make white box.</p>
             </div>
 
+            <!-- Bug Inventor -->
             <div class="glass-card">
                 <div class="flex flex-col md:flex-row justify-between mb-4 items-start">
-                    <h3 class="text-xl font-bold text-white uppercase italic text-white">Bug Inventor (Tencent)</h3>
+                    <h3 class="text-xl font-bold text-white uppercase italic tracking-tight">Bug Inventor (Tencent)</h3>
                     <span class="text-slate-500 font-sync text-xs uppercase pt-1">Dec 2022 - Feb 2023</span>
                 </div>
-                <p class="text-pink text-sm italic font-semibold mb-6 uppercase tracking-wider italic">Intern Level Designer for Screaming Chicken</p>
-                <ul class="space-y-4 text-sm list-disc ml-4 text-slate-400">
-                    <li><strong class="text-slate-200">Level Creation:</strong> Built 4 original multiplayer brawl maps to enhance livestream engagement.</li>
-                    <li><strong class="text-slate-200">Production:</strong> Led iterative playtesting cycles and managed full deployment pipeline.</li>
-                    <li><strong class="text-slate-200">Collaboration:</strong> Aligned level design with live-ops strategy and content planning.</li>
+                <p class="text-pink text-sm italic font-semibold mb-2 uppercase tracking-wider italic">Intern Level Designer for Screaming Chicken</p>
+                <p class="text-[10px] font-sync text-slate-500 mb-6 uppercase tracking-widest italic border-b border-white/5 pb-2">Project: https://www.youtube.com/watch?v=jxHt0R11O-o</p>
+                <ul class="space-y-4 text-sm list-disc ml-4">
+                    <li><strong class="text-slate-100">Level Creation:</strong> Built 4 original multiplayer brawl maps (FFA/2v2) leveraging core systems to support seasonal content goals.</li>
+                    <li><strong class="text-slate-100">Production & Maintenance:</strong> Led playtesting cycles, revised levels based on feedback, and managed full deployment pipeline.</li>
+                    <li><strong class="text-slate-100">Cross-Team Collaboration:</strong> Partnered with production and operations to align level design with live-ops strategy.</li>
                 </ul>
             </div>
         </section>
 
-        <!-- INDIE PROJECTS -->
+        <!-- INDIE PROJECT EXPERIENCES -->
         <section class="mb-24">
             <h2 class="section-title uppercase">Indie Project Experiences</h2>
             
+            <!-- Inside The Paper -->
             <div class="glass-card">
-                <div class="flex justify-between mb-4 items-start">
-                    <h3 class="text-lg font-bold text-white uppercase italic tracking-tight underline decoration-pink/30">Inside The Paper</h3>
-                    <span class="text-slate-500 font-sync text-xs pt-1 italic">Jun 2023 - Aug 2023</span>
+                <div class="flex flex-col md:flex-row justify-between mb-4 items-start">
+                    <h3 class="text-xl font-bold text-white uppercase italic tracking-tight underline decoration-pink/20">Inside The Paper</h3>
+                    <span class="text-slate-500 font-sync text-xs uppercase pt-1">Jun 2023 - Aug 2023</span>
                 </div>
-                <p class="text-pink text-xs uppercase font-bold tracking-widest mb-4 italic italic">Technical Artist (3D Stylized Puzzle Game)</p>
-                <p class="text-sm leading-relaxed text-slate-400">Built level whiteboxes in Unity; crafted scene ambiance through particle effects; created Low Poly models in Maya and textures in Substance Designer.</p>
+                <p class="text-pink text-sm italic font-semibold mb-6 uppercase tracking-wider">Technical Artist (3D Stylized Puzzle Game)</p>
+                <p class="text-[10px] font-sync text-slate-500 mb-6 uppercase tracking-widest italic border-b border-white/5 pb-2">Project: https://www.youtube.com/watch?v=mVqrnLEID94</p>
+                <ul class="space-y-4 text-sm list-disc ml-4">
+                    <li><strong class="text-slate-100">Environment Art:</strong> Built level whiteboxes in Unity aligned with concept art; crafted scene ambiance through particle effects and post-processing; created Low Poly models in Maya and produced textures using Substance Designer.</li>
+                    <li><strong class="text-slate-100">Shader Development:</strong> Independently developed a streamlined cartoon graffiti-style shader to match the game’s artistic vision, integrating it for visual cohesion.</li>
+                </ul>
             </div>
 
+            <!-- Lycoris -->
             <div class="glass-card">
-                <div class="flex justify-between mb-4 items-start">
-                    <h3 class="text-lg font-bold text-white uppercase italic tracking-tight underline decoration-pink/30">Lycoris</h3>
-                    <span class="text-slate-500 font-sync text-xs pt-1 italic">May 2022 - Aug 2022</span>
+                <div class="flex flex-col md:flex-row justify-between mb-4 items-start">
+                    <h3 class="text-xl font-bold text-white uppercase italic tracking-tight underline decoration-pink/20">Lycoris</h3>
+                    <span class="text-slate-500 font-sync text-xs uppercase pt-1">May 2022 - Aug 2022</span>
                 </div>
-                <p class="text-pink text-xs uppercase font-bold tracking-widest mb-4 italic italic">Winner: Outstanding Future Game Production Team Award (9th Golden Mouth Awards)</p>
-                <p class="text-sm leading-relaxed text-slate-400">Crafted 3D assets; developed custom shaders in Unity URP; led project timeline planning and technical art pipelines. Coordinated with programmers to resolve integration issues.</p>
+                <p class="text-pink text-sm italic font-semibold mb-2 uppercase tracking-wider">Technical Artist (3D Puzzle Platformer)</p>
+                <p class="text-[10px] font-sync text-pink mb-4 uppercase tracking-widest italic border-b border-pink/10 pb-2">Won the Outstanding Future Game Production Team Award (9th Golden Mouth Awards)</p>
+                <p class="text-[10px] font-sync text-slate-500 mb-6 uppercase tracking-widest italic">Project: https://www.youtube.com/watch?v=kVGB4noxZYs</p>
+                <ul class="space-y-4 text-sm list-disc ml-4">
+                    <li><strong class="text-slate-100">3D Art:</strong> Crafted 3D character and environment assets; developed custom VFX for puzzle feedback loops; implemented dynamic lighting schemes to guide navigation.</li>
+                    <li><strong class="text-slate-100">Shaders:</strong> Designed custom shaders in Unity URP for character gameplay, environment art and core puzzle mechanics (trigger-based material transitions).</li>
+                    <li><strong class="text-slate-100">Project Task Planning & Coordination:</strong> Led project timeline planning by breaking down technical pipelines into manageable sprints; maintained accountability through weekly check-ins.</li>
+                    <li><strong class="text-slate-100">Cross-Team Collaboration:</strong> Coordinated with designers to align technical assets with logic; collaborated with programmers to resolve asset integration issues.</li>
+                </ul>
             </div>
 
+            <!-- Behind Me -->
             <div class="glass-card">
-                <div class="flex justify-between mb-4 items-start">
-                    <h3 class="text-lg font-bold text-white uppercase italic tracking-tight underline decoration-pink/30">Behind Me</h3>
-                    <span class="text-slate-500 font-sync text-xs pt-1 italic">Mar 2022 - May 2022</span>
+                <div class="flex flex-col md:flex-row justify-between mb-4 items-start">
+                    <h3 class="text-xl font-bold text-white uppercase italic tracking-tight underline decoration-pink/20">Behind Me</h3>
+                    <span class="text-slate-500 font-sync text-xs uppercase pt-1">Mar 2022 - May 2022</span>
                 </div>
-                <p class="text-pink text-xs uppercase font-bold tracking-widest mb-4 italic italic">Lead Designer (VR Horror Game)</p>
-                <p class="text-sm leading-relaxed text-slate-400">Developed comprehensive GDD; created modular level whitebox environments in Unity; programmed enemy AI behaviors in Unity C#.</p>
+                <p class="text-pink text-sm italic font-semibold mb-6 uppercase tracking-wider">Lead Designer (VR Horror Game)</p>
+                <p class="text-[10px] font-sync text-slate-500 mb-6 uppercase tracking-widest italic border-b border-white/5 pb-2">Project: https://www.youtube.com/watch?v=eIB4k4AAeCE</p>
+                <ul class="space-y-4 text-sm list-disc ml-4">
+                    <li><strong class="text-slate-100">Game Design Documentation:</strong> Developed a comprehensive GDD centered on immersive horror VR experience, defining loops, interaction logic, and narrative elements.</li>
+                    <li><strong class="text-slate-100">Level Design:</strong> Created modular level whitebox environments in Unity, ensuring smooth, tension-rich progression.</li>
+                    <li><strong class="text-slate-100">Visual Design & Shaders:</strong> Designed high-impact enemy visuals and implemented custom horror-themed shaders (displacement mapping, emissive effects).</li>
+                    <li><strong class="text-slate-100">Enemy AI Programming:</strong> Programmed enemy AI behaviors (detection, pursuit, ambush) in Unity C# to deliver dynamic encounters.</li>
+                </ul>
             </div>
         </section>
 
@@ -164,19 +189,19 @@
         <section>
             <h2 class="section-title uppercase">Certificates & Skills</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="glass-card">
+                <div class="glass-card p-8">
                     <h4 class="font-sync text-[10px] text-pink mb-6 tracking-[0.2em] uppercase italic border-b border-white/10 pb-2">Languages</h4>
                     <ul class="text-xs space-y-3 text-slate-300 font-bold uppercase italic">
                         <li>IELTS: 8.0</li><li>CET-6</li><li>Japanese (CET-3)</li>
                     </ul>
                 </div>
-                <div class="glass-card">
+                <div class="glass-card p-8">
                     <h4 class="font-sync text-[10px] text-pink mb-6 tracking-[0.2em] uppercase italic border-b border-white/10 pb-2">Programming</h4>
                     <div class="flex flex-wrap gap-1">
                         <span class="tag italic uppercase">Unity C#</span><span class="tag italic uppercase">CG/HLSL</span><span class="tag italic uppercase">UE Blueprint</span><span class="tag italic uppercase">Python</span><span class="tag italic uppercase">Vex</span>
                     </div>
                 </div>
-                <div class="glass-card">
+                <div class="glass-card p-8">
                     <h4 class="font-sync text-[10px] text-pink mb-6 tracking-[0.2em] uppercase italic border-b border-white/10 pb-2">Art & Media</h4>
                     <div class="flex flex-wrap gap-1 text-slate-200">
                         <span class="tag italic uppercase">Maya</span><span class="tag italic uppercase">Substance</span><span class="tag italic uppercase">Zbrush</span><span class="tag italic uppercase">Houdini</span><span class="tag italic uppercase">PR/AE/PS/AI</span><span class="tag italic uppercase">Da Vinci</span>
@@ -187,7 +212,7 @@
     </main>
 
     <footer class="py-20 border-t border-white/5 text-center">
-        <p class="font-sync text-[9px] text-slate-600 tracking-[0.5em] uppercase italic">© 2025 HANQING LI · TECHNICAL ARTIST RESUME</p>
+        <p class="font-sync text-[9px] text-slate-600 tracking-[0.5em] uppercase italic">© 2025 HANQING LI · FULL RESUME CONTENT</p>
     </footer>
 </body>
 </html>
