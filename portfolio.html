@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio | Hanqing Li · KYUKAO</title>
+  <style>
+    :root {
+      --pink:       #ff2d78;
+      --pink-dim:   #ff2d7844;
+      --pink-glow:  0 0 18px #ff2d7888, 0 0 40px #ff2d7833;
+      --bg:         #080808;
+      --bg2:        #111111;
+      --bg3:        #1a1a1a;
+      --text:       #f0f0f0;
+      --text-muted: #888888;
+      --border:     #2a2a2a;
+      --font:       'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+
+    /* 导航 */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 60px;
+      background: rgba(8,8,8,0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.15em; color: var(--pink); }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); transition: color 0.2s; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 1px; background: var(--pink); transition: width 0.3s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+    .nav-links a.active { color: var(--pink); }
+
+    /* 语言切换按钮 */
+    .lang-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .lang-toggle:hover { border-color: var(--pink); color: var(--pink); }
+
+    .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .nav-toggle span { display: block; width: 24px; height: 2px; background: var(--text); }
+
+    /* 页面头部 */
+    .page-header {
+      padding: 160px 60px 80px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: 'PORTFOLIO';
+      position: absolute;
+      right: -20px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 12rem;
+      font-weight: 900;
+      color: rgba(255,45,120,0.03);
+      letter-spacing: 0.05em;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .section-label { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--pink); margin-bottom: 12px; }
+    .section-title { font-size: clamp(2rem, 5vw, 4rem); font-weight: 700; letter-spacing: 0.05em; }
+    .divider { width: 40px; height: 2px; background: var(--pink); margin: 20px 0; box-shadow: var(--pink-glow); }
+    .section-desc { color: var(--text-muted); max-width: 560px; line-height: 1.8; }
+
+    /* 筛选按钮 */
+    .filters {
+      padding: 40px 60px 0;
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 22px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: var(--font);
+    }
+    .filter-btn:hover { border-color: var(--pink); color: var(--pink); }
+    .filter-btn.active {
+      background: var(--pink);
+      border-color: var(--pink);
+      color: #fff;
+      box-shadow: var(--pink-glow);
+    }
+
+    /* 作品网格 */
+    .portfolio-grid {
+      padding: 40px 60px 100px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 2px;
+    }
+
+    /* 作品卡片 */
+    .work-card {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg2);
+      cursor: pointer;
+      transition: opacity 0.4s;
+    }
+    .work-card.hidden { display: none; }
+
+    /* 缩略图区域 */
+    .work-thumb {
+      aspect-ratio: 16/9;
+      position: relative;
+      overflow: hidden;
+    }
+    .work-thumb-bg {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      transition: transform 0.6s ease;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--border); font-size: 0.7rem; letter-spacing: 0.1em;
+      text-align: center; padding: 20px;
+    }
+    .work-card:hover .work-thumb-bg { transform: scale(1.05); }
+
+    /* 视频标识 */
+    .video-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+    .play-icon {
+      position: absolute;
+      inset: 0; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .play-icon svg { width: 48px; height: 48px; fill: rgba(255,255,255,0.9); }
+    .work-card:hover .play-icon { opacity: 1; }
+
+    /* 粉色发光边框 */
+    .work-thumb::after {
+      content: '';
+      position: absolute; inset: 0;
+      border: 1px solid transparent;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      pointer-events: none;
+    }
+    .work-card:hover .work-thumb::after {
+      border-color: var(--pink);
+      box-shadow: inset 0 0 30px var(--pink-dim);
+    }
+
+    /* 卡片信息 */
+    .work-info {
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      border-top: none;
+      transition: border-color 0.3s;
+    }
+    .work-card:hover .work-info { border-color: var(--pink-dim); }
+    .work-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .work-tag {
+      font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--pink); border: 1px solid var(--pink-dim); padding: 2px 8px;
+    }
+    .work-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; }
+    .work-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+    .work-links {
+      display: flex; gap: 16px; margin-top: 16px;
+      padding-top: 16px; border-top: 1px solid var(--border);
+    }
+    .work-link {
+      font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); transition: color 0.2s;
+    }
+    .work-link:hover { color: var(--pink); }
+
+    /* 空状态 */
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 0;
+      color: var(--text-muted);
+      display: none;
+    }
+
+    /* 进入动画 */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* 页脚 */
+    footer {
+      padding: 40px 60px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--text-muted); font-size: 0.8rem;
+    }
+    .footer-logo { color: var(--pink); font-weight: 700; letter-spacing: 0.15em; }
+    .footer-links { display: flex; gap: 30px; }
+    .footer-links a:hover { color: var(--pink); }
+
+    /* 响应式 */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex; flex-direction: column;
+        position: absolute; top: 100%; left: 0; right: 0;
+        background: rgba(8,8,8,0.97); padding: 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-toggle { display: flex; }
+      .page-header { padding: 120px 24px 60px; }
+      .filters { padding: 30px 24px 0; }
+      .portfolio-grid { padding: 30px 24px 80px; grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 导航 -->
+  <nav>
+    <a href="home.html" class="nav-logo">KYUKAO</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="home.html" data-i18n="nav.home">首页</a></li>
+      <li><a href="portfolio.html" class="active" data-i18n="nav.portfolio">作品集</a></li>
+      <li><a href="index.html" data-i18n="nav.resume">简历</a></li>
+      <li><a href="about.html" data-i18n="nav.about">关于我</a></li>
+    </ul>
+    <!-- lang toggle injected by i18n.js -->
+    <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
+  </nav>
+
+  <!-- 页面头 -->
+  <div class="page-header">
+    <p class="section-label" data-i18n="portfolio.label">Portfolio</p>
+    <h1 class="section-title" data-i18n="portfolio.title">作品集</h1>
+    <div class="divider"></div>
+    <p class="section-desc" data-i18n="portfolio.desc">Shader、特效、工具开发与渲染实验——技术与美学的交叉探索。</p>
+  </div>
+
+  <!-- 筛选按钮 -->
+  <div class="filters">
+    <button class="filter-btn active" data-category="all" data-i18n="filter.all">全部</button>
+    <button class="filter-btn" data-category="shader" data-i18n="filter.shader">Shader</button>
+    <button class="filter-btn" data-category="vfx" data-i18n="filter.vfx">特效 VFX</button>
+    <button class="filter-btn" data-category="tool" data-i18n="filter.tool">工具 Tools</button>
+    <button class="filter-btn" data-category="render" data-i18n="filter.render">渲染 Render</button>
+    <button class="filter-btn" data-category="code" data-i18n="filter.code">代码 Code</button>
+  </div>
+
+  <!-- 作品网格 — cards injected by i18n.js / renderPortfolioCards() -->
+  <div class="portfolio-grid" id="workGrid">
+    <div class="no-results" id="noResults" data-i18n="no.results">没有找到该分类的作品</div>
+  </div>
+
+  <!-- 页脚 -->
+  <footer>
+    <span class="footer-logo">KYUKAO</span>
+    <div class="footer-links">
+      <a href="portfolio.html" data-i18n="footer.portfolio">作品集</a>
+      <a href="index.html" data-i18n="footer.resume">简历</a>
+      <a href="about.html" data-i18n="footer.contact">联系</a>
+    </div>
+    <span data-i18n="footer.copy">© 2026 Hanqing Li · All rights reserved</span>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="js/typography.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/i18n.js"></script>
+  <script>
+    // 移动端菜单
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+
+    // 作品筛选 (runs after cards are rendered by i18n.js)
+    var revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelector('.portfolio-grid').addEventListener('click', function(e) {
+      // Delegated filter-btn handler not needed — handled below
+    });
+
+    // Filter logic — uses event delegation so it works after dynamic card injection
+    document.querySelector('.filters').addEventListener('click', function (e) {
+      var btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      var cat = btn.dataset.category;
+      var cards = document.querySelectorAll('#workGrid .work-card');
+      var count = 0;
+      cards.forEach(card => {
+        var match = cat === 'all' || card.dataset.category === cat;
+        card.classList.toggle('hidden', !match);
+        if (match) count++;
+      });
+      document.getElementById('noResults').style.display = count === 0 ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>

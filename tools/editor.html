@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KYUKAO · 作品集编辑器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --pink:       #ff2d75;
+    --pink-dim:   rgba(255,45,117,0.15);
+    --pink-glow:  0 0 16px rgba(255,45,117,0.35);
+    --bg:         #080808;
+    --bg2:        #111111;
+    --bg3:        #1a1a1a;
+    --bg4:        #222222;
+    --text:       #e8e8e8;
+    --text-muted: #666;
+    --border:     #2a2a2a;
+    --border2:    #333;
+    --font:       'Inter', sans-serif;
+    --font-sync:  'Syncopate', sans-serif;
+    --sidebar-w:  200px;
+    --topbar-h:   56px;
+    --radius:     6px;
+  }
+
+  html, body { height: 100%; overflow: hidden; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13px; line-height: 1.5; display: flex; flex-direction: column; }
+
+  /* ── Topbar ── */
+  #topbar {
+    height: var(--topbar-h); flex-shrink: 0;
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 12px; z-index: 100;
+  }
+  #topbar .logo {
+    font-family: var(--font-sync); font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.2em; color: var(--pink); margin-right: auto;
+  }
+  #topbar .logo span { color: var(--text-muted); font-size: 0.6rem; letter-spacing: 0.1em; margin-left: 8px; }
+  .btn {
+    padding: 7px 16px; border-radius: var(--radius); font-size: 11px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em; border: 1px solid transparent;
+    font-family: var(--font);
+  }
+  .btn-ghost { background: transparent; border-color: var(--border2); color: var(--text-muted); }
+  .btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+  .btn-primary { background: var(--pink); color: #fff; border-color: var(--pink); }
+  .btn-primary:hover { background: #ff4d8a; box-shadow: var(--pink-glow); }
+  .btn-danger { background: transparent; border-color: #444; color: #888; font-size: 10px; padding: 4px 10px; }
+  .btn-danger:hover { border-color: #e53e3e; color: #e53e3e; }
+  .btn-add { background: var(--pink-dim); border-color: rgba(255,45,117,0.3); color: var(--pink); font-size: 11px; padding: 6px 14px; }
+  .btn-add:hover { background: rgba(255,45,117,0.25); }
+
+  /* ── Layout ── */
+  #layout { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    background: var(--bg2); border-right: 1px solid var(--border);
+    padding: 16px 0; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 16px; cursor: pointer; transition: all 0.15s;
+    border-left: 2px solid transparent; color: var(--text-muted);
+    font-size: 11.5px; user-select: none;
+  }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { border-left-color: var(--pink); background: var(--pink-dim); color: var(--pink); }
+  .nav-item .nav-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+  .nav-divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+  /* ── Main area ── */
+  #main { flex: 1; overflow-y: auto; padding: 28px 36px 60px; }
+
+  /* ── Section header ── */
+  .section-header { margin-bottom: 24px; }
+  .section-header h2 {
+    font-family: var(--font-sync); font-size: 0.85rem; letter-spacing: 0.15em;
+    color: var(--text); margin-bottom: 4px;
+  }
+  .section-header p { color: var(--text-muted); font-size: 12px; }
+
+  /* ── Form fields ── */
+  .form-group { margin-bottom: 18px; }
+  .form-label {
+    display: block; font-size: 11px; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+  }
+  .form-label .lang-badge {
+    display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 9px;
+    font-weight: 700; margin-left: 6px; letter-spacing: 0.1em;
+  }
+  .lang-en { background: rgba(59,130,246,0.2); color: #60a5fa; }
+  .lang-zh { background: rgba(239,68,68,0.15); color: #f87171; }
+
+  input[type="text"], input[type="url"], input[type="email"], input[type="tel"], textarea, select {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: var(--radius); color: var(--text); font-family: var(--font);
+    font-size: 13px; padding: 8px 12px; transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none; resize: vertical;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--pink); box-shadow: 0 0 0 2px rgba(255,45,117,0.12);
+  }
+  textarea { min-height: 72px; }
+  select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+
+  /* ── Bilingual row ── */
+  .bilingual { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ── Card (for list items) ── */
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 14px; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; cursor: pointer; user-select: none;
+    background: var(--bg3);
+  }
+  .card-header:hover { background: #1e1e1e; }
+  .card-number {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--pink-dim);
+    color: var(--pink); font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .card-title { flex: 1; font-size: 12.5px; font-weight: 500; color: var(--text); }
+  .card-title small { color: var(--text-muted); font-size: 11px; margin-left: 8px; }
+  .card-toggle { color: var(--text-muted); font-size: 16px; transition: transform 0.2s; }
+  .card-toggle.open { transform: rotate(180deg); }
+  .card-body {
+    padding: 0 16px; border-top: 1px solid transparent;
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease, border-color 0.3s ease;
+  }
+  .card-body.open { max-height: 6000px; padding: 16px; border-top-color: var(--border); }
+
+  /* ── Tags/Chips ── */
+  .chips-wrapper { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--bg4); border: 1px solid var(--border2);
+    border-radius: 20px; padding: 3px 10px 3px 10px;
+    font-size: 11.5px; color: var(--text);
+  }
+  .chip-del {
+    background: none; border: none; color: var(--text-muted); cursor: pointer;
+    font-size: 14px; line-height: 1; padding: 0; display: flex; align-items: center;
+  }
+  .chip-del:hover { color: #e53e3e; }
+  .chip-input {
+    background: var(--bg3); border: 1px dashed var(--border2);
+    border-radius: 20px; padding: 3px 10px; font-size: 11.5px;
+    color: var(--text); width: 110px; outline: none;
+  }
+  .chip-input:focus { border-color: var(--pink); }
+
+  /* ── Toggle switch ── */
+  .toggle-row { display: flex; align-items: center; gap: 10px; }
+  .switch { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0; border-radius: 20px;
+    background: var(--border2); cursor: pointer; transition: background 0.2s;
+  }
+  .slider::before {
+    content: ''; position: absolute; left: 3px; top: 3px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; transition: transform 0.2s;
+  }
+  input:checked + .slider { background: var(--pink); }
+  input:checked + .slider::before { transform: translateX(16px); }
+
+  /* ── Section panels ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .panel.active.anim { animation: panelFadeIn 0.15s ease; }
+  @keyframes panelFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── Divider ── */
+  .field-divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+    background: #1a1a1a; border: 1px solid var(--border2);
+    border-radius: 8px; padding: 12px 18px;
+    font-size: 12.5px; color: var(--text);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.3s ease;
+    display: flex; align-items: center; gap: 8px;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success .toast-icon { color: #48bb78; }
+  #toast.error .toast-icon { color: #e53e3e; }
+
+  /* ── Bullets list ── */
+  .bullet-item {
+    display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px;
+  }
+  .bullet-item textarea { flex: 1; min-height: 56px; }
+  .bullet-num {
+    width: 22px; flex-shrink: 0; color: var(--pink); font-size: 11px;
+    font-weight: 700; padding-top: 10px; text-align: center;
+  }
+
+  /* ── File input hidden ── */
+  #fileInput { display: none; }
+
+  /* responsive hint */
+  @media (max-width: 768px) {
+    #sidebar { width: 52px; }
+    .nav-item span { display: none; }
+    #main { padding: 20px 16px 60px; }
+    .bilingual { grid-template-columns: 1fr; }
+  }
+
+  /* ── Confirm Modal ── */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 9000; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-backdrop.show { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 28px; width: 360px; max-width: 90vw;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    transform: scale(0.95); transition: transform 0.2s;
+  }
+  .modal-backdrop.show .modal-box { transform: scale(1); }
+  .modal-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .modal-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 22px; }
+  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ── Export dialog ── */
+  .export-option {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px; border: 1px solid var(--border2); border-radius: 8px;
+    margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
+  }
+  .export-option:hover { border-color: var(--pink); background: var(--bg3); }
+  .export-option-icon { font-size: 22px; flex-shrink: 0; padding-top: 2px; }
+  .export-option-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .export-option-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+  /* ── Status bar ── */
+  #statusbar {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 11px; color: var(--text-muted);
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 14px; margin-right: 4px;
+  }
+  #statusbar span { white-space: nowrap; }
+  #statusbar span b { color: var(--pink); }
+
+  /* ── Bilingual copy btn ── */
+  .bilingual-copy-btn {
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 12px; padding: 2px 4px;
+    margin-left: 6px; opacity: 0.5; transition: opacity 0.2s, color 0.2s;
+  }
+  .bilingual-copy-btn:hover { opacity: 1; color: var(--pink); }
+
+  /* ── Translate btn ── */
+  .translate-btn {
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 11px; padding: 2px 5px;
+    margin-left: 2px; opacity: 0.5; transition: opacity 0.2s, color 0.2s;
+    border-radius: 3px;
+  }
+  .translate-btn:hover { opacity: 1; color: #48bb78; }
+  .translate-btn.loading { opacity: 1; color: var(--pink); cursor: wait; pointer-events: none; }
+
+  /* ── Undo/redo buttons ── */
+  .btn-icon {
+    padding: 7px 10px; border-radius: var(--radius); font-size: 13px;
+    cursor: pointer; transition: all 0.2s; border: 1px solid transparent;
+    font-family: var(--font); background: transparent;
+    border-color: var(--border2); color: var(--text-muted);
+  }
+  .btn-icon:hover { border-color: var(--text-muted); color: var(--text); }
+  .btn-icon:disabled { opacity: 0.3; cursor: default; }
+
+  /* ── Keyboard shortcut help ── */
+  .help-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .help-table td { padding: 7px 10px; font-size: 12px; border-bottom: 1px solid var(--border); }
+  .help-table td:first-child { color: var(--text-muted); width: 50%; }
+  .help-table td:last-child { color: var(--text); }
+  kbd {
+    display: inline-block; padding: 2px 6px; background: var(--bg3);
+    border: 1px solid var(--border2); border-radius: 4px;
+    font-size: 11px; font-family: monospace; color: var(--text);
+  }
+  .expand-all-row {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 8px; margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div id="topbar">
+  <div class="logo">KYUKAO <span>EDITOR</span></div>
+  <div id="statusbar">
+    <span>作品 <b id="st_works">0</b></span>
+    <span>工作 <b id="st_work6">0</b></span>
+    <span>教育 <b id="st_edu">0</b></span>
+    <span>项目 <b id="st_indie">0</b></span>
+  </div>
+  <button class="btn-icon" id="btn_undo" onclick="undo()" title="撤销 (Ctrl+Z)" disabled>⟲</button>
+  <button class="btn-icon" id="btn_redo" onclick="redo()" title="重做 (Ctrl+Y)" disabled>⟳</button>
+  <button class="btn btn-ghost" onclick="window.open('../index.html')" title="预览简历页">👁 预览</button>
+  <button class="btn btn-ghost" onclick="document.getElementById('fileInput').click()">⬆ 导入 config.js</button>
+  <input type="file" id="fileInput" accept=".js">
+  <button class="btn btn-ghost" onclick="document.getElementById('tyFileInput').click()">⬆ 导入 typography.js</button>
+  <input type="file" id="tyFileInput" accept=".js">
+  <button class="btn btn-ghost" onclick="exportTypography()">⬇ 导出 typography.js</button>
+  <button class="btn btn-primary" onclick="showExportDialog()">⬇ 导出 config.js</button>
+</div>
+
+<!-- ══ LAYOUT ══ -->
+<div id="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <nav id="sidebar">
+    <div class="nav-item" data-panel="p0" onclick="switchPanel('p0',this)">
+      <span class="nav-icon">🔤</span><span>§0 字体排版</span>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-item active" data-panel="p1" onclick="switchPanel('p1',this)">
+      <span class="nav-icon">👤</span><span>§1 基本信息</span>
+    </div>
+    <div class="nav-item" data-panel="p2" onclick="switchPanel('p2',this)">
+      <span class="nav-icon">🏠</span><span>§2 首页文字</span>
+    </div>
+    <div class="nav-item" data-panel="p3" onclick="switchPanel('p3',this)">
+      <span class="nav-icon">💬</span><span>§3 关于我</span>
+    </div>
+    <div class="nav-item" data-panel="p4" onclick="switchPanel('p4',this)">
+      <span class="nav-icon">🎨</span><span>§4 作品集</span>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-item" data-panel="p5" onclick="switchPanel('p5',this)">
+      <span class="nav-icon">🎓</span><span>§5 教育经历</span>
+    </div>
+    <div class="nav-item" data-panel="p6" onclick="switchPanel('p6',this)">
+      <span class="nav-icon">💼</span><span>§6 工作经历</span>
+    </div>
+    <div class="nav-item" data-panel="p7" onclick="switchPanel('p7',this)">
+      <span class="nav-icon">🚀</span><span>§7 独立项目</span>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-item" data-panel="p8" onclick="switchPanel('p8',this)">
+      <span class="nav-icon">📦</span><span>§8 媒体上传</span>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-item" onclick="openModal('helpModal')">
+      <span class="nav-icon">⌨</span><span>快捷键帮助</span>
+    </div>
+  </nav>
+
+  <!-- ── MAIN ── -->
+  <main id="main">
+
+    <!-- §0 字体排版 -->
+    <div class="panel" id="p0">
+      <div class="section-header">
+        <h2>§0 · TYPOGRAPHY</h2>
+        <p>字体与排版配置，修改后导出 typography.js 替换原文件</p>
+      </div>
+
+      <div class="section-header" style="margin-top:8px;"><h2 style="font-size:0.7rem;">字体</h2></div>
+      <div class="form-group">
+        <label class="form-label">正文字体（home / portfolio / about 页）</label>
+        <select id="ty_fontBody" onchange="TY.fontBody=this.value">
+          <option value="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">Segoe UI / PingFang（默认）</option>
+          <option value="'Inter', sans-serif">Inter</option>
+          <option value="'Noto Sans SC', sans-serif">Noto Sans SC</option>
+          <option value="'Source Han Sans CN', sans-serif">思源黑体</option>
+          <option value="system-ui, sans-serif">System UI</option>
+        </select>
+      </div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">标题/Logo 字体（fontDisplay）</label>
+          <input type="text" id="ty_fontDisplay" oninput="TY.fontDisplay=this.value" placeholder="'Syncopate', sans-serif">
+        </div>
+        <div class="form-group">
+          <label class="form-label">简历页正文字体（fontResume）</label>
+          <input type="text" id="ty_fontResume" oninput="TY.fontResume=this.value" placeholder="'Inter', sans-serif">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Google Fonts URL（留空则不加载）</label>
+        <input type="url" id="ty_googleFonts" oninput="TY.googleFonts=this.value" placeholder="https://fonts.googleapis.com/css2?...">
+      </div>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">行距 &amp; 基础</h2></div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">正文行距</label>
+          <input type="text" id="ty_lineHeightBody" oninput="TY.lineHeightBody=this.value" placeholder="1.6">
+        </div>
+        <div class="form-group">
+          <label class="form-label">简历页行距</label>
+          <input type="text" id="ty_resumeBodyLineH" oninput="TY.resumeBodyLineH=this.value" placeholder="1.6">
+        </div>
+      </div>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">Hero 标题</h2></div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">Hero 标题字号</label>
+          <input type="text" id="ty_heroTitleSize" oninput="TY.heroTitleSize=this.value" placeholder="clamp(3.5rem, 10vw, 9rem)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hero 标题字重</label>
+          <input type="text" id="ty_heroTitleWeight" oninput="TY.heroTitleWeight=this.value" placeholder="800">
+        </div>
+      </div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">Hero 副标题字号</label>
+          <input type="text" id="ty_heroSubtitleSize" oninput="TY.heroSubtitleSize=this.value" placeholder="clamp(1rem, 2.5vw, 1.4rem)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">关于我页 Hero 名字字号</label>
+          <input type="text" id="ty_heroNameSize" oninput="TY.heroNameSize=this.value" placeholder="clamp(2.5rem, 6vw, 5.5rem)">
+        </div>
+      </div>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">导航</h2></div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">Logo 字号</label>
+          <input type="text" id="ty_navLogoSize" oninput="TY.navLogoSize=this.value" placeholder="1.2rem">
+        </div>
+        <div class="form-group">
+          <label class="form-label">链接字号</label>
+          <input type="text" id="ty_navLinkSize" oninput="TY.navLinkSize=this.value" placeholder="0.85rem">
+        </div>
+      </div>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">区块标题 &amp; 正文</h2></div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">Section 标题字号</label>
+          <input type="text" id="ty_sectionTitleSize" oninput="TY.sectionTitleSize=this.value" placeholder="clamp(1.8rem, 4vw, 3rem)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Section 描述字号</label>
+          <input type="text" id="ty_sectionDescSize" oninput="TY.sectionDescSize=this.value" placeholder="1rem">
+        </div>
+      </div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">统计数字字号</label>
+          <input type="text" id="ty_statNumSize" oninput="TY.statNumSize=this.value" placeholder="2.5rem">
+        </div>
+        <div class="form-group">
+          <label class="form-label">技能标签字号</label>
+          <input type="text" id="ty_skillTagSize" oninput="TY.skillTagSize=this.value" placeholder="0.80rem">
+        </div>
+      </div>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">作品卡片</h2></div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">作品标题字号</label>
+          <input type="text" id="ty_workTitleSize" oninput="TY.workTitleSize=this.value" placeholder="1.05rem">
+        </div>
+        <div class="form-group">
+          <label class="form-label">作品描述字号</label>
+          <input type="text" id="ty_workDescSize" oninput="TY.workDescSize=this.value" placeholder="0.82rem">
+        </div>
+      </div>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">简历页</h2></div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">Section 标题字号</label>
+          <input type="text" id="ty_resumeSectionTitleSize" oninput="TY.resumeSectionTitleSize=this.value" placeholder="1.25rem">
+        </div>
+        <div class="form-group">
+          <label class="form-label">标签字号</label>
+          <input type="text" id="ty_resumeTagSize" oninput="TY.resumeTagSize=this.value" placeholder="0.75rem">
+        </div>
+      </div>
+
+      <div style="margin-top:24px; padding:14px 16px; background:var(--bg3); border-radius:var(--radius); border:1px solid var(--border2); font-size:12px; color:var(--text-muted); line-height:1.7;">
+        💡 编辑完成后点顶栏「⬇ 导出 typography.js」，用下载的文件替换项目中的 <code style="color:var(--pink);">js/typography.js</code>
+      </div>
+    </div>
+
+    <!-- §1 个人基本信息 -->
+    <div class="panel active" id="p1">
+      <div class="section-header">
+        <h2>§1 · PERSONAL INFO</h2>
+        <p>基本信息会同步到所有页面</p>
+      </div>
+
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">英文姓名 <span class="lang-badge lang-en">EN</span>
+            <button class="bilingual-copy-btn" title="复制到中文" onclick="copyLang('name_en','name_zh')">→ZH</button>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('name_en','name_zh','zh-CN')">🌐→ZH</button>
+          </label>
+          <input type="text" id="name_en" placeholder="Hanqing Li">
+        </div>
+        <div class="form-group">
+          <label class="form-label">中文姓名 <span class="lang-badge lang-zh">ZH</span>
+            <button class="bilingual-copy-btn" title="复制到英文" onclick="copyLang('name_zh','name_en')">→EN</button>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('name_zh','name_en','en')">🌐→EN</button>
+          </label>
+          <input type="text" id="name_zh" placeholder="李含青">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">昵称 / 品牌名（alias）</label>
+        <input type="text" id="name_alias" placeholder="KYUKAO">
+      </div>
+
+      <hr class="field-divider">
+
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">职位 <span class="lang-badge lang-en">EN</span>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('role_en','role_zh','zh-CN')">🌐→ZH</button>
+          </label>
+          <input type="text" id="role_en" placeholder="Technical Artist · Game Creator">
+        </div>
+        <div class="form-group">
+          <label class="form-label">职位 <span class="lang-badge lang-zh">ZH</span>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('role_zh','role_en','en')">🌐→EN</button>
+          </label>
+          <input type="text" id="role_zh" placeholder="技术美术师 · 游戏创作者">
+        </div>
+      </div>
+
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">地点 <span class="lang-badge lang-en">EN</span>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('location_en','location_zh','zh-CN')">🌐→ZH</button>
+          </label>
+          <input type="text" id="location_en" placeholder="Shanghai, China">
+        </div>
+        <div class="form-group">
+          <label class="form-label">地点 <span class="lang-badge lang-zh">ZH</span>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('location_zh','location_en','en')">🌐→EN</button>
+          </label>
+          <input type="text" id="location_zh" placeholder="中国 · 上海">
+        </div>
+      </div>
+
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">经验 <span class="lang-badge lang-en">EN</span>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('experience_en','experience_zh','zh-CN')">🌐→ZH</button>
+          </label>
+          <input type="text" id="experience_en" placeholder="3+ years in game industry">
+        </div>
+        <div class="form-group">
+          <label class="form-label">经验 <span class="lang-badge lang-zh">ZH</span>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('experience_zh','experience_en','en')">🌐→EN</button>
+          </label>
+          <input type="text" id="experience_zh" placeholder="3 年以上游戏行业经验">
+        </div>
+      </div>
+
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">语言能力 <span class="lang-badge lang-en">EN</span>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('languages_en','languages_zh','zh-CN')">🌐→ZH</button>
+          </label>
+          <input type="text" id="languages_en" placeholder="Chinese (native) / English (professional)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">语言能力 <span class="lang-badge lang-zh">ZH</span>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('languages_zh','languages_en','en')">🌐→EN</button>
+          </label>
+          <input type="text" id="languages_zh" placeholder="中文（母语）/ 英文（专业阅读）">
+        </div>
+      </div>
+
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">求职状态 <span class="lang-badge lang-en">EN</span>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('status_en','status_zh','zh-CN')">🌐→ZH</button>
+          </label>
+          <input type="text" id="status_en" placeholder="Open to new opportunities">
+        </div>
+        <div class="form-group">
+          <label class="form-label">求职状态 <span class="lang-badge lang-zh">ZH</span>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('status_zh','status_en','en')">🌐→EN</button>
+          </label>
+          <input type="text" id="status_zh" placeholder="开放新机会 · 可接项目合作">
+        </div>
+      </div>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">联系方式</h2></div>
+
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">邮箱</label>
+          <input type="email" id="contact_email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">电话</label>
+          <input type="tel" id="contact_tel" placeholder="13800000000">
+        </div>
+      </div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">GitHub URL</label>
+          <input type="url" id="contact_github" placeholder="https://github.com/yourname">
+        </div>
+        <div class="form-group">
+          <label class="form-label">LinkedIn URL</label>
+          <input type="url" id="contact_linkedin" placeholder="https://linkedin.com/in/...">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ArtStation URL</label>
+        <input type="url" id="contact_artstation" placeholder="https://artstation.com/yourname">
+      </div>
+      <div class="form-group">
+        <label class="form-label">版权声明</label>
+        <input type="text" id="copyright" placeholder="© 2026 Hanqing Li · All rights reserved">
+      </div>
+    </div>
+
+    <!-- §2 首页文字 -->
+    <div class="panel" id="p2">
+      <div class="section-header">
+        <h2>§2 · HOME PAGE</h2>
+        <p>首页 hero 区块、关于我、统计数据、技能标签</p>
+      </div>
+      <div style="padding:10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);font-size:11.5px;color:var(--text-muted);margin-bottom:20px;line-height:1.6;">
+        💡 <b style="color:var(--text);">部分字段支持 HTML</b>，例如用 <code style="color:var(--pink);">&lt;span style="color:var(--pink)"&gt;文字&lt;/span&gt;</code> 来高亮关键词。编辑器中显示的是原始 HTML 代码，保存后在网页中会正常渲染。
+      </div>
+
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">Hero 副标题 <span class="lang-badge lang-en">EN</span>
+            <button class="bilingual-copy-btn" title="复制到中文" onclick="copyLang('home_subtitle_en','home_subtitle_zh')">→ZH</button>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('home_subtitle_en','home_subtitle_zh','zh-CN')">🌐→ZH</button>
+            <span style="color:var(--text-muted);font-size:9px;margin-left:4px;">支持 HTML</span>
+          </label>
+          <input type="text" id="home_subtitle_en" placeholder="Technical Artist · Kyukao">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hero 副标题 <span class="lang-badge lang-zh">ZH</span>
+            <button class="bilingual-copy-btn" title="复制到英文" onclick="copyLang('home_subtitle_zh','home_subtitle_en')">→EN</button>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('home_subtitle_zh','home_subtitle_en','en')">🌐→EN</button>
+            <span style="color:var(--text-muted);font-size:9px;margin-left:4px;">支持 HTML</span>
+          </label>
+          <input type="text" id="home_subtitle_zh" placeholder="技术美术师 · 九十九">
+        </div>
+      </div>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">关于我区块</h2></div>
+
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">标题 <span class="lang-badge lang-en">EN</span>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('home_about_title_en','home_about_title_zh','zh-CN')">🌐→ZH</button>
+          </label>
+          <input type="text" id="home_about_title_en" placeholder="Technical Artist">
+        </div>
+        <div class="form-group">
+          <label class="form-label">标题 <span class="lang-badge lang-zh">ZH</span>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('home_about_title_zh','home_about_title_en','en')">🌐→EN</button>
+          </label>
+          <input type="text" id="home_about_title_zh" placeholder="游戏技术美术">
+        </div>
+      </div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">描述 <span class="lang-badge lang-en">EN</span>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('home_about_desc_en','home_about_desc_zh','zh-CN')">🌐→ZH</button>
+          </label>
+          <textarea id="home_about_desc_en" placeholder="About description..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">描述 <span class="lang-badge lang-zh">ZH</span>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('home_about_desc_zh','home_about_desc_en','en')">🌐→EN</button>
+          </label>
+          <textarea id="home_about_desc_zh" placeholder="关于我的描述..."></textarea>
+        </div>
+      </div>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">数字统计卡片</h2></div>
+      <div class="expand-all-row">
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="expandAll('stats_list')">全部展开</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="collapseAll('stats_list')">全部折叠</button>
+      </div>
+      <div id="stats_list"></div>
+      <button class="btn btn-add" onclick="addStat()">＋ 添加统计卡片</button>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">技能标签</h2></div>
+      <div id="skills_chips" class="chips-wrapper">
+        <input class="chip-input" id="skills_input" placeholder="新增标签…" onkeydown="addSkill(event)">
+      </div>
+    </div>
+
+    <!-- §3 关于我 -->
+    <div class="panel" id="p3">
+      <div class="section-header">
+        <h2>§3 · ABOUT ME</h2>
+        <p>关于我页面的详细内容</p>
+      </div>
+
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">大段自我介绍 <span class="lang-badge lang-en">EN</span>
+            <button class="bilingual-copy-btn" title="复制到中文" onclick="copyLang('about_bio_en','about_bio_zh')">→ZH</button>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('about_bio_en','about_bio_zh','zh-CN')">🌐→ZH</button>
+          </label>
+          <textarea id="about_bio_en" style="min-height:100px;" placeholder="Bio..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">大段自我介绍 <span class="lang-badge lang-zh">ZH</span>
+            <button class="bilingual-copy-btn" title="复制到英文" onclick="copyLang('about_bio_zh','about_bio_en')">→EN</button>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('about_bio_zh','about_bio_en','en')">🌐→EN</button>
+          </label>
+          <textarea id="about_bio_zh" style="min-height:100px;" placeholder="自我介绍..."></textarea>
+        </div>
+      </div>
+
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">简介段落 <span class="lang-badge lang-en">EN</span>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('about_desc_en','about_desc_zh','zh-CN')">🌐→ZH</button>
+          </label>
+          <textarea id="about_desc_en" style="min-height:100px;" placeholder="Desc..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">简介段落 <span class="lang-badge lang-zh">ZH</span>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('about_desc_zh','about_desc_en','en')">🌐→EN</button>
+          </label>
+          <textarea id="about_desc_zh" style="min-height:100px;" placeholder="描述段落..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">头像图片路径</label>
+        <input type="text" id="about_photo" placeholder="assets/photo.jpg（留空则显示占位符）">
+      </div>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">兴趣方向卡片</h2></div>
+      <div class="expand-all-row">
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="expandAll('interests_list')">全部展开</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="collapseAll('interests_list')">全部折叠</button>
+      </div>
+      <div id="interests_list"></div>
+      <button class="btn btn-add" onclick="addInterest()">＋ 添加兴趣方向</button>
+    </div>
+
+    <!-- §4 作品集 -->
+    <div class="panel" id="p4">
+      <div class="section-header">
+        <h2>§4 · WORKS</h2>
+        <p>每个作品卡片，可展开编辑、新增、删除</p>
+      </div>
+      <div class="expand-all-row">
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="expandAll('works_list')">全部展开</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="collapseAll('works_list')">全部折叠</button>
+      </div>
+      <div id="works_list"></div>
+      <button class="btn btn-add" onclick="addWork()">＋ 添加作品</button>
+    </div>
+
+    <!-- §5 教育经历 -->
+    <div class="panel" id="p5">
+      <div class="section-header">
+        <h2>§5 · EDUCATION</h2>
+        <p>教育经历，按时间倒序排列</p>
+      </div>
+      <div class="expand-all-row">
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="expandAll('edu_list')">全部展开</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="collapseAll('edu_list')">全部折叠</button>
+      </div>
+      <div id="edu_list"></div>
+      <button class="btn btn-add" onclick="addEdu()">＋ 添加教育经历</button>
+    </div>
+
+    <!-- §6 工作经历 -->
+    <div class="panel" id="p6">
+      <div class="section-header">
+        <h2>§6 · WORK EXPERIENCE</h2>
+        <p>工作经历，按时间倒序排列</p>
+      </div>
+      <div class="expand-all-row">
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="expandAll('work_list')">全部展开</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="collapseAll('work_list')">全部折叠</button>
+      </div>
+      <div id="work_list"></div>
+      <button class="btn btn-add" onclick="addWork6()">＋ 添加工作经历</button>
+    </div>
+
+    <!-- §7 独立项目 -->
+    <div class="panel" id="p7">
+      <div class="section-header">
+        <h2>§7 · INDIE PROJECTS</h2>
+        <p>独立项目 / Game Jam 作品</p>
+      </div>
+      <div class="expand-all-row">
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="expandAll('indie_list')">全部展开</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="collapseAll('indie_list')">全部折叠</button>
+      </div>
+      <div id="indie_list"></div>
+      <button class="btn btn-add" onclick="addIndie()">＋ 添加独立项目</button>
+    </div>
+
+    <!-- §8 媒体上传 -->
+    <div class="panel" id="p8">
+      <div class="section-header">
+        <h2>§8 · MEDIA UPLOADER</h2>
+        <p>上传图片/视频到 GitHub Releases，获取直链填入 config.js</p>
+      </div>
+
+      <!-- GitHub 配置 -->
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header" onclick="toggleCard(this)" style="cursor:pointer;">
+          <div class="card-number">⚙</div>
+          <div class="card-title">GitHub 账号设置</div>
+          <span class="card-toggle open">▾</span>
+        </div>
+        <div class="card-body open">
+          <div class="bilingual">
+            <div class="form-group">
+              <label class="form-label">GitHub 用户名</label>
+              <input type="text" id="gh_owner" placeholder="yourname" oninput="saveGhConfig()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">仓库名称</label>
+              <input type="text" id="gh_repo" placeholder="kyukao-portfolio" oninput="saveGhConfig()">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Personal Access Token（PAT）
+              <a href="https://github.com/settings/tokens/new?scopes=repo&description=KYUKAO+Editor" target="_blank"
+                 style="color:var(--pink);font-size:10px;margin-left:8px;text-decoration:none;">
+                → 点此生成 Token ↗
+              </a>
+            </label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="password" id="gh_token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" oninput="saveGhConfig()" style="flex:1;">
+              <button class="btn btn-ghost" onclick="toggleTokenVis()" style="flex-shrink:0;padding:7px 12px;">👁</button>
+            </div>
+            <div style="margin-top:6px;font-size:11px;color:var(--text-muted);">
+              Token 保存在 sessionStorage（关闭标签页后自动清除），不会上传到任何服务器。需要勾选 <code style="color:var(--pink)">repo</code> 权限。
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Release Tag（上传目标）</label>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="gh_tag" placeholder="v1.0-assets" oninput="saveGhConfig()" style="flex:1;">
+              <button class="btn btn-ghost" onclick="checkOrCreateRelease()" style="flex-shrink:0;">检查/创建 Release</button>
+            </div>
+            <div style="margin-top:6px;font-size:11px;color:var(--text-muted);">
+              首次使用需先点「检查/创建 Release」，后续直接上传即可。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 上传区 -->
+      <div style="border:2px dashed var(--border2);border-radius:8px;padding:32px;text-align:center;margin-bottom:20px;transition:border-color 0.2s;cursor:pointer;"
+           id="dropzone"
+           onclick="document.getElementById('mediaFileInput').click()"
+           ondragover="event.preventDefault();this.style.borderColor='var(--pink)'"
+           ondragleave="this.style.borderColor='var(--border2)'"
+           ondrop="handleDrop(event)">
+        <div style="font-size:2rem;margin-bottom:8px;">📁</div>
+        <div style="color:var(--text);font-size:13px;margin-bottom:4px;">点击或拖拽文件到此处</div>
+        <div style="color:var(--text-muted);font-size:11px;">支持 MP4、WebM、MOV、JPG、PNG、GIF、WebP 等</div>
+        <div style="color:var(--text-muted);font-size:11px;margin-top:4px;">单文件最大 2GB（GitHub Releases 限制）</div>
+        <input type="file" id="mediaFileInput" style="display:none;" multiple accept="video/*,image/*" onchange="handleFileSelect(this.files)">
+      </div>
+
+      <!-- 上传队列 -->
+      <div id="upload_queue"></div>
+
+      <!-- 已上传文件列表 -->
+      <div style="margin-top:24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">已上传文件（点击复制直链）</div>
+          <button class="btn btn-ghost" onclick="fetchUploadedFiles()" style="font-size:10px;padding:4px 10px;">刷新列表</button>
+        </div>
+        <div id="uploaded_list" style="display:flex;flex-direction:column;gap:8px;">
+          <div style="color:var(--text-muted);font-size:12px;padding:12px 0;">点击「刷新列表」加载已上传文件</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div id="toast"><span class="toast-icon">✓</span><span id="toast-msg"></span></div>
+
+<!-- ══ CONFIRM MODAL ══ -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-title" id="confirmTitle">确认删除</div>
+    <div class="modal-desc" id="confirmDesc">此操作不可撤销，确认继续？</div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal('confirmModal')">取消</button>
+      <button class="btn" id="confirmOkBtn" style="background:#c53030;border-color:#c53030;color:#fff;">删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EXPORT DIALOG ══ -->
+<div class="modal-backdrop" id="exportModal">
+  <div class="modal-box" style="width:420px;">
+    <div class="modal-title">导出 config.js</div>
+    <div class="modal-desc">选择保存方式：</div>
+    <div class="export-option" onclick="doExportFSA()">
+      <div class="export-option-icon">📁</div>
+      <div>
+        <div class="export-option-title">直接覆盖原文件</div>
+        <div class="export-option-desc">使用 File System Access API，选择项目中的 config.js 直接覆盖保存，无需手动替换文件（仅限现代浏览器）</div>
+      </div>
+    </div>
+    <div class="export-option" onclick="doExportDownload()">
+      <div class="export-option-icon">⬇</div>
+      <div>
+        <div class="export-option-title">下载文件</div>
+        <div class="export-option-desc">将 config.js 下载到本地，然后手动替换项目中的原文件（兼容所有浏览器）</div>
+      </div>
+    </div>
+    <div class="modal-btns" style="margin-top:6px;">
+      <button class="btn btn-ghost" onclick="closeModal('exportModal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HELP MODAL ══ -->
+<div class="modal-backdrop" id="helpModal">
+  <div class="modal-box" style="width:400px;">
+    <div class="modal-title">⌨ 键盘快捷键</div>
+    <table class="help-table">
+      <tr><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td>导出 config.js</td></tr>
+      <tr><td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td><td>撤销</td></tr>
+      <tr><td><kbd>Ctrl</kbd> + <kbd>Y</kbd> / <kbd>Shift+Z</kbd></td><td>重做</td></tr>
+      <tr><td><kbd>?</kbd></td><td>显示此帮助</td></tr>
+    </table>
+    <div style="margin-top:16px;font-size:11px;color:var(--text-muted);">
+      💡 编辑器每 30 秒自动备份到本地，下次打开时可选择恢复。
+    </div>
+    <div class="modal-btns" style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="closeModal('helpModal')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RESTORE BACKUP MODAL ══ -->
+<div class="modal-backdrop" id="restoreModal">
+  <div class="modal-box" style="width:420px;">
+    <div class="modal-title">🔄 检测到本地备份</div>
+    <div class="modal-desc" id="restoreDesc">检测到上次编辑的自动备份，是否恢复？</div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal('restoreModal')">忽略，从空白开始</button>
+      <button class="btn btn-primary" onclick="restoreBackup()">恢复备份</button>
+    </div>
+  </div>
+</div>
+
+<script src="editor.js"></script>
+</body>
+</html>

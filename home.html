@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KYUKAO | Hanqing Li</title>
+  <style>
+    /* ============================================================
+       全局 CSS 变量 —— 修改这里可以统一改变网站配色
+       ============================================================ */
+    :root {
+      --pink:        #ff2d78;   /* ← 主色：粉色高亮，改这里换主题色 */
+      --pink-dim:    #ff2d7844; /* 粉色半透明，用于发光/背景 */
+      --pink-glow:   0 0 18px #ff2d7888, 0 0 40px #ff2d7833;
+      --bg:          #080808;   /* 主背景色 */
+      --bg2:         #111111;   /* 次背景，卡片/区块 */
+      --bg3:         #1a1a1a;   /* 悬浮态背景 */
+      --text:        #f0f0f0;   /* 主文字 */
+      --text-muted:  #888888;   /* 次要文字 */
+      --border:      #2a2a2a;   /* 边框线 */
+      --font:        'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    /* ============================================================
+       重置 & 基础
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    /* ============================================================
+       导航栏
+       ============================================================ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 60px;
+      transition: background 0.4s, backdrop-filter 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(8,8,8,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--pink);
+      text-shadow: var(--pink-glow);
+    }
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--pink);
+      transition: width 0.3s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--pink); }
+    .nav-links a.active::after { width: 100%; }
+
+    /* 语言切换按钮 */
+    .lang-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .lang-toggle:hover {
+      border-color: var(--pink);
+      color: var(--pink);
+    }
+
+    /* 移动端汉堡菜单按钮 */
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--text);
+      transition: transform 0.3s;
+    }
+
+    /* ============================================================
+       Hero 区域
+       ============================================================ */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 20px;
+      overflow: hidden;
+    }
+
+    /* 动态网格背景 */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,45,120,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,45,120,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridMove 20s linear infinite;
+    }
+    @keyframes gridMove {
+      0%   { transform: translateY(0); }
+      100% { transform: translateY(60px); }
+    }
+
+    /* 径向渐变遮罩，营造聚焦感 */
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%,
+        transparent 30%, var(--bg) 100%);
+    }
+
+    /* 扫光动画 */
+    .hero-scanline {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(255,45,120,0.03) 50%,
+        transparent 100%
+      );
+      background-size: 100% 200%;
+      animation: scan 6s linear infinite;
+    }
+    @keyframes scan {
+      0%   { background-position: 0 -100%; }
+      100% { background-position: 0 100%; }
+    }
+
+    /* Hero 内容 */
+    .hero-content { position: relative; z-index: 2; }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--pink);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s forwards;
+    }
+
+    .hero-title {
+      font-size: clamp(3.5rem, 10vw, 9rem); /* ← 改这里调整标题大小 */
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff 30%, var(--pink) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.4s forwards;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      margin-bottom: 50px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.6s forwards;
+    }
+    .hero-subtitle span { color: var(--pink); }
+
+    .hero-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.8s forwards;
+    }
+
+    /* 主按钮（粉色发光） */
+    .btn-primary {
+      padding: 14px 40px;
+      background: var(--pink);
+      color: #fff;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s, transform 0.2s;
+      clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+    }
+    .btn-primary:hover {
+      box-shadow: var(--pink-glow);
+      transform: translateY(-2px);
+    }
+
+    /* 次要按钮（描边） */
+    .btn-outline {
+      padding: 14px 40px;
+      background: transparent;
+      color: var(--text);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.3s, color 0.3s, transform 0.2s;
+      clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+    }
+    .btn-outline:hover {
+      border-color: var(--pink);
+      color: var(--pink);
+      transform: translateY(-2px);
+    }
+
+    /* 向下滚动提示 */
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 0.8s 1.2s forwards;
+    }
+    .scroll-hint::after {
+      content: '';
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(var(--pink), transparent);
+      animation: lineGrow 2s ease-in-out infinite;
+    }
+    @keyframes lineGrow {
+      0%, 100% { transform: scaleY(0); transform-origin: top; }
+      50%       { transform: scaleY(1); transform-origin: top; }
+    }
+
+    /* ============================================================
+       通用区块样式
+       ============================================================ */
+    section { padding: 100px 60px; }
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--pink);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+    .section-desc {
+      color: var(--text-muted);
+      max-width: 560px;
+      line-height: 1.8;
+    }
+
+    /* 分隔线 */
+    .divider {
+      width: 40px;
+      height: 2px;
+      background: var(--pink);
+      margin: 20px 0;
+      box-shadow: var(--pink-glow);
+    }
+
+    /* ============================================================
+       简介区块
+       ============================================================ */
+    .intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .intro-text {}
+    .intro-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    .stat-item {
+      padding: 30px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .stat-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 2px; height: 100%;
+      background: var(--pink);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .stat-item:hover { border-color: var(--pink-dim); }
+    .stat-item:hover::before { opacity: 1; }
+    .stat-num {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--pink);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* ============================================================
+       精选作品预览
+       ============================================================ */
+    .featured { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .featured-inner { max-width: 1200px; margin: 0 auto; }
+    .featured-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 50px;
+    }
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    /* 作品卡片 */
+    .work-card {
+      position: relative;
+      aspect-ratio: 16/9;
+      background: var(--bg3);
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .work-card-bg {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      transition: transform 0.6s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: var(--border);
+      letter-spacing: 0.1em;
+    }
+    .work-card:hover .work-card-bg { transform: scale(1.05); }
+    .work-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(transparent 40%, rgba(0,0,0,0.9) 100%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 24px;
+    }
+    .work-card:hover .work-card-overlay { opacity: 1; }
+    .work-card-tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--pink);
+      margin-bottom: 6px;
+    }
+    .work-card-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    /* 粉色边框发光 */
+    .work-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid transparent;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      pointer-events: none;
+    }
+    .work-card:hover::after {
+      border-color: var(--pink);
+      box-shadow: inset 0 0 20px var(--pink-dim);
+    }
+
+    /* ============================================================
+       技能标签区
+       ============================================================ */
+    .skills-section { max-width: 1200px; margin: 0 auto; }
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 40px;
+    }
+    .skill-tag {
+      padding: 8px 20px;
+      border: 1px solid var(--border);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      transition: all 0.3s;
+      cursor: default;
+    }
+    .skill-tag:hover {
+      border-color: var(--pink);
+      color: var(--pink);
+      background: var(--pink-dim);
+      box-shadow: var(--pink-glow);
+    }
+
+    /* ============================================================
+       页脚
+       ============================================================ */
+    footer {
+      padding: 40px 60px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .footer-logo { color: var(--pink); font-weight: 700; letter-spacing: 0.15em; }
+    .footer-links { display: flex; gap: 30px; }
+    .footer-links a { transition: color 0.2s; }
+    .footer-links a:hover { color: var(--pink); }
+
+    /* ============================================================
+       进入动画
+       ============================================================ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ============================================================
+       响应式
+       ============================================================ */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        background: rgba(8,8,8,0.97);
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-toggle { display: flex; }
+      section { padding: 60px 24px; }
+      .intro { grid-template-columns: 1fr; gap: 40px; }
+      .works-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .intro-stats { grid-template-columns: 1fr 1fr; }
+      .featured-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== 导航栏 ==================== -->
+  <nav id="navbar">
+    <a href="home.html" class="nav-logo">KYUKAO</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="home.html" class="active" data-i18n="nav.home">首页</a></li>
+      <li><a href="portfolio.html" data-i18n="nav.portfolio">作品集</a></li>
+      <li><a href="index.html" data-i18n="nav.resume">简历</a></li>
+      <li><a href="about.html" data-i18n="nav.about">关于我</a></li>
+    </ul>
+    <!-- lang toggle injected by i18n.js -->
+    <div class="nav-toggle" id="navToggle" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- ==================== Hero ==================== -->
+  <section class="hero" id="home">
+    <div class="hero-grid"></div>
+    <div class="hero-scanline"></div>
+    <div class="hero-vignette"></div>
+
+    <div class="hero-content">
+      <p class="hero-eyebrow" data-i18n="index.eyebrow">Technical Artist · Game Creator</p>
+      <h1 class="hero-title">KYUKAO</h1>
+      <p class="hero-subtitle" data-i18n="index.subtitle">技术美术师 · <span>九十九</span></p>
+      <div class="hero-buttons">
+        <a href="portfolio.html" class="btn-primary" data-i18n="index.btn.portfolio">查看作品集</a>
+        <a href="about.html" class="btn-outline" data-i18n="index.btn.contact">联系我</a>
+      </div>
+    </div>
+    <div class="scroll-hint" data-i18n="index.scroll">Scroll</div>
+  </section>
+
+  <!-- ==================== 简介 ==================== -->
+  <section>
+    <div class="intro">
+      <div class="intro-text reveal">
+        <p class="section-label" data-i18n="index.about.label">About</p>
+        <h2 class="section-title" data-i18n="index.about.title">游戏技术美术</h2>
+        <div class="divider"></div>
+        <p class="section-desc" data-i18n="index.about.desc">
+          专注于游戏视觉技术与艺术的交叉领域，擅长 Shader 开发、程序化内容生成与实时渲染优化。
+          致力于将技术与美学融合，打造沉浸式游戏视觉体验。
+        </p>
+        <br/>
+        <a href="index.html" class="btn-outline" style="display:inline-block; margin-top:10px;" data-i18n="index.about.resume">查看简历</a>
+      </div>
+      <div class="intro-stats reveal">
+        <div class="stat-item">
+          <div class="stat-num" data-i18n="index.stat1.num">3+</div>
+          <div class="stat-label" data-i18n="index.stat1.label">年从业经验</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-i18n="index.stat2.num">20+</div>
+          <div class="stat-label" data-i18n="index.stat2.label">完成项目</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-i18n="index.stat3.num">5+</div>
+          <div class="stat-label" data-i18n="index.stat3.label">参与游戏</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-i18n="index.stat4.num">∞</div>
+          <div class="stat-label" data-i18n="index.stat4.label">对游戏的热爱</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 精选作品 ==================== -->
+  <section class="featured">
+    <div class="featured-inner">
+      <div class="featured-header reveal">
+        <div>
+          <p class="section-label" data-i18n="index.featured.label">Featured Works</p>
+          <h2 class="section-title" data-i18n="index.featured.title">精选作品</h2>
+        </div>
+        <a href="portfolio.html" class="btn-outline" data-i18n="index.featured.viewall">查看全部 →</a>
+      </div>
+
+      <div class="works-grid">
+        <div class="work-card reveal">
+          <div class="work-card-bg">[ 图片占位 · 替换为你的作品截图 ]</div>
+          <div class="work-card-overlay">
+            <p class="work-card-tag" data-i18n="index.feat1.tag">Shader</p>
+            <p class="work-card-title" data-i18n="index.feat1.title">水面折射着色器</p>
+          </div>
+        </div>
+
+        <div class="work-card reveal">
+          <div class="work-card-bg">[ 图片占位 · 替换为你的作品截图 ]</div>
+          <div class="work-card-overlay">
+            <p class="work-card-tag" data-i18n="index.feat2.tag">特效 VFX</p>
+            <p class="work-card-title" data-i18n="index.feat2.title">粒子爆炸系统</p>
+          </div>
+        </div>
+
+        <div class="work-card reveal">
+          <div class="work-card-bg">[ 图片占位 · 替换为你的作品截图 ]</div>
+          <div class="work-card-overlay">
+            <p class="work-card-tag" data-i18n="index.feat3.tag">工具 Tools</p>
+            <p class="work-card-title" data-i18n="index.feat3.title">Maya 自动绑定工具</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 技能标签 ==================== -->
+  <section>
+    <div class="skills-section reveal">
+      <p class="section-label" data-i18n="index.skills.label">Skills</p>
+      <h2 class="section-title" data-i18n="index.skills.title">技术栈</h2>
+      <div class="divider"></div>
+      <div class="skills-grid">
+        <span class="skill-tag">HLSL / GLSL</span>
+        <span class="skill-tag">Unity URP / HDRP</span>
+        <span class="skill-tag">Unreal Engine 5</span>
+        <span class="skill-tag">Houdini</span>
+        <span class="skill-tag">Python</span>
+        <span class="skill-tag">Maya</span>
+        <span class="skill-tag">Substance Painter</span>
+        <span class="skill-tag">Shader Graph</span>
+        <span class="skill-tag">Niagara VFX</span>
+        <span class="skill-tag">C#</span>
+        <span class="skill-tag">Procedural Generation</span>
+        <span class="skill-tag">Real-time Rendering</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 页脚 ==================== -->
+  <footer>
+    <span class="footer-logo">KYUKAO</span>
+    <div class="footer-links">
+      <a href="portfolio.html" data-i18n="footer.portfolio">作品集</a>
+      <a href="index.html" data-i18n="footer.resume">简历</a>
+      <a href="about.html" data-i18n="footer.contact">联系</a>
+    </div>
+    <span data-i18n="footer.copy">© 2026 Hanqing Li · All rights reserved</span>
+  </footer>
+
+  <!-- ==================== JS ==================== -->
+  <script src="config.js"></script>
+  <script src="js/typography.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/i18n.js"></script>
+  <script>
+    // 导航栏滚动变色
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // 移动端菜单
+    const toggle = document.getElementById('navToggle');
+    const links  = document.getElementById('navLinks');
+    toggle.addEventListener('click', () => links.classList.toggle('open'));
+
+    // 滚动进入动画（IntersectionObserver）
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

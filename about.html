@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About | Hanqing Li · KYUKAO</title>
+  <style>
+    :root {
+      --pink:       #ff2d78;
+      --pink-dim:   #ff2d7844;
+      --pink-glow:  0 0 18px #ff2d7888, 0 0 40px #ff2d7833;
+      --bg:         #080808;
+      --bg2:        #111111;
+      --bg3:        #1a1a1a;
+      --text:       #f0f0f0;
+      --text-muted: #888888;
+      --border:     #2a2a2a;
+      --font:       'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+
+    /* 导航 */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 60px;
+      background: rgba(8,8,8,0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.15em; color: var(--pink); }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); transition: color 0.2s; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 1px; background: var(--pink); transition: width 0.3s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+    .nav-links a.active { color: var(--pink); }
+
+    /* 语言切换按钮 */
+    .lang-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .lang-toggle:hover { border-color: var(--pink); color: var(--pink); }
+
+    .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .nav-toggle span { display: block; width: 24px; height: 2px; background: var(--text); }
+
+    /* Hero */
+    .about-hero {
+      min-height: 60vh;
+      display: flex; align-items: flex-end;
+      padding: 160px 60px 80px;
+      position: relative; overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    /* 背景装饰圆 */
+    .about-hero::before {
+      content: '';
+      position: absolute; right: -100px; top: 50%;
+      transform: translateY(-50%);
+      width: 600px; height: 600px; border-radius: 50%;
+      border: 1px solid var(--pink-dim);
+      box-shadow: 0 0 80px var(--pink-dim), inset 0 0 80px var(--pink-dim);
+      pointer-events: none;
+    }
+    .about-hero::after {
+      content: '';
+      position: absolute; right: 50px; top: 50%;
+      transform: translateY(-50%);
+      width: 300px; height: 300px; border-radius: 50%;
+      border: 1px solid rgba(255,45,120,0.08);
+      pointer-events: none;
+    }
+    .hero-text { position: relative; z-index: 2; max-width: 700px; }
+    .section-label { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--pink); margin-bottom: 16px; }
+    .hero-name {
+      font-size: clamp(2.5rem, 6vw, 5.5rem);
+      font-weight: 800; letter-spacing: 0.05em; line-height: 1.1;
+      margin-bottom: 8px;
+    }
+    .hero-role {
+      font-size: 1rem; color: var(--text-muted);
+      letter-spacing: 0.15em; margin-bottom: 30px;
+    }
+    .hero-role span { color: var(--pink); }
+    .divider { width: 40px; height: 2px; background: var(--pink); margin: 24px 0; box-shadow: var(--pink-glow); }
+    .hero-bio {
+      font-size: 0.95rem; color: var(--text-muted);
+      line-height: 1.9; max-width: 560px;
+    }
+
+    /* 关于区块 */
+    .about-body {
+      max-width: 1100px; margin: 0 auto;
+      padding: 80px 60px 100px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+    }
+
+    /* 头像占位 */
+    .avatar-wrap { position: relative; }
+    .avatar-placeholder {
+      width: 100%; aspect-ratio: 3/4;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px; color: var(--text-muted);
+      font-size: 0.8rem; letter-spacing: 0.1em;
+      position: relative; overflow: hidden;
+    }
+    .avatar-placeholder::before { content: '👤'; font-size: 4rem; opacity: 0.2; }
+    .avatar-placeholder span { opacity: 0.4; }
+    .avatar-deco {
+      position: absolute;
+      bottom: -16px; right: -16px;
+      width: calc(100% - 30px); height: calc(100% - 30px);
+      border: 1px solid var(--pink-dim);
+      pointer-events: none;
+    }
+
+    /* 个人信息 */
+    .about-info {}
+    .block-title {
+      font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--pink); margin-bottom: 24px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .block-title::before {
+      content: ''; display: block; width: 4px; height: 14px;
+      background: var(--pink); box-shadow: var(--pink-glow);
+    }
+    .info-text {
+      font-size: 0.92rem; color: var(--text-muted); line-height: 1.9;
+      margin-bottom: 30px;
+    }
+    .info-list { list-style: none; margin-bottom: 30px; }
+    .info-list li {
+      display: flex; gap: 16px;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .info-list li:last-child { border-bottom: none; }
+    .info-key { color: var(--text-muted); min-width: 80px; letter-spacing: 0.05em; }
+    .info-val { color: var(--text); }
+    .info-val a { color: var(--pink); transition: opacity 0.2s; }
+    .info-val a:hover { opacity: 0.7; }
+
+    /* 联系方式大按钮 */
+    .contact-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin-top: 30px;
+    }
+    .contact-btn {
+      display: flex; flex-direction: column; gap: 6px;
+      padding: 20px; border: 1px solid var(--border);
+      background: var(--bg2); transition: all 0.3s;
+      cursor: pointer;
+    }
+    .contact-btn:hover {
+      border-color: var(--pink-dim);
+      background: var(--bg3);
+      box-shadow: 0 0 20px var(--pink-dim);
+      transform: translateY(-2px);
+    }
+    .contact-btn-icon { font-size: 1.2rem; }
+    .contact-btn-label { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+    .contact-btn-val { font-size: 0.82rem; color: var(--text); }
+
+    /* 兴趣爱好 */
+    .interests { padding: 0 60px 100px; max-width: 1100px; margin: 0 auto; }
+    .interests-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+      margin-top: 30px;
+    }
+    .interest-item {
+      padding: 30px 24px;
+      background: var(--bg2); border: 1px solid var(--border);
+      transition: all 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .interest-item::before {
+      content: '';
+      position: absolute; bottom: 0; left: 0;
+      width: 100%; height: 2px;
+      background: var(--pink); transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .interest-item:hover { border-color: var(--pink-dim); }
+    .interest-item:hover::before { transform: scaleX(1); }
+    .interest-icon { font-size: 2rem; margin-bottom: 16px; }
+    .interest-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+    .interest-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* 进入动画 */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* 页脚 */
+    footer {
+      padding: 40px 60px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--text-muted); font-size: 0.8rem;
+    }
+    .footer-logo { color: var(--pink); font-weight: 700; letter-spacing: 0.15em; }
+    .footer-links { display: flex; gap: 30px; }
+    .footer-links a:hover { color: var(--pink); }
+
+    /* 响应式 */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex; flex-direction: column;
+        position: absolute; top: 100%; left: 0; right: 0;
+        background: rgba(8,8,8,0.97); padding: 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-toggle { display: flex; }
+      .about-hero { padding: 120px 24px 60px; min-height: auto; }
+      .about-hero::before, .about-hero::after { display: none; }
+      .about-body { grid-template-columns: 1fr; padding: 50px 24px 60px; gap: 50px; }
+      .interests { padding: 0 24px 80px; }
+      .interests-grid { grid-template-columns: 1fr 1fr; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .contact-grid { grid-template-columns: 1fr; }
+      .interests-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 导航 -->
+  <nav>
+    <a href="home.html" class="nav-logo">KYUKAO</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="home.html" data-i18n="nav.home">首页</a></li>
+      <li><a href="portfolio.html" data-i18n="nav.portfolio">作品集</a></li>
+      <li><a href="index.html" data-i18n="nav.resume">简历</a></li>
+      <li><a href="about.html" class="active" data-i18n="nav.about">关于我</a></li>
+    </ul>
+    <!-- lang toggle injected by i18n.js -->
+    <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
+  </nav>
+
+  <!-- Hero 文字区 -->
+  <div class="about-hero">
+    <div class="hero-text">
+      <p class="section-label" data-i18n="about.label">About Me</p>
+      <h1 class="hero-name" data-i18n="about.name">HANQING<br><span style="color:var(--pink)">李含青</span></h1>
+      <p class="hero-role" data-i18n="about.role">Technical Artist · <span>Game Creator</span></p>
+      <div class="divider"></div>
+      <p class="hero-bio" data-i18n="about.bio">
+        热爱游戏的技术美术师，专注于 Shader 开发、程序化内容生成与实时渲染。
+        相信技术与艺术的边界本就模糊——最好的游戏画面，是代码写出来的诗。
+      </p>
+    </div>
+  </div>
+
+  <!-- 关于主体 -->
+  <div class="about-body">
+
+    <!-- 左侧：头像 -->
+    <div class="avatar-wrap reveal">
+      <div class="avatar-placeholder">
+        <span>[ 替换为你的照片 ]</span>
+        <span style="font-size:0.7rem">assets/photo.jpg</span>
+      </div>
+      <div class="avatar-deco"></div>
+    </div>
+
+    <!-- 右侧：个人信息 -->
+    <div class="about-info reveal">
+      <h2 class="block-title" data-i18n="about.info.title">个人信息</h2>
+
+      <ul class="info-list">
+        <li>
+          <span class="info-key" data-i18n="about.info.name.key">姓名</span>
+          <span class="info-val" data-i18n="about.info.name.val">Hanqing Li · 李含青</span>
+        </li>
+        <li>
+          <span class="info-key" data-i18n="about.info.job.key">职业</span>
+          <span class="info-val" data-i18n="about.info.job.val">技术美术师 / 游戏创作者</span>
+        </li>
+        <li>
+          <span class="info-key" data-i18n="about.info.loc.key">所在地</span>
+          <span class="info-val" data-i18n="about.info.loc.val">中国 · 上海</span>
+        </li>
+        <li>
+          <span class="info-key" data-i18n="about.info.exp.key">经验</span>
+          <span class="info-val" data-i18n="about.info.exp.val">3 年以上游戏行业经验</span>
+        </li>
+        <li>
+          <span class="info-key" data-i18n="about.info.lang.key">语言</span>
+          <span class="info-val" data-i18n="about.info.lang.val">中文（母语）/ 英文（专业阅读）</span>
+        </li>
+        <li>
+          <span class="info-key" data-i18n="about.info.status.key">状态</span>
+          <span class="info-val" style="color:var(--pink)" data-i18n="about.info.status.val">开放新机会 · 可接项目合作</span>
+        </li>
+      </ul>
+
+      <p class="info-text" data-i18n="about.info.desc">
+        从小热爱游戏，大学期间自学 Shader 编程并一头扎进技术美术领域。
+        喜欢解决"这个效果能实现吗"这类问题——大多数时候，答案是可以的。
+        业余时间喜欢制作 Game Jam 游戏，探索独立游戏的美学可能性。
+      </p>
+
+      <!-- 联系方式按钮 -->
+      <h2 class="block-title" style="margin-top:10px" data-i18n="about.contact.title">联系我</h2>
+      <div class="contact-grid">
+        <a href="mailto:kyuandart@sina.com" class="contact-btn">
+          <span class="contact-btn-icon">✉️</span>
+          <span class="contact-btn-label">Email</span>
+          <span class="contact-btn-val">kyuandart@sina.com</span>
+        </a>
+        <a href="https://github.com/yourname" target="_blank" class="contact-btn">
+          <span class="contact-btn-icon">⌥</span>
+          <span class="contact-btn-label">GitHub</span>
+          <span class="contact-btn-val">github.com/yourname</span>
+        </a>
+        <a href="#" target="_blank" class="contact-btn">
+          <span class="contact-btn-icon">🎨</span>
+          <span class="contact-btn-label">ArtStation</span>
+          <span class="contact-btn-val">artstation.com/kyukao</span>
+        </a>
+        <a href="https://www.linkedin.com/in/hanqing-li-000069223" target="_blank" class="contact-btn">
+          <span class="contact-btn-icon">🔗</span>
+          <span class="contact-btn-label">LinkedIn</span>
+          <span class="contact-btn-val">linkedin.com/in/hanqing-li</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 兴趣爱好 -->
+  <div class="interests reveal">
+    <h2 class="block-title" data-i18n="about.interests.title">兴趣与方向</h2>
+    <!-- Dynamically rendered by i18n.js / renderAboutInterests() -->
+    <div class="interests-grid" id="interestsGrid"></div>
+  </div>
+
+  <!-- 页脚 -->
+  <footer>
+    <span class="footer-logo">KYUKAO</span>
+    <div class="footer-links">
+      <a href="portfolio.html" data-i18n="footer.portfolio">作品集</a>
+      <a href="index.html" data-i18n="footer.resume">简历</a>
+      <a href="about.html" data-i18n="footer.contact">联系</a>
+    </div>
+    <span data-i18n="footer.copy">© 2026 Hanqing Li · All rights reserved</span>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="js/typography.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/i18n.js"></script>
+  <script>
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
