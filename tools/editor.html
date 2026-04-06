@@ -185,6 +185,19 @@
   .panel.active { display: block; }
   .panel.active.anim { animation: panelFadeIn 0.15s ease; }
   @keyframes panelFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .works-editor-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+  .works-media-panel {
+    position: sticky; top: 16px; max-height: calc(100vh - 120px); overflow: auto;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px;
+  }
+  .works-media-list { display: flex; flex-direction: column; gap: 10px; }
+  .works-media-item { border: 1px solid var(--border2); border-radius: 8px; overflow: hidden; background: var(--bg3); cursor: pointer; }
+  .works-media-item.active { border-color: var(--pink); box-shadow: 0 0 0 1px rgba(255,45,117,0.3); }
+  .works-media-thumb { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
+  .works-media-meta { padding: 8px; font-size: 11px; color: var(--text-muted); }
+  .works-media-meta .name { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+  .works-active-hint { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+  .work-card-active { border-color: rgba(255,45,117,0.65); box-shadow: 0 0 0 1px rgba(255,45,117,0.25); }
 
   /* ── Divider ── */
   .field-divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
@@ -229,6 +242,8 @@
     .nav-item span { display: none; }
     #main { padding: 20px 16px 60px; }
     .bilingual { grid-template-columns: 1fr; }
+    .works-editor-layout { grid-template-columns: 1fr; }
+    .works-media-panel { position: static; max-height: none; }
   }
 
   /* ── Confirm Modal ── */
@@ -791,12 +806,27 @@
         <h2>§4 · WORKS</h2>
         <p>每个作品卡片，可展开编辑、新增、删除</p>
       </div>
-      <div class="expand-all-row">
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="expandAll('works_list')">全部展开</button>
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="collapseAll('works_list')">全部折叠</button>
+      <div class="works-editor-layout">
+        <div>
+          <div class="expand-all-row">
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="expandAll('works_list')">全部展开</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="collapseAll('works_list')">全部折叠</button>
+          </div>
+          <div id="works_list"></div>
+          <button class="btn btn-add" onclick="addWork()">＋ 添加作品</button>
+        </div>
+        <aside class="works-media-panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">VIDEO LIBRARY</div>
+            <button class="btn btn-ghost" onclick="refreshWorkMediaLibrary(true)" style="font-size:10px;padding:4px 10px;">刷新</button>
+          </div>
+          <div id="works_active_hint" class="works-active-hint">先在左侧点击「选择当前作品」，右侧点击视频即可绑定到该作品。</div>
+          <div id="works_active_preview" style="margin-bottom:12px;"></div>
+          <div id="works_media_list" class="works-media-list">
+            <div style="color:var(--text-muted);font-size:12px;padding:6px 0;">请先在 §8 上传视频，然后回到这里选择绑定。</div>
+          </div>
+        </aside>
       </div>
-      <div id="works_list"></div>
-      <button class="btn btn-add" onclick="addWork()">＋ 添加作品</button>
     </div>
 
     <!-- §5 教育经历 -->
@@ -910,6 +940,9 @@
 
       <!-- 上传队列 -->
       <div id="upload_queue"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <button class="btn btn-ghost" onclick="retryFailedUploads()" style="font-size:10px;padding:4px 10px;">重试失败项</button>
+      </div>
 
       <!-- 已上传文件列表 -->
       <div style="margin-top:24px;">

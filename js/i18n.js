@@ -47,6 +47,7 @@
     if (typeof renderPortfolioCards === 'function') renderPortfolioCards(lang);
     if (typeof renderResumeEntries  === 'function') renderResumeEntries(lang);
     if (typeof renderAboutInterests === 'function') renderAboutInterests(lang);
+    if (typeof renderContactButtons === 'function') renderContactButtons(lang);
   }
 
   /* ================================================================
@@ -240,6 +241,37 @@
         '<p class="interest-desc">' + item.desc + '</p>' +
       '</div>';
     }).join('');
+  };
+
+  window.renderContactButtons = function (lang) {
+    var contacts = CONFIG.contact || {};
+    var map = [
+      { key: 'email', selector: '#contact-email', prefix: 'mailto:' },
+      { key: 'github', selector: '#contact-github' },
+      { key: 'artstation', selector: '#contact-artstation' },
+      { key: 'linkedin', selector: '#contact-linkedin' },
+    ];
+
+    map.forEach(function (item) {
+      var btn = document.querySelector(item.selector);
+      if (!btn) return;
+      var rawValue = contacts[item.key];
+      var value = rawValue ? String(rawValue).trim() : '';
+      var normalized = value.toLowerCase();
+      if (!value || normalized === 'n/a') {
+        btn.style.display = 'none';
+        btn.removeAttribute('href');
+        return;
+      }
+      btn.style.display = '';
+      var href = item.prefix ? item.prefix + value : value;
+      btn.href = href;
+      var valEl = btn.querySelector('.contact-btn-val');
+      if (valEl) {
+        valEl.textContent = value;
+        valEl.setAttribute('data-contact-key', item.key);
+      }
+    });
   };
 
   /* ================================================================

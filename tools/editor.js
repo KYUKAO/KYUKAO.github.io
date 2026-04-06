@@ -459,6 +459,10 @@ function switchPanel(id, el) {
   // Add animation class on next frame so display:block has already taken effect
   requestAnimationFrame(() => panel.classList.add('anim'));
   el.classList.add('active');
+  if (id === 'p4') {
+    renderWorkMediaLibraryPanel();
+    if (!uploadedAssetsCache.length) refreshWorkMediaLibrary(false);
+  }
 }
 
 // ════════════════════════════════════════════
@@ -652,6 +656,199 @@ function removeInterest(i) {
 //  WORKS (§4)
 // ════════════════════════════════════════════
 const WORK_CATS = ['shader','vfx','tool','render','code'];
+const WORK_VIDEO_EXT_RE = /\.(mp4|webm|mov|m4v|ogv|avi|mkv)(\?.*)?$/i;
+let currentWorkIndex = 0;
+let uploadedAssetsCache = [];
+
+function getYoutubeEmbedUrl(url) {
+  try {
+    const u = new URL(url);
+    const host = (u.hostname || '').toLowerCase();
+    if (host.includes('youtu.be')) {
+      const id = u.pathname.replace('/', '').trim();
+      return id ? `https://www.youtube.com/embed/${id}` : '';
+    }
+    if (host.includes('youtube.com')) {
+      if (u.pathname.startsWith('/shorts/')) {
+        const id = u.pathname.split('/')[2] || '';
+        return id ? `https://www.youtube.com/embed/${id}` : '';
+      }
+      const v = u.searchParams.get('v');
+      if (v) return `https://www.youtube.com/embed/${v}`;
+      if (u.pathname.startsWith('/embed/')) return url;
+    }
+  } catch (e) {}
+  return '';
+}
+
+function getVimeoEmbedUrl(url) {
+  try {
+    const u = new URL(url);
+    const host = (u.hostname || '').toLowerCase();
+    if (!host.includes('vimeo.com')) return '';
+    const parts = u.pathname.split('/').filter(Boolean);
+    const id = parts.find(p => /^\d+$/.test(p)) || '';
+    return id ? `https://player.vimeo.com/video/${id}` : '';
+  } catch (e) {}
+  return '';
+}
+
+function isDirectVideoUrl(url) { return WORK_VIDEO_EXT_RE.test(url || ''); }
+function normalizeWorkIndex(i) {
+  if (!Array.isArray(S.works) || !S.works.length) return -1;
+  if (typeof i !== 'number' || Number.isNaN(i)) return 0;
+  return Math.max(0, Math.min(S.works.length - 1, i));
+}
+
+function getWorkVideoPreview(work) {
+  const links = (work && work.links) || [];
+  for (let i = 0; i < links.length; i++) {
+    const href = String((links[i] && links[i].href) || '').trim();
+    if (!href) continue;
+    const yt = getYoutubeEmbedUrl(href);
+    if (yt) return { kind: 'iframe', src: yt, from: href };
+    const vimeo = getVimeoEmbedUrl(href);
+    if (vimeo) return { kind: 'iframe', src: vimeo, from: href };
+    if (isDirectVideoUrl(href)) return { kind: 'video', src: href, from: href };
+  }
+  return null;
+}
+
+function buildWorkVideoPreviewHtml(work) {
+  const preview = getWorkVideoPreview(work);
+  if (!preview) {
+    return `<div style="font-size:11px;color:var(--text-muted);padding:10px 12px;background:var(--bg3);border:1px dashed var(--border2);border-radius:6px;">
+      未检测到可预览视频链接（支持 YouTube / Vimeo / .mp4/.webm 直链）
+    </div>`;
+  }
+
+  if (preview.kind === 'iframe') {
+    return `<div style="border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:#000;">
+      <iframe src="${esc(preview.src)}" style="width:100%;aspect-ratio:16/9;border:0;display:block;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      <div style="padding:8px 10px;font-size:10px;color:var(--text-muted);border-top:1px solid var(--border2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+        来源：${esc(preview.from)}
+      </div>
+    </div>`;
+  }
+
+  return `<div style="border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:#000;">
+    <video src="${esc(preview.src)}" controls preload="metadata" style="width:100%;aspect-ratio:16/9;display:block;background:#000;"></video>
+    <div style="padding:8px 10px;font-size:10px;color:var(--text-muted);border-top:1px solid var(--border2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+      来源：${esc(preview.from)}
+    </div>
+  </div>`;
+}
+
+function renderWorkVideoPreview(i) {
+  const mount = document.getElementById(`wvideo_preview_${i}`);
+  if (!mount) return;
+  mount.innerHTML = buildWorkVideoPreviewHtml(S.works[i] || {});
+}
+function getWorkVideoLinkIndex(work) {
+  if (!work || !Array.isArray(work.links)) return -1;
+  for (let i = 0; i < work.links.length; i++) {
+    const href = String((work.links[i] && work.links[i].href) || '').trim();
+    if (!href) continue;
+    if (getYoutubeEmbedUrl(href) || getVimeoEmbedUrl(href) || isDirectVideoUrl(href)) return i;
+  }
+  return -1;
+}
+function ensureWorkVideoLink(work) {
+  if (!work.links || !Array.isArray(work.links)) work.links = [];
+  let idx = getWorkVideoLinkIndex(work);
+  if (idx >= 0) return idx;
+  work.links.push({ label: { en: 'Watch', zh: '观看视频' }, href: '' });
+  return work.links.length - 1;
+}
+function getUploadedVideoAssets() {
+  return (uploadedAssetsCache || []).filter(a => WORK_VIDEO_EXT_RE.test(String((a && a.name) || '')));
+}
+function setCurrentWorkIndex(i, keepCardOpen) {
+  const next = normalizeWorkIndex(i);
+  if (next < 0) {
+    currentWorkIndex = 0;
+    renderWorkMediaLibraryPanel();
+    return;
+  }
+  currentWorkIndex = next;
+  renderWorks();
+  if (!keepCardOpen) return;
+  setTimeout(() => {
+    const body = document.querySelector(`#works_list .card[data-work-index="${currentWorkIndex}"] .card-body`);
+    const arrow = document.querySelector(`#works_list .card[data-work-index="${currentWorkIndex}"] .card-toggle`);
+    if (body && !body.classList.contains('open')) body.classList.add('open');
+    if (arrow && !arrow.classList.contains('open')) arrow.classList.add('open');
+  }, 0);
+}
+function applyLibraryVideoByAssetId(assetId) {
+  const asset = (uploadedAssetsCache || []).find(a => a && a.id === assetId);
+  if (!asset) return toast('未找到对应视频资源，请先刷新视频库。', 'error');
+  const wi = normalizeWorkIndex(currentWorkIndex);
+  if (wi < 0) return toast('请先创建作品后再绑定视频。', 'error');
+
+  const work = S.works[wi];
+  const li = ensureWorkVideoLink(work);
+  work.links[li].href = asset.browser_download_url;
+  work.hasVideo = true;
+
+  renderWorks();
+  snapshot();
+  toast(`已绑定视频：${asset.name}`, 'success');
+}
+function renderWorkMediaLibraryPanel() {
+  const listEl = document.getElementById('works_media_list');
+  const hintEl = document.getElementById('works_active_hint');
+  const previewEl = document.getElementById('works_active_preview');
+  if (!listEl || !hintEl || !previewEl) return;
+
+  const wi = normalizeWorkIndex(currentWorkIndex);
+  if (wi < 0) {
+    hintEl.textContent = '当前还没有作品，请先添加作品。';
+    previewEl.innerHTML = '';
+  } else {
+    currentWorkIndex = wi;
+    const w = S.works[wi];
+    const title = (w.title && (w.title.zh || w.title.en)) || `作品 ${wi + 1}`;
+    hintEl.textContent = `当前作品：${title}`;
+    previewEl.innerHTML = buildWorkVideoPreviewHtml(w);
+  }
+
+  const videos = getUploadedVideoAssets();
+  if (!videos.length) {
+    listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:6px 0;">视频库为空。可在 §8 上传后点击刷新。</div>';
+    return;
+  }
+  const activeWork = wi >= 0 ? S.works[wi] : null;
+  const activeLi = activeWork ? getWorkVideoLinkIndex(activeWork) : -1;
+  const activeHref = activeLi >= 0 ? String(activeWork.links[activeLi].href || '').trim() : '';
+
+  listEl.innerHTML = videos.map(v => {
+    const size = v.size > 1024 * 1024 ? `${(v.size / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(v.size / 1024))} KB`;
+    const activeClass = activeHref && activeHref === v.browser_download_url ? ' active' : '';
+    return `<div class="works-media-item${activeClass}" onclick="applyLibraryVideoByAssetId(${v.id})">
+      <video class="works-media-thumb" src="${esc(v.browser_download_url)}" preload="metadata" muted playsinline></video>
+      <div class="works-media-meta">
+        <div class="name">${esc(v.name)}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span>${size}</span>
+          <button class="btn btn-add" style="padding:4px 10px;font-size:10px;" onclick="event.stopPropagation();applyLibraryVideoByAssetId(${v.id})">绑定到当前作品</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function refreshWorkMediaLibrary(showToast) {
+  const c = getGhConfig();
+  if (!c.owner || !c.repo || !c.token) {
+    uploadedAssetsCache = [];
+    renderWorkMediaLibraryPanel();
+    if (showToast) toast('请先在 §8 填写 GitHub 配置。', 'error');
+    return false;
+  }
+  const ok = await fetchUploadedFiles({ silent: !showToast, skipListLoading: true });
+  if (showToast && ok) toast('视频库已刷新。', 'success');
+  return ok;
+}
 function renderWorks() {
   const c = document.getElementById('works_list');
   c.innerHTML = '';
@@ -670,24 +867,26 @@ function renderWorks() {
         <div class="card-body">
           <div class="bilingual">
             <div class="form-group"><label class="form-label">文字 <span class="lang-badge lang-en">EN</span></label>
-              <input type="text" value="${esc(lk.label.en)}" oninput="S.works[${i}].links[${li}].label.en=this.value">
+              <input type="text" value="${esc((lk.label&&lk.label.en)||'')}" oninput="if(!S.works[${i}].links[${li}].label)S.works[${i}].links[${li}].label={en:'',zh:''};S.works[${i}].links[${li}].label.en=this.value">
             </div>
             <div class="form-group"><label class="form-label">文字 <span class="lang-badge lang-zh">ZH</span></label>
-              <input type="text" value="${esc(lk.label.zh)}" oninput="S.works[${i}].links[${li}].label.zh=this.value">
+              <input type="text" value="${esc((lk.label&&lk.label.zh)||'')}" oninput="if(!S.works[${i}].links[${li}].label)S.works[${i}].links[${li}].label={en:'',zh:''};S.works[${i}].links[${li}].label.zh=this.value">
             </div>
           </div>
           <div class="form-group"><label class="form-label">URL</label>
-            <input type="url" value="${esc(lk.href)}" oninput="S.works[${i}].links[${li}].href=this.value">
+            <input type="url" value="${esc(lk.href)}" oninput="S.works[${i}].links[${li}].href=this.value;renderWorkVideoPreview(${i});if(currentWorkIndex===${i})renderWorkMediaLibraryPanel()">
           </div>
         </div>
       </div>`).join('');
 
     const d = document.createElement('div');
-    d.className = 'card';
+    d.className = `card${i === currentWorkIndex ? ' work-card-active' : ''}`;
+    d.dataset.workIndex = String(i);
     d.innerHTML = `
-      <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header" onclick="setCurrentWorkIndex(${i});toggleCard(this)">
         <div class="card-number">${i+1}</div>
         <div class="card-title">${w.title.zh||w.title.en||'新作品'}<small> · ${w.category||'—'}</small></div>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="event.stopPropagation();setCurrentWorkIndex(${i}, true)">设为当前</button>
         <button class="btn btn-danger" onclick="event.stopPropagation();removeWork(${i})">删除</button>
         <span class="card-toggle">▾</span>
       </div>
@@ -699,7 +898,7 @@ function renderWorks() {
           <div class="form-group"><label class="form-label">是否有视频</label>
             <div class="toggle-row" style="margin-top:8px;">
               <label class="switch">
-                <input type="checkbox" ${w.hasVideo?'checked':''} onchange="S.works[${i}].hasVideo=this.checked">
+                <input type="checkbox" ${w.hasVideo?'checked':''} onchange="S.works[${i}].hasVideo=this.checked;renderWorkVideoPreview(${i});if(currentWorkIndex===${i})renderWorkMediaLibraryPanel()">
                 <span class="slider"></span>
               </label>
               <span style="color:var(--text-muted);font-size:12px;">显示视频角标</span>
@@ -718,7 +917,7 @@ function renderWorks() {
           <div class="form-group"><label class="form-label">标题 <span class="lang-badge lang-zh">ZH</span>
             <button class="translate-btn" title="翻译为英文" onclick="translateField('w_title_zh_${i}','w_title_en_${i}','en')">🌐→EN</button>
           </label>
-            <input type="text" id="w_title_zh_${i}" value="${esc(w.title.zh)}" oninput="S.works[${i}].title.zh=this.value;renderWorks()">
+            <input type="text" id="w_title_zh_${i}" value="${esc(w.title.zh)}" oninput="S.works[${i}].title.zh=this.value;renderWorks();if(currentWorkIndex===${i})renderWorkMediaLibraryPanel()">
           </div>
         </div>
         <div class="bilingual">
@@ -743,12 +942,18 @@ function renderWorks() {
           <div id="wlinks_${i}">${linksHtml}</div>
           <button class="btn btn-add" style="margin-top:4px;" onclick="addWorkLink(${i})">＋ 添加链接</button>
         </div>
+        <div class="form-group">
+          <label class="form-label" style="margin-bottom:10px;">视频预览（自动匹配）</label>
+          <div id="wvideo_preview_${i}">${buildWorkVideoPreviewHtml(w)}</div>
+        </div>
       </div>`;
     c.appendChild(d);
   });
+  renderWorkMediaLibraryPanel();
 }
 function addWork() {
   S.works.push({category:'shader',hasVideo:false,image:'',title:{en:'',zh:''},desc:{en:'',zh:''},tags:[],links:[]});
+  currentWorkIndex = S.works.length - 1;
   renderWorks();
   snapshot();
   updateStatus();
@@ -758,7 +963,13 @@ function addWork() {
   }, 50);
 }
 function removeWork(i) {
-  confirmDelete('删除作品', `确认删除「${S.works[i].title.zh||S.works[i].title.en||'此作品'}」？`, () => { S.works.splice(i,1); renderWorks(); snapshot(); updateStatus(); });
+  confirmDelete('删除作品', `确认删除「${S.works[i].title.zh||S.works[i].title.en||'此作品'}」？`, () => {
+    S.works.splice(i,1);
+    currentWorkIndex = normalizeWorkIndex(currentWorkIndex);
+    renderWorks();
+    snapshot();
+    updateStatus();
+  });
 }
 function addWorkTag(e, i) {
   if(e.key!=='Enter') return;
@@ -1690,6 +1901,50 @@ function handleDrop(e) {
   handleFileSelect(e.dataTransfer.files);
 }
 
+const UPLOAD_MAX_BYTES = 2 * 1024 * 1024 * 1024; // GitHub Releases single asset limit
+const UPLOAD_RETRY_MAX = 2;
+const UPLOAD_CONCURRENCY = 1;
+const VIDEO_EXT_RE = /\.(mp4|webm|mov|avi|mkv)$/i;
+const IMAGE_EXT_RE = /\.(jpg|jpeg|png|gif|webp|svg)$/i;
+
+let uploadQueue = [];
+let uploadInFlight = 0;
+
+function normalizeAssetName(name) {
+  return String(name || '').trim().replace(/\s+/g, '_');
+}
+
+function formatSize(bytes) {
+  if (bytes >= 1024 * 1024 * 1024) return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+  if (bytes >= 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+  return (bytes / 1024).toFixed(0) + ' KB';
+}
+
+function isRetryableUploadError(err) {
+  if (!err) return false;
+  if (err.isNetwork) return true;
+  return typeof err.status === 'number' && err.status >= 500;
+}
+
+function validateMediaFile(file) {
+  const extName = file && file.name ? file.name : '';
+  const validType = VIDEO_EXT_RE.test(extName) || IMAGE_EXT_RE.test(extName);
+  if (!validType) return '仅支持图片/视频格式（mp4/webm/mov/avi/mkv/jpg/png/gif/webp/svg）';
+  if (file.size > UPLOAD_MAX_BYTES) return `文件超过 2GB 限制：${formatSize(file.size)}`;
+  return '';
+}
+
+function enqueueNextUpload() {
+  if (uploadInFlight >= UPLOAD_CONCURRENCY) return;
+  const next = uploadQueue.find(i => i.status === 'pending');
+  if (!next) return;
+  uploadInFlight += 1;
+  uploadFile(next.id).finally(() => {
+    uploadInFlight -= 1;
+    enqueueNextUpload();
+  });
+}
+
 // ── File select → add to queue ──
 function handleFileSelect(files) {
   if (!files || !files.length) return;
@@ -1697,131 +1952,282 @@ function handleFileSelect(files) {
 }
 
 // ── Upload queue ──
-let uploadQueue = [];
 function addToQueue(file) {
-  const id = 'uq_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-  // Size warning for files > 500MB
-  if (file.size > 500 * 1024 * 1024) {
-    toast(`⚠ "${file.name}" 体积 ${(file.size/1024/1024).toFixed(0)} MB，较大文件上传可能需要数分钟`, 'error');
+  const errMsg = validateMediaFile(file);
+  if (errMsg) {
+    toast(`✗ "${file.name}" 无法上传：${errMsg}`, 'error');
+    return;
   }
-  uploadQueue.push({ id, file, status: 'pending' });
+
+  const normalizedName = normalizeAssetName(file.name);
+  const dup = uploadQueue.find(i => normalizeAssetName(i.file.name) === normalizedName && i.status !== 'error');
+  if (dup) {
+    toast(`⚠ "${normalizedName}" 已在队列中，已跳过重复项`, 'error');
+    return;
+  }
+
+  if (VIDEO_EXT_RE.test(file.name) && file.size > 500 * 1024 * 1024) {
+    toast(`⚠ "${file.name}" 较大（${formatSize(file.size)}），建议保持网络稳定`, 'error');
+  }
+
+  const id = 'uq_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  uploadQueue.push({ id, file, status: 'pending', retries: 0, progress: 0, error: '', url: '' });
   renderQueue();
-  uploadFile(id);
+  enqueueNextUpload();
 }
 
 function renderQueue() {
   const c = document.getElementById('upload_queue');
   if (!uploadQueue.length) { c.innerHTML=''; return; }
   c.innerHTML = uploadQueue.map(item => {
-    const icon = item.status==='done' ? '✓' : item.status==='error' ? '✗' : item.status==='uploading' ? '⟳' : '·';
-    const color = item.status==='done' ? '#48bb78' : item.status==='error' ? '#e53e3e' : item.status==='uploading' ? 'var(--pink)' : 'var(--text-muted)';
-    const size = (item.file.size/1024/1024).toFixed(1) + ' MB';
+    const icon = item.status === 'done'
+      ? '✓'
+      : (item.status === 'error' ? '✗' : (item.status === 'uploading' || item.status === 'retrying' ? '⟳' : '·'));
+    const color = item.status === 'done'
+      ? '#48bb78'
+      : (item.status === 'error' ? '#e53e3e' : (item.status === 'uploading' || item.status === 'retrying' ? 'var(--pink)' : 'var(--text-muted)'));
+    const statusText = item.status === 'done'
+      ? '上传完成'
+      : (item.status === 'error'
+        ? ('上传失败' + (item.retries ? `（已重试 ${item.retries} 次）` : ''))
+        : (item.status === 'uploading'
+          ? '上传中…'
+          : (item.status === 'retrying' ? `重试中（第 ${item.retries} 次）…` : '等待中')));
+    const actionRetry = item.status === 'error'
+      ? `<button class="btn btn-ghost" style="font-size:10px;padding:2px 8px;margin-top:6px;" onclick="retryUploadItem('${item.id}')">重试</button>`
+      : '';
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border-radius:6px;margin-bottom:6px;border:1px solid var(--border);">
       <span style="color:${color};font-size:14px;width:16px;text-align:center;flex-shrink:0;">${icon}</span>
       <div style="flex:1;min-width:0;">
         <div style="font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(item.file.name)}</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${size} · ${item.status==='uploading'?'上传中…':item.status==='done'?'上传完成':item.status==='error'?'上传失败':'等待中'}</div>
-        ${item.status==='uploading' ? `<div style="height:2px;background:var(--border2);border-radius:2px;margin-top:6px;overflow:hidden;"><div id="prog_${item.id}" style="height:100%;background:var(--pink);width:0%;transition:width 0.3s;"></div></div>` : ''}
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${formatSize(item.file.size)} · ${statusText}</div>
+        ${(item.status === 'uploading' || item.status === 'retrying') ? `<div style="height:2px;background:var(--border2);border-radius:2px;margin-top:6px;overflow:hidden;"><div id="prog_${item.id}" style="height:100%;background:var(--pink);width:${item.progress || 0}%;transition:width 0.2s;"></div></div>` : ''}
+        ${item.error ? `<div style="font-size:10px;color:#e53e3e;margin-top:4px;">${esc(item.error)}</div>` : ''}
         ${item.url ? `<div style="font-size:10px;color:var(--pink);margin-top:4px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onclick="copyUrl('${item.url}')" title="${item.url}">📋 ${item.url}</div>` : ''}
+        ${actionRetry}
       </div>
-      ${item.status!=='uploading'?`<button class="btn btn-danger" onclick="removeQueueItem('${item.id}')">×</button>`:''}
+      ${item.status !== 'uploading' && item.status !== 'retrying' ? `<button class="btn btn-danger" onclick="removeQueueItem('${item.id}')">×</button>` : ''}
     </div>`;
   }).join('');
 }
 
 function removeQueueItem(id) {
+  const item = uploadQueue.find(i => i.id === id);
+  if (item && (item.status === 'uploading' || item.status === 'retrying')) {
+    toast('⚠ 上传中的文件不能移除，请等待完成', 'error');
+    return;
+  }
   uploadQueue = uploadQueue.filter(i => i.id !== id);
   renderQueue();
+}
+
+function retryUploadItem(id) {
+  const item = uploadQueue.find(i => i.id === id);
+  if (!item || item.status !== 'error') return;
+  item.status = 'pending';
+  item.error = '';
+  item.progress = 0;
+  renderQueue();
+  enqueueNextUpload();
+}
+
+function retryFailedUploads() {
+  const failed = uploadQueue.filter(i => i.status === 'error');
+  if (!failed.length) {
+    toast('没有失败项可重试', 'success');
+    return;
+  }
+  failed.forEach(item => {
+    item.status = 'pending';
+    item.error = '';
+    item.progress = 0;
+  });
+  renderQueue();
+  enqueueNextUpload();
+}
+
+async function getOrCreateReleaseUploadInfo(c) {
+  let rel = await getReleaseUploadUrl(c);
+  if (rel) return rel;
+  const newRel = await checkOrCreateRelease();
+  if (!newRel) return null;
+  rel = await getReleaseUploadUrl(c);
+  return rel || null;
+}
+
+async function getReleaseAssetsMap(c) {
+  const res = await ghFetch(`/repos/${c.owner}/${c.repo}/releases/tags/${c.tag}`);
+  if (!res.ok) return new Map();
+  const data = await res.json();
+  const m = new Map();
+  (data.assets || []).forEach(a => m.set(normalizeAssetName(a.name), a));
+  return m;
+}
+
+async function deleteAssetById(c, assetId) {
+  const res = await ghFetch(`/repos/${c.owner}/${c.repo}/releases/assets/${assetId}`, { method: 'DELETE' });
+  if (res.status !== 204) {
+    let msg = '删除同名文件失败';
+    try {
+      const json = await res.json();
+      msg = json.message || msg;
+    } catch (e) {}
+    const err = new Error(msg);
+    err.status = res.status;
+    throw err;
+  }
 }
 
 // ── Core upload function ──
 async function uploadFile(id) {
   const item = uploadQueue.find(i => i.id === id); if (!item) return;
-  const c = validateGhConfig(); if (!c) { item.status='error'; renderQueue(); return; }
+  const c = validateGhConfig(); if (!c) { item.status='error'; item.error='GitHub 配置不完整'; renderQueue(); return; }
 
-  item.status = 'uploading'; renderQueue();
+  item.status = 'uploading';
+  item.error = '';
+  item.progress = 0;
+  renderQueue();
 
   try {
-    // Get release upload URL
-    const rel = await getReleaseUploadUrl(c);
-    if (!rel) {
-      // Release doesn't exist yet — try to create it
-      const newRel = await checkOrCreateRelease();
-      if (!newRel) { item.status='error'; renderQueue(); return; }
-      const rel2 = await getReleaseUploadUrl(c);
-      if (!rel2) { item.status='error'; renderQueue(); return; }
-      await doUpload(item, rel2, c);
-    } else {
-      await doUpload(item, rel, c);
+    const rel = await getOrCreateReleaseUploadInfo(c);
+    if (!rel) throw new Error('无法获取 Release 上传地址');
+
+    const safeName = normalizeAssetName(item.file.name);
+    const assetsMap = await getReleaseAssetsMap(c);
+    const existing = assetsMap.get(safeName);
+    if (existing) {
+      item.status = 'retrying';
+      item.error = '检测到同名文件，正在替换…';
+      renderQueue();
+      await deleteAssetById(c, existing.id);
+      item.status = 'uploading';
+      item.error = '';
+      renderQueue();
     }
+
+    let lastErr = null;
+    for (let attempt = 0; attempt <= UPLOAD_RETRY_MAX; attempt++) {
+      try {
+        const data = await doUpload(item, rel, c, safeName);
+        item.status = 'done';
+        item.error = '';
+        item.url = data.browser_download_url;
+        item.progress = 100;
+        renderQueue();
+        fetchUploadedFiles();
+        toast(`✓ "${safeName}" 上传成功`, 'success');
+        return;
+      } catch (err) {
+        lastErr = err;
+        if (attempt >= UPLOAD_RETRY_MAX || !isRetryableUploadError(err)) break;
+        item.retries = attempt + 1;
+        item.status = 'retrying';
+        item.error = `网络波动，${1500 * (attempt + 1)}ms 后重试`;
+        renderQueue();
+        await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+        item.status = 'uploading';
+        item.error = '';
+        renderQueue();
+      }
+    }
+    throw lastErr || new Error('上传失败');
   } catch(e) {
-    item.status='error'; item.error=e.message; renderQueue();
-    toast('✗ 上传失败：' + e.message, 'error');
+    item.status = 'error';
+    item.error = e && e.message ? e.message : '上传失败';
+    renderQueue();
+    toast('✗ 上传失败：' + item.error, 'error');
   }
 }
 
-async function doUpload(item, rel, c) {
+async function doUpload(item, rel, c, safeName) {
   const file = item.file;
-  // Sanitize filename (spaces → underscores)
-  const safeName = file.name.replace(/\s+/g, '_');
-
-  // Read file as ArrayBuffer for XHR upload with progress
   const buffer = await file.arrayBuffer();
+  const uploadTarget = `${rel.uploadUrl}?name=${encodeURIComponent(safeName)}`;
 
-  await new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${rel.uploadUrl}?name=${encodeURIComponent(safeName)}`);
+    xhr.open('POST', uploadTarget);
+    xhr.timeout = 60000;
     xhr.setRequestHeader('Authorization', `token ${c.token}`);
     xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
     xhr.setRequestHeader('Accept', 'application/vnd.github+json');
 
     xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) {
-        const pct = Math.round(e.loaded / e.total * 100);
-        const bar = document.getElementById('prog_' + item.id);
-        if (bar) bar.style.width = pct + '%';
-      }
+      if (!e.lengthComputable) return;
+      const pct = Math.max(0, Math.min(100, Math.round(e.loaded / e.total * 100)));
+      item.progress = pct;
+      const bar = document.getElementById('prog_' + item.id);
+      if (bar) bar.style.width = pct + '%';
     };
 
     xhr.onload = () => {
       if (xhr.status === 201) {
-        const data = JSON.parse(xhr.responseText);
-        item.status = 'done';
-        item.url = data.browser_download_url;
-        renderQueue();
-        fetchUploadedFiles();
-        toast(`✓ "${safeName}" 上传成功！`, 'success');
-        resolve();
-      } else {
-        let msg = '上传失败 HTTP ' + xhr.status;
-        try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e){}
-        item.status='error'; item.error=msg; renderQueue();
-        reject(new Error(msg));
+        try {
+          resolve(JSON.parse(xhr.responseText));
+        } catch (e) {
+          const err = new Error('上传成功但返回解析失败');
+          err.status = xhr.status;
+          reject(err);
+        }
+        return;
       }
+      let msg = '上传失败 HTTP ' + xhr.status;
+      try {
+        const json = JSON.parse(xhr.responseText);
+        msg = json.message || msg;
+      } catch(e) {}
+      const err = new Error(msg);
+      err.status = xhr.status;
+      reject(err);
     };
-    xhr.onerror = () => { item.status='error'; renderQueue(); reject(new Error('网络错误')); };
+    xhr.onerror = () => {
+      const err = new Error(`网络错误：无法连接上传域名 uploads.github.com（目标：${uploadTarget}）`);
+      err.isNetwork = true;
+      reject(err);
+    };
+    xhr.ontimeout = () => {
+      const err = new Error('上传超时：请检查代理/网络是否放行 uploads.github.com');
+      err.isNetwork = true;
+      reject(err);
+    };
     xhr.send(buffer);
   });
 }
 
 // ── Fetch uploaded files list ──
-async function fetchUploadedFiles() {
-  const c = validateGhConfig(); if (!c) return;
+async function fetchUploadedFiles(options = {}) {
+  const silent = !!options.silent;
+  const skipListLoading = !!options.skipListLoading;
+  const c = getGhConfig();
   const listEl = document.getElementById('uploaded_list');
-  listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:12px 0;">加载中…</div>';
+  if (!c.owner || !c.repo || !c.token) {
+    uploadedAssetsCache = [];
+    renderWorkMediaLibraryPanel();
+    if (!silent) validateGhConfig();
+    if (listEl) listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:12px 0;">请先填写 GitHub 配置</div>';
+    return false;
+  }
+  if (listEl && !skipListLoading) {
+    listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:12px 0;">加载中…</div>';
+  }
 
   try {
     const res = await ghFetch(`/repos/${c.owner}/${c.repo}/releases/tags/${c.tag}`);
     if (!res.ok) {
-      listEl.innerHTML = `<div style="color:#e53e3e;font-size:12px;padding:12px 0;">未找到 Release "${c.tag}"，请先点「检查/创建 Release」</div>`;
-      return;
+      uploadedAssetsCache = [];
+      renderWorkMediaLibraryPanel();
+      if (listEl) listEl.innerHTML = `<div style="color:#e53e3e;font-size:12px;padding:12px 0;">未找到 Release "${c.tag}"，请先点「检查/创建 Release」</div>`;
+      return false;
     }
     const data = await res.json();
     const assets = data.assets || [];
+    uploadedAssetsCache = assets;
+    renderWorkMediaLibraryPanel();
     if (!assets.length) {
-      listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:12px 0;">暂无文件</div>';
-      return;
+      if (listEl) listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:12px 0;">暂无文件</div>';
+      return true;
     }
+    if (!listEl) return true;
     listEl.innerHTML = assets.map(a => {
       const isVideo = /\.(mp4|webm|mov|avi|mkv)$/i.test(a.name);
       const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(a.name);
@@ -1838,8 +2244,12 @@ async function fetchUploadedFiles() {
         <button class="btn btn-danger" onclick="event.stopPropagation();deleteAsset(${a.id},'${esc(a.name)}')" title="删除">🗑</button>
       </div>`;
     }).join('');
+    return true;
   } catch(e) {
-    listEl.innerHTML = `<div style="color:#e53e3e;font-size:12px;padding:12px 0;">加载失败：${e.message}</div>`;
+    uploadedAssetsCache = [];
+    renderWorkMediaLibraryPanel();
+    if (listEl) listEl.innerHTML = `<div style="color:#e53e3e;font-size:12px;padding:12px 0;">加载失败：${e.message}</div>`;
+    return false;
   }
 }
 
@@ -1871,5 +2281,7 @@ async function deleteAsset(assetId, name) {
 }
 
 // Load saved GitHub config on startup
-document.addEventListener('DOMContentLoaded', () => { loadGhConfig(); });
-
+document.addEventListener('DOMContentLoaded', () => {
+  loadGhConfig();
+  renderWorkMediaLibraryPanel();
+});

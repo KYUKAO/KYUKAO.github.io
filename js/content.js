@@ -126,6 +126,10 @@
       'about.info.desc':       t(C.about.desc, lang),
 
       'about.contact.title':   lang === 'zh' ? '联系我'    : 'Contact',
+      'contact.email.label':    lang === 'zh' ? '邮件'      : 'Email',
+      'contact.github.label':   lang === 'zh' ? 'GitHub'    : 'GitHub',
+      'contact.artstation.label': lang === 'zh' ? 'ArtStation' : 'ArtStation',
+      'contact.linkedin.label': lang === 'zh' ? 'LinkedIn'  : 'LinkedIn',
       'about.interests.title': lang === 'zh' ? '兴趣与方向' : 'Interests & Directions',
     };
   }
