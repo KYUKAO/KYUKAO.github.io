@@ -205,11 +205,24 @@
   .panel.active { display: block; }
   .panel.active.anim { animation: panelFadeIn 0.15s ease; }
   @keyframes panelFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-  .works-editor-layout { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
+  .works-editor-layout { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 16px; align-items: start; }
+  .works-editor-layout.media-collapsed { grid-template-columns: minmax(0,1fr) 42px; }
   .works-media-panel {
     position: sticky; top: 16px; max-height: calc(100vh - 120px); overflow: auto;
     background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px;
   }
+  .works-media-panel.collapsed { padding: 8px 6px; overflow: hidden; }
+  .works-media-panel.collapsed .works-media-content { display: none; }
+  .works-media-toggle {
+    border: 1px solid var(--border2);
+    background: var(--bg3);
+    color: var(--text-muted);
+    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+  }
+  .works-media-panel.collapsed .works-media-toggle { width: 100%; }
   .works-media-list { display: flex; flex-direction: column; gap: 10px; }
   .works-media-item { border: 1px solid var(--border2); border-radius: 8px; overflow: hidden; background: var(--bg3); cursor: pointer; }
   .works-media-item.active { border-color: var(--pink); box-shadow: 0 0 0 1px rgba(255,45,117,0.3); }
@@ -284,7 +297,7 @@
     .nav-item span { display: none; }
     #main { padding: 20px 16px 60px; }
     .bilingual { grid-template-columns: 1fr; }
-    .works-editor-layout { grid-template-columns: 1fr; }
+    .works-editor-layout, .works-editor-layout.media-collapsed { grid-template-columns: 1fr; }
     .works-media-panel { position: static; max-height: none; }
     .works-group-grid { grid-template-columns: 1fr; }
     .works-toolbar { grid-template-columns: 1fr; position: static; }
@@ -888,7 +901,7 @@
         <h2>§4 · WORKS</h2>
         <p>每个作品卡片，可展开编辑、新增、删除</p>
       </div>
-      <div class="works-editor-layout">
+      <div class="works-editor-layout" id="works_editor_layout">
         <div>
           <div class="expand-all-row">
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="expandAll('works_list')">全部展开</button>
@@ -909,15 +922,20 @@
           <div id="works_list"></div>
           <button class="btn btn-add" onclick="addWork()">＋ 添加作品</button>
         </div>
-        <aside class="works-media-panel">
+        <aside class="works-media-panel" id="works_media_panel">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
             <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">VIDEO LIBRARY</div>
-            <button class="btn btn-ghost" onclick="refreshWorkMediaLibrary(true)" style="font-size:10px;padding:4px 10px;">刷新</button>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button class="btn btn-ghost" onclick="refreshWorkMediaLibrary(true)" style="font-size:10px;padding:4px 10px;">刷新</button>
+              <button class="works-media-toggle" id="works_media_toggle" onclick="toggleWorksMediaPanel()" title="折叠/展开媒体库">⇔</button>
+            </div>
           </div>
-          <div id="works_active_hint" class="works-active-hint">先点击左侧作品卡片即可设为当前，右侧点击视频即可绑定。</div>
-          <div id="works_active_preview" style="margin-bottom:12px;"></div>
-          <div id="works_media_list" class="works-media-list">
-            <div style="color:var(--text-muted);font-size:12px;padding:6px 0;">请先在 §8 上传视频，然后回到这里选择绑定。</div>
+          <div class="works-media-content">
+            <div id="works_active_hint" class="works-active-hint">先点击左侧作品卡片即可设为当前，右侧点击视频即可绑定。</div>
+            <div id="works_active_preview" style="margin-bottom:12px;"></div>
+            <div id="works_media_list" class="works-media-list">
+              <div style="color:var(--text-muted);font-size:12px;padding:6px 0;">请先在 §8 上传视频，然后回到这里选择绑定。</div>
+            </div>
           </div>
         </aside>
       </div>

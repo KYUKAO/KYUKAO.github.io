@@ -460,9 +460,27 @@ function switchPanel(id, el) {
   requestAnimationFrame(() => panel.classList.add('anim'));
   el.classList.add('active');
   if (id === 'p4') {
+    applyWorksMediaPanelState();
     renderWorkMediaLibraryPanel();
     if (!uploadedAssetsCache.length) refreshWorkMediaLibrary(false);
   }
+}
+const WORKS_MEDIA_COLLAPSED_KEY = 'works_media_collapsed_v1';
+let worksMediaCollapsed = false;
+function applyWorksMediaPanelState() {
+  const layout = document.getElementById('works_editor_layout');
+  const panel = document.getElementById('works_media_panel');
+  const btn = document.getElementById('works_media_toggle');
+  if (!layout || !panel || !btn) return;
+  layout.classList.toggle('media-collapsed', worksMediaCollapsed);
+  panel.classList.toggle('collapsed', worksMediaCollapsed);
+  btn.textContent = worksMediaCollapsed ? '◀' : '▶';
+  btn.title = worksMediaCollapsed ? '展开媒体库' : '折叠媒体库';
+}
+function toggleWorksMediaPanel(forceState) {
+  worksMediaCollapsed = typeof forceState === 'boolean' ? forceState : !worksMediaCollapsed;
+  try { localStorage.setItem(WORKS_MEDIA_COLLAPSED_KEY, worksMediaCollapsed ? '1' : '0'); } catch (e) {}
+  applyWorksMediaPanelState();
 }
 
 // ════════════════════════════════════════════
@@ -2808,6 +2826,8 @@ async function deleteAsset(path, name, sha) {
 
 // Load saved GitHub config on startup
 document.addEventListener('DOMContentLoaded', () => {
+  try { worksMediaCollapsed = localStorage.getItem(WORKS_MEDIA_COLLAPSED_KEY) === '1'; } catch (e) {}
+  applyWorksMediaPanelState();
   loadGhConfig();
   loadWorkLinkPresets();
   renderWorkMediaLibraryPanel();
