@@ -667,6 +667,43 @@
         <label class="form-label">版权声明</label>
         <input type="text" id="copyright" placeholder="© 2026 Hanqing Li · All rights reserved">
       </div>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">作品链接通用文案</h2></div>
+      <div style="padding:10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);font-size:11.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
+        在这里统一配置“链接1/2/3”的按钮名称。点击“应用到全部作品”后，会覆盖每个作品对应序号的链接文案（URL 不会改）。
+      </div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">链接1名称 <span class="lang-badge lang-en">EN</span></label>
+          <input type="text" id="work_link_name_en_0" placeholder="Watch Video →" oninput="saveWorkLinkPresetsFromInputs()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">链接1名称 <span class="lang-badge lang-zh">ZH</span></label>
+          <input type="text" id="work_link_name_zh_0" placeholder="观看视频 →" oninput="saveWorkLinkPresetsFromInputs()">
+        </div>
+      </div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">链接2名称 <span class="lang-badge lang-en">EN</span></label>
+          <input type="text" id="work_link_name_en_1" placeholder="GitHub" oninput="saveWorkLinkPresetsFromInputs()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">链接2名称 <span class="lang-badge lang-zh">ZH</span></label>
+          <input type="text" id="work_link_name_zh_1" placeholder="GitHub" oninput="saveWorkLinkPresetsFromInputs()">
+        </div>
+      </div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">链接3名称 <span class="lang-badge lang-en">EN</span></label>
+          <input type="text" id="work_link_name_en_2" placeholder="View Details →" oninput="saveWorkLinkPresetsFromInputs()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">链接3名称 <span class="lang-badge lang-zh">ZH</span></label>
+          <input type="text" id="work_link_name_zh_2" placeholder="查看详情 →" oninput="saveWorkLinkPresetsFromInputs()">
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="applyWorkLinkPresetsToAllWorks()">应用到全部作品</button>
     </div>
 
     <!-- §2 首页文字 -->
@@ -875,7 +912,7 @@
     <div class="panel" id="p8">
       <div class="section-header">
         <h2>§8 · MEDIA UPLOADER</h2>
-        <p>上传图片/视频到 GitHub Releases，获取直链填入 config.js</p>
+        <p>上传图片/视频到仓库目录（assets/uploads），获取直链填入 config.js</p>
       </div>
 
       <!-- GitHub 配置 -->
@@ -907,18 +944,25 @@
               <input type="password" id="gh_token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" oninput="saveGhConfig()" style="flex:1;">
               <button class="btn btn-ghost" onclick="toggleTokenVis()" style="flex-shrink:0;padding:7px 12px;">👁</button>
             </div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+              <select id="gh_token_history" onchange="applySelectedTokenFromHistory(this.value)" style="flex:1;">
+                <option value="">选择历史 Token（仅本机保存）</option>
+              </select>
+              <button class="btn btn-ghost" onclick="saveCurrentTokenToHistory()" style="padding:6px 10px;">保存当前</button>
+              <button class="btn btn-danger" onclick="removeSelectedTokenFromHistory()" style="padding:6px 10px;">删除选中</button>
+            </div>
             <div style="margin-top:6px;font-size:11px;color:var(--text-muted);">
-              Token 保存在 sessionStorage（关闭标签页后自动清除），不会上传到任何服务器。需要勾选 <code style="color:var(--pink)">repo</code> 权限。
+              Token 会保存在本机 localStorage（不会上传到服务器）。需要勾选 <code style="color:var(--pink)">repo</code> 权限。
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Release Tag（上传目标）</label>
+            <label class="form-label">Release Tag（兼容字段，可忽略）</label>
             <div style="display:flex;gap:8px;">
               <input type="text" id="gh_tag" placeholder="v1.0-assets" oninput="saveGhConfig()" style="flex:1;">
-              <button class="btn btn-ghost" onclick="checkOrCreateRelease()" style="flex-shrink:0;">检查/创建 Release</button>
+              <button class="btn btn-ghost" onclick="checkOrCreateRelease()" style="flex-shrink:0;">检查仓库权限</button>
             </div>
             <div style="margin-top:6px;font-size:11px;color:var(--text-muted);">
-              首次使用需先点「检查/创建 Release」，后续直接上传即可。
+              建议先点「检查仓库权限」，确认 token 对仓库有写权限后再上传。
             </div>
           </div>
         </div>
@@ -934,7 +978,7 @@
         <div style="font-size:2rem;margin-bottom:8px;">📁</div>
         <div style="color:var(--text);font-size:13px;margin-bottom:4px;">点击或拖拽文件到此处</div>
         <div style="color:var(--text-muted);font-size:11px;">支持 MP4、WebM、MOV、JPG、PNG、GIF、WebP 等</div>
-        <div style="color:var(--text-muted);font-size:11px;margin-top:4px;">单文件最大 2GB（GitHub Releases 限制）</div>
+        <div style="color:var(--text-muted);font-size:11px;margin-top:4px;">单文件建议 ≤ 100MB（当前上传通道限制）</div>
         <input type="file" id="mediaFileInput" style="display:none;" multiple accept="video/*,image/*" onchange="handleFileSelect(this.files)">
       </div>
 

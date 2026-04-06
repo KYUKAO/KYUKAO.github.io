@@ -151,7 +151,7 @@ const CONFIG = {
   works: [
     {
       category: 'shader',
-      hasVideo: false,
+      hasVideo: true,
       image: '',
       title: { en: 'Water Refraction Shader', zh: '水面折射着色器' },
       desc:  {
@@ -162,6 +162,7 @@ const CONFIG = {
       links: [
         { label: { en: 'View Details →', zh: '查看详情 →' }, href: '#' },
         { label: { en: 'GitHub', zh: 'GitHub' }, href: '#' },
+        { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'https://raw.githubusercontent.com/KYUKAO/KYUKAO.github.io/main/assets/uploads/视频1.mp4' },
       ],
     },
     {

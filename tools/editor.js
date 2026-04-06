@@ -655,10 +655,79 @@ function removeInterest(i) {
 // ════════════════════════════════════════════
 //  WORKS (§4)
 // ════════════════════════════════════════════
+const DEFAULT_WORK_LINK_PRESETS = [
+  { en: 'Watch Video →', zh: '观看视频 →' },
+  { en: 'GitHub', zh: 'GitHub' },
+  { en: 'View Details →', zh: '查看详情 →' },
+];
+let workLinkPresets = DEFAULT_WORK_LINK_PRESETS.map(x => ({ en: x.en, zh: x.zh }));
 const WORK_CATS = ['shader','vfx','tool','render','code'];
 const WORK_VIDEO_EXT_RE = /\.(mp4|webm|mov|m4v|ogv|avi|mkv)(\?.*)?$/i;
 let currentWorkIndex = 0;
 let uploadedAssetsCache = [];
+
+function getWorkLinkPreset(i) {
+  const p = workLinkPresets[i] || {};
+  return {
+    en: String(p.en || DEFAULT_WORK_LINK_PRESETS[i] && DEFAULT_WORK_LINK_PRESETS[i].en || `Link ${i+1}`),
+    zh: String(p.zh || DEFAULT_WORK_LINK_PRESETS[i] && DEFAULT_WORK_LINK_PRESETS[i].zh || `链接${i+1}`),
+  };
+}
+function renderWorkLinkPresetInputs() {
+  for (let i = 0; i < 3; i++) {
+    const p = getWorkLinkPreset(i);
+    const enEl = document.getElementById(`work_link_name_en_${i}`);
+    const zhEl = document.getElementById(`work_link_name_zh_${i}`);
+    if (enEl) enEl.value = p.en;
+    if (zhEl) zhEl.value = p.zh;
+  }
+}
+function saveWorkLinkPresetsFromInputs() {
+  const next = [];
+  for (let i = 0; i < 3; i++) {
+    const enEl = document.getElementById(`work_link_name_en_${i}`);
+    const zhEl = document.getElementById(`work_link_name_zh_${i}`);
+    next.push({
+      en: (enEl && enEl.value || '').trim(),
+      zh: (zhEl && zhEl.value || '').trim(),
+    });
+  }
+  workLinkPresets = next;
+  localStorage.setItem('kyukao_work_link_presets', JSON.stringify(workLinkPresets));
+}
+function loadWorkLinkPresets() {
+  try {
+    const raw = localStorage.getItem('kyukao_work_link_presets');
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) {
+        workLinkPresets = arr.slice(0, 3).map((x, i) => ({
+          en: String((x && x.en) || DEFAULT_WORK_LINK_PRESETS[i].en),
+          zh: String((x && x.zh) || DEFAULT_WORK_LINK_PRESETS[i].zh),
+        }));
+      }
+    }
+  } catch (e) {}
+  while (workLinkPresets.length < 3) {
+    const i = workLinkPresets.length;
+    workLinkPresets.push({ en: DEFAULT_WORK_LINK_PRESETS[i].en, zh: DEFAULT_WORK_LINK_PRESETS[i].zh });
+  }
+  renderWorkLinkPresetInputs();
+}
+function applyWorkLinkPresetsToAllWorks() {
+  S.works.forEach(w => {
+    if (!Array.isArray(w.links)) return;
+    w.links.forEach((lk, i) => {
+      const p = getWorkLinkPreset(i);
+      if (!lk.label || typeof lk.label !== 'object') lk.label = { en: '', zh: '' };
+      lk.label.en = p.en;
+      lk.label.zh = p.zh;
+    });
+  });
+  renderWorks();
+  snapshot();
+  toast('✓ 已应用通用链接文案到全部作品', 'success');
+}
 
 function getYoutubeEmbedUrl(url) {
   try {
@@ -757,7 +826,8 @@ function ensureWorkVideoLink(work) {
   if (!work.links || !Array.isArray(work.links)) work.links = [];
   let idx = getWorkVideoLinkIndex(work);
   if (idx >= 0) return idx;
-  work.links.push({ label: { en: 'Watch', zh: '观看视频' }, href: '' });
+  const p = getWorkLinkPreset(0);
+  work.links.push({ label: { en: p.en, zh: p.zh }, href: '' });
   return work.links.length - 1;
 }
 function getUploadedVideoAssets() {
@@ -780,20 +850,20 @@ function setCurrentWorkIndex(i, keepCardOpen) {
     if (arrow && !arrow.classList.contains('open')) arrow.classList.add('open');
   }, 0);
 }
-function applyLibraryVideoByAssetId(assetId) {
-  const asset = (uploadedAssetsCache || []).find(a => a && a.id === assetId);
-  if (!asset) return toast('未找到对应视频资源，请先刷新视频库。', 'error');
+function applyLibraryVideoByUrl(url, name) {
+  const assetUrl = String(url || '').trim();
+  if (!assetUrl) return toast('未找到对应视频资源，请先刷新视频库。', 'error');
   const wi = normalizeWorkIndex(currentWorkIndex);
   if (wi < 0) return toast('请先创建作品后再绑定视频。', 'error');
 
   const work = S.works[wi];
   const li = ensureWorkVideoLink(work);
-  work.links[li].href = asset.browser_download_url;
+  work.links[li].href = assetUrl;
   work.hasVideo = true;
 
   renderWorks();
   snapshot();
-  toast(`已绑定视频：${asset.name}`, 'success');
+  toast(`已绑定视频：${name || '已选文件'}`, 'success');
 }
 function renderWorkMediaLibraryPanel() {
   const listEl = document.getElementById('works_media_list');
@@ -825,13 +895,15 @@ function renderWorkMediaLibraryPanel() {
   listEl.innerHTML = videos.map(v => {
     const size = v.size > 1024 * 1024 ? `${(v.size / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(v.size / 1024))} KB`;
     const activeClass = activeHref && activeHref === v.browser_download_url ? ' active' : '';
-    return `<div class="works-media-item${activeClass}" onclick="applyLibraryVideoByAssetId(${v.id})">
+    const safeUrl = JSON.stringify(v.browser_download_url || '');
+    const safeName = JSON.stringify(v.name || '');
+    return `<div class="works-media-item${activeClass}" onclick='applyLibraryVideoByUrl(${safeUrl}, ${safeName})'>
       <video class="works-media-thumb" src="${esc(v.browser_download_url)}" preload="metadata" muted playsinline></video>
       <div class="works-media-meta">
         <div class="name">${esc(v.name)}</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <span>${size}</span>
-          <button class="btn btn-add" style="padding:4px 10px;font-size:10px;" onclick="event.stopPropagation();applyLibraryVideoByAssetId(${v.id})">绑定到当前作品</button>
+          <button class="btn btn-add" style="padding:4px 10px;font-size:10px;" onclick='event.stopPropagation();applyLibraryVideoByUrl(${safeUrl}, ${safeName})'>绑定到当前作品</button>
         </div>
       </div>
     </div>`;
@@ -867,10 +939,10 @@ function renderWorks() {
         <div class="card-body">
           <div class="bilingual">
             <div class="form-group"><label class="form-label">文字 <span class="lang-badge lang-en">EN</span></label>
-              <input type="text" value="${esc((lk.label&&lk.label.en)||'')}" oninput="if(!S.works[${i}].links[${li}].label)S.works[${i}].links[${li}].label={en:'',zh:''};S.works[${i}].links[${li}].label.en=this.value">
+              <input type="text" value="${esc((lk.label&&lk.label.en)||getWorkLinkPreset(li).en)}" oninput="if(!S.works[${i}].links[${li}].label)S.works[${i}].links[${li}].label={en:'',zh:''};S.works[${i}].links[${li}].label.en=this.value">
             </div>
             <div class="form-group"><label class="form-label">文字 <span class="lang-badge lang-zh">ZH</span></label>
-              <input type="text" value="${esc((lk.label&&lk.label.zh)||'')}" oninput="if(!S.works[${i}].links[${li}].label)S.works[${i}].links[${li}].label={en:'',zh:''};S.works[${i}].links[${li}].label.zh=this.value">
+              <input type="text" value="${esc((lk.label&&lk.label.zh)||getWorkLinkPreset(li).zh)}" oninput="if(!S.works[${i}].links[${li}].label)S.works[${i}].links[${li}].label={en:'',zh:''};S.works[${i}].links[${li}].label.zh=this.value">
             </div>
           </div>
           <div class="form-group"><label class="form-label">URL</label>
@@ -980,7 +1052,9 @@ function removeWorkTag(i,ti) {
   confirmDelete('删除标签', `确认删除标签「${S.works[i].tags[ti]}」？`, () => { S.works[i].tags.splice(ti,1); renderWorks(); snapshot(); });
 }
 function addWorkLink(i) {
-  S.works[i].links.push({label:{en:'',zh:''},href:''});
+  const idx = (S.works[i].links || []).length;
+  const p = getWorkLinkPreset(idx);
+  S.works[i].links.push({label:{en:p.en,zh:p.zh},href:''});
   renderWorks(); snapshot();
 }
 function removeWorkLink(i,li) {
@@ -1752,6 +1826,7 @@ function esc(str) {
 // ════════════════════════════════════════════
 (function init() {
   bindSimple();
+  loadWorkLinkPresets();
 
   // Start auto-backup every 30s
   setInterval(autoBackup, 30000);
@@ -1792,32 +1867,146 @@ function esc(str) {
 // ════════════════════════════════════════════
 //  §8 GITHUB UPLOADER
 // ════════════════════════════════════════════
+const TOKEN_HISTORY_KEY = 'gh_token_history_v1';
+const TOKEN_HISTORY_MAX = 8;
 
-// ── Persist config to localStorage (token → sessionStorage) ──
+function getTokenHistory() {
+  try {
+    const raw = localStorage.getItem(TOKEN_HISTORY_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr.filter(Boolean) : [];
+  } catch (e) {
+    return [];
+  }
+}
+function setTokenHistory(history) {
+  localStorage.setItem(TOKEN_HISTORY_KEY, JSON.stringify((history || []).slice(0, TOKEN_HISTORY_MAX)));
+}
+function maskToken(token) {
+  const t = String(token || '');
+  if (!t) return '';
+  if (t.length <= 10) return t;
+  return `${t.slice(0, 6)}...${t.slice(-4)}`;
+}
+function refreshTokenHistoryUI(selectedToken) {
+  const sel = document.getElementById('gh_token_history');
+  if (!sel) return;
+  const history = getTokenHistory();
+  const cur = selectedToken || '';
+  sel.innerHTML = '<option value="">选择历史 Token（仅本机保存）</option>' +
+    history.map(function(t) {
+      const selected = cur && t === cur ? ' selected' : '';
+      return `<option value="${esc(t)}"${selected}>${esc(maskToken(t))}</option>`;
+    }).join('');
+}
+function saveTokenToHistory(token) {
+  const clean = normalizeTokenInput(token);
+  if (!clean) return;
+  const history = getTokenHistory().filter(t => t !== clean);
+  history.unshift(clean);
+  setTokenHistory(history);
+  refreshTokenHistoryUI(clean);
+}
+function saveCurrentTokenToHistory() {
+  const tokenEl = document.getElementById('gh_token');
+  const clean = normalizeTokenInput(tokenEl && tokenEl.value);
+  if (!clean) return toast('先输入有效 Token 再保存历史', 'error');
+  saveTokenToHistory(clean);
+  localStorage.setItem('gh_token', clean);
+  if (tokenEl) tokenEl.value = clean;
+  toast('✓ 当前 Token 已保存到历史', 'success');
+}
+function applySelectedTokenFromHistory(value) {
+  const clean = normalizeTokenInput(value);
+  if (!clean) return;
+  const tokenEl = document.getElementById('gh_token');
+  if (tokenEl) tokenEl.value = clean;
+  localStorage.setItem('gh_token', clean);
+  saveGhConfig();
+  refreshTokenHistoryUI(clean);
+  toast('✓ 已应用历史 Token', 'success');
+}
+function removeSelectedTokenFromHistory() {
+  const sel = document.getElementById('gh_token_history');
+  if (!sel || !sel.value) return toast('请先在下拉里选中一个 Token', 'error');
+  const selected = normalizeTokenInput(sel.value);
+  const history = getTokenHistory().filter(t => t !== selected);
+  setTokenHistory(history);
+  if (localStorage.getItem('gh_token') === selected) localStorage.removeItem('gh_token');
+  refreshTokenHistoryUI('');
+  toast('✓ 已删除选中的历史 Token', 'success');
+}
+
+// ── Persist config to localStorage (including token) ──
 function saveGhConfig() {
-  localStorage.setItem('gh_owner', document.getElementById('gh_owner').value);
-  localStorage.setItem('gh_repo',  document.getElementById('gh_repo').value);
-  sessionStorage.setItem('gh_token', document.getElementById('gh_token').value);
+  const ownerRaw = document.getElementById('gh_owner').value;
+  const repoRaw = document.getElementById('gh_repo').value;
+  const tokenRaw = document.getElementById('gh_token').value;
+  const normalized = normalizeRepoInput(ownerRaw, repoRaw);
+  const cleanToken = normalizeTokenInput(tokenRaw);
+  localStorage.setItem('gh_owner', normalized.owner);
+  localStorage.setItem('gh_repo',  normalized.repo);
+  localStorage.setItem('gh_token', cleanToken);
   localStorage.setItem('gh_tag',   document.getElementById('gh_tag').value);
+  if (cleanToken) saveTokenToHistory(cleanToken);
 }
 function loadGhConfig() {
   const set = (id, key, storage) => { const el=document.getElementById(id); if(el) el.value=(storage||localStorage).getItem(key)||''; };
   set('gh_owner','gh_owner'); set('gh_repo','gh_repo');
-  set('gh_token','gh_token', sessionStorage); set('gh_tag','gh_tag');
-  // Migrate old token from localStorage to sessionStorage (one-time)
-  const oldToken = localStorage.getItem('gh_token');
-  if (oldToken) {
-    sessionStorage.setItem('gh_token', oldToken);
-    localStorage.removeItem('gh_token');
-    const el = document.getElementById('gh_token');
-    if (el && !el.value) el.value = oldToken;
+  set('gh_token','gh_token'); set('gh_tag','gh_tag');
+  const tokenEl = document.getElementById('gh_token');
+  const cleanToken = normalizeTokenInput(tokenEl && tokenEl.value);
+  if (tokenEl) tokenEl.value = cleanToken;
+  if (cleanToken) {
+    localStorage.setItem('gh_token', cleanToken);
+    saveTokenToHistory(cleanToken);
   }
+  refreshTokenHistoryUI(cleanToken);
+}
+function normalizeRepoInput(ownerRaw, repoRaw) {
+  let owner = String(ownerRaw || '').trim();
+  let repo = String(repoRaw || '').trim();
+  if (!repo) return { owner, repo };
+  if (/^https?:\/\//i.test(repo)) {
+    try {
+      const u = new URL(repo);
+      const parts = u.pathname.split('/').filter(Boolean);
+      if (parts.length >= 2) {
+        if (!owner) owner = parts[0];
+        repo = parts[1].replace(/\.git$/i, '');
+      }
+    } catch (e) {}
+  } else if (repo.includes('/')) {
+    const parts = repo.split('/').filter(Boolean);
+    if (parts.length >= 2) {
+      if (!owner) owner = parts[0];
+      repo = parts[1].replace(/\.git$/i, '');
+    }
+  }
+  return { owner, repo };
+}
+function normalizeTokenInput(raw) {
+  return String(raw || '')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '') // remove zero-width chars
+    .trim()
+    .replace(/^token\s+/i, '')
+    .replace(/[“”"'`]/g, '')
+    .replace(/\s+/g, '');
 }
 function getGhConfig() {
+  const ownerInput = document.getElementById('gh_owner').value;
+  const repoInput = document.getElementById('gh_repo').value;
+  const tokenEl = document.getElementById('gh_token');
+  const tokenInput = tokenEl ? tokenEl.value : '';
+  const storedToken = normalizeTokenInput(localStorage.getItem('gh_token') || '');
+  const token = normalizeTokenInput(tokenInput) || storedToken || '';
+  if (tokenEl && tokenEl.value !== token && token) tokenEl.value = token;
+  if (localStorage.getItem('gh_token') !== token && token) localStorage.setItem('gh_token', token);
+  const normalized = normalizeRepoInput(ownerInput, repoInput);
   return {
-    owner: document.getElementById('gh_owner').value.trim(),
-    repo:  document.getElementById('gh_repo').value.trim(),
-    token: document.getElementById('gh_token').value.trim() || sessionStorage.getItem('gh_token') || '',
+    owner: normalized.owner,
+    repo: normalized.repo,
+    token,
     tag:   document.getElementById('gh_tag').value.trim() || 'v1.0-assets',
   };
 }
@@ -1832,55 +2021,46 @@ function validateGhConfig() {
   if (!c.owner) { toast('✗ 请填写 GitHub 用户名', 'error'); return null; }
   if (!c.repo)  { toast('✗ 请填写仓库名称', 'error'); return null; }
   if (!c.token) { toast('✗ 请填写 Personal Access Token', 'error'); return null; }
+  if (/[^\x00-\xFF]/.test(c.token)) {
+    toast('✗ Token 含非法字符（常见为中文引号/零宽字符），请清空后手动重新粘贴 token 本体', 'error');
+    return null;
+  }
   return c;
 }
 
 // ── GitHub API helper ──
 async function ghFetch(path, options={}) {
   const c = getGhConfig();
-  const res = await fetch(`https://api.github.com${path}`, {
-    ...options,
-    headers: {
-      'Authorization': `token ${c.token}`,
-      'Accept': 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...(options.headers||{}),
-    },
-  });
-  return res;
+  try {
+    const res = await fetch(`https://api.github.com${path}`, {
+      ...options,
+      headers: {
+        'Authorization': `token ${c.token}`,
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        ...(options.headers||{}),
+      },
+    });
+    return res;
+  } catch (e) {
+    const msg = e && e.message ? e.message : 'Unknown fetch error';
+    throw new Error(`GitHub API 请求失败（api.github.com）: ${msg}；路径: ${path}`);
+  }
 }
 
-// ── Check or create Release ──
+// ── Validate repository access (legacy button kept for compatibility) ──
 async function checkOrCreateRelease() {
   const c = validateGhConfig(); if (!c) return;
-  toast('⟳ 正在检查 Release...', 'success');
+  toast('⟳ 正在检查仓库访问权限...', 'success');
   try {
-    // Try to get existing release
-    let res = await ghFetch(`/repos/${c.owner}/${c.repo}/releases/tags/${c.tag}`);
-    if (res.ok) {
-      const data = await res.json();
-      toast(`✓ Release "${c.tag}" 已存在，可以上传文件`, 'success');
-      return data;
-    }
-    // Create new release
-    res = await ghFetch(`/repos/${c.owner}/${c.repo}/releases`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tag_name: c.tag,
-        name: c.tag + ' — Media Assets',
-        body: 'Media assets for KYUKAO Portfolio. Managed by KYUKAO Editor.',
-        draft: false,
-        prerelease: false,
-      }),
-    });
-    if (res.ok) {
-      toast(`✓ Release "${c.tag}" 创建成功！`, 'success');
-      return await res.json();
-    } else {
+    const res = await ghFetch(`/repos/${c.owner}/${c.repo}`);
+    if (!res.ok) {
       const err = await res.json();
-      toast(`✗ 创建失败：${err.message}`, 'error');
+      toast(`✗ 仓库访问失败：${err.message || res.status}`, 'error');
+      return null;
     }
+    toast(`✓ 仓库可访问，上传目录：${CONTENTS_UPLOAD_DIR}`, 'success');
+    return await res.json();
   } catch(e) {
     toast('✗ 网络错误：' + e.message, 'error');
   }
@@ -1901,7 +2081,7 @@ function handleDrop(e) {
   handleFileSelect(e.dataTransfer.files);
 }
 
-const UPLOAD_MAX_BYTES = 2 * 1024 * 1024 * 1024; // GitHub Releases single asset limit
+const UPLOAD_MAX_BYTES = 100 * 1024 * 1024; // Contents API practical limit
 const UPLOAD_RETRY_MAX = 2;
 const UPLOAD_CONCURRENCY = 1;
 const VIDEO_EXT_RE = /\.(mp4|webm|mov|avi|mkv)$/i;
@@ -1966,7 +2146,7 @@ function addToQueue(file) {
     return;
   }
 
-  if (VIDEO_EXT_RE.test(file.name) && file.size > 500 * 1024 * 1024) {
+  if (VIDEO_EXT_RE.test(file.name) && file.size > 80 * 1024 * 1024) {
     toast(`⚠ "${file.name}" 较大（${formatSize(file.size)}），建议保持网络稳定`, 'error');
   }
 
@@ -2046,42 +2226,79 @@ function retryFailedUploads() {
   enqueueNextUpload();
 }
 
-async function getOrCreateReleaseUploadInfo(c) {
-  let rel = await getReleaseUploadUrl(c);
-  if (rel) return rel;
-  const newRel = await checkOrCreateRelease();
-  if (!newRel) return null;
-  rel = await getReleaseUploadUrl(c);
-  return rel || null;
+const CONTENTS_UPLOAD_DIR = 'assets/uploads';
+const CONTENTS_UPLOAD_MAX_BYTES = 100 * 1024 * 1024; // GitHub Contents API practical limit
+function encodeGitHubPath(path) {
+  return String(path || '').split('/').filter(Boolean).map(encodeURIComponent).join('/');
 }
-
-async function getReleaseAssetsMap(c) {
-  const res = await ghFetch(`/repos/${c.owner}/${c.repo}/releases/tags/${c.tag}`);
-  if (!res.ok) return new Map();
-  const data = await res.json();
-  const m = new Map();
-  (data.assets || []).forEach(a => m.set(normalizeAssetName(a.name), a));
-  return m;
-}
-
-async function deleteAssetById(c, assetId) {
-  const res = await ghFetch(`/repos/${c.owner}/${c.repo}/releases/assets/${assetId}`, { method: 'DELETE' });
-  if (res.status !== 204) {
-    let msg = '删除同名文件失败';
-    try {
-      const json = await res.json();
-      msg = json.message || msg;
-    } catch (e) {}
-    const err = new Error(msg);
-    err.status = res.status;
-    throw err;
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000;
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode.apply(null, chunk);
   }
+  return btoa(binary);
+}
+function getContentsPathByName(fileName) {
+  return `${CONTENTS_UPLOAD_DIR}/${normalizeAssetName(fileName)}`;
+}
+async function getContentFileMeta(c, contentPath) {
+  const encoded = encodeGitHubPath(contentPath);
+  const res = await ghFetch(`/repos/${c.owner}/${c.repo}/contents/${encoded}`);
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    let msg = '读取文件信息失败';
+    try {
+      const err = await res.json();
+      msg = err.message || msg;
+    } catch (e) {}
+    throw new Error(msg);
+  }
+  const data = await res.json();
+  return data && data.type === 'file' ? data : null;
+}
+async function doUploadViaContentsApi(item, c, safeName) {
+  const contentPath = getContentsPathByName(safeName);
+  const existing = await getContentFileMeta(c, contentPath);
+  const base64 = arrayBufferToBase64(await item.file.arrayBuffer());
+  const body = {
+    message: existing ? `chore: update ${contentPath}` : `chore: add ${contentPath}`,
+    content: base64,
+  };
+  if (existing && existing.sha) body.sha = existing.sha;
+  const encoded = encodeGitHubPath(contentPath);
+  const res = await ghFetch(`/repos/${c.owner}/${c.repo}/contents/${encoded}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    let msg = '上传失败';
+    try {
+      const err = await res.json();
+      msg = err.message || msg;
+    } catch (e) {}
+    const ex = new Error(msg);
+    ex.status = res.status;
+    throw ex;
+  }
+  const data = await res.json();
+  const dl = data && data.content && (data.content.download_url || data.content.html_url);
+  return {
+    path: contentPath,
+    browser_download_url: dl || '',
+    size: item.file.size,
+    sha: data && data.content && data.content.sha,
+  };
 }
 
 // ── Core upload function ──
 async function uploadFile(id) {
   const item = uploadQueue.find(i => i.id === id); if (!item) return;
   const c = validateGhConfig(); if (!c) { item.status='error'; item.error='GitHub 配置不完整'; renderQueue(); return; }
+  let stage = '准备上传';
 
   item.status = 'uploading';
   item.error = '';
@@ -2089,26 +2306,16 @@ async function uploadFile(id) {
   renderQueue();
 
   try {
-    const rel = await getOrCreateReleaseUploadInfo(c);
-    if (!rel) throw new Error('无法获取 Release 上传地址');
-
     const safeName = normalizeAssetName(item.file.name);
-    const assetsMap = await getReleaseAssetsMap(c);
-    const existing = assetsMap.get(safeName);
-    if (existing) {
-      item.status = 'retrying';
-      item.error = '检测到同名文件，正在替换…';
-      renderQueue();
-      await deleteAssetById(c, existing.id);
-      item.status = 'uploading';
-      item.error = '';
-      renderQueue();
+    if (item.file.size > CONTENTS_UPLOAD_MAX_BYTES) {
+      throw new Error(`文件超过 100MB（当前 ${formatSize(item.file.size)}）。建议压缩后再传，或改用命令行 gh release upload。`);
     }
 
     let lastErr = null;
     for (let attempt = 0; attempt <= UPLOAD_RETRY_MAX; attempt++) {
       try {
-        const data = await doUpload(item, rel, c, safeName);
+        stage = `上传到仓库目录 ${CONTENTS_UPLOAD_DIR}`;
+        const data = await doUploadViaContentsApi(item, c, safeName);
         item.status = 'done';
         item.error = '';
         item.url = data.browser_download_url;
@@ -2133,65 +2340,13 @@ async function uploadFile(id) {
     throw lastErr || new Error('上传失败');
   } catch(e) {
     item.status = 'error';
-    item.error = e && e.message ? e.message : '上传失败';
+    const raw = e && e.message ? e.message : '上传失败';
+    item.error = raw.includes('Failed to fetch')
+      ? `上传失败（${stage}）：网络请求被浏览器中断。请检查是否通过 http://localhost 打开编辑器、是否有插件/代理拦截 GitHub 域名。原始错误: ${raw}`
+      : `上传失败（${stage}）：${raw}`;
     renderQueue();
     toast('✗ 上传失败：' + item.error, 'error');
   }
-}
-
-async function doUpload(item, rel, c, safeName) {
-  const file = item.file;
-  const buffer = await file.arrayBuffer();
-  const uploadTarget = `${rel.uploadUrl}?name=${encodeURIComponent(safeName)}`;
-
-  return await new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', uploadTarget);
-    xhr.timeout = 60000;
-    xhr.setRequestHeader('Authorization', `token ${c.token}`);
-    xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-    xhr.setRequestHeader('Accept', 'application/vnd.github+json');
-
-    xhr.upload.onprogress = (e) => {
-      if (!e.lengthComputable) return;
-      const pct = Math.max(0, Math.min(100, Math.round(e.loaded / e.total * 100)));
-      item.progress = pct;
-      const bar = document.getElementById('prog_' + item.id);
-      if (bar) bar.style.width = pct + '%';
-    };
-
-    xhr.onload = () => {
-      if (xhr.status === 201) {
-        try {
-          resolve(JSON.parse(xhr.responseText));
-        } catch (e) {
-          const err = new Error('上传成功但返回解析失败');
-          err.status = xhr.status;
-          reject(err);
-        }
-        return;
-      }
-      let msg = '上传失败 HTTP ' + xhr.status;
-      try {
-        const json = JSON.parse(xhr.responseText);
-        msg = json.message || msg;
-      } catch(e) {}
-      const err = new Error(msg);
-      err.status = xhr.status;
-      reject(err);
-    };
-    xhr.onerror = () => {
-      const err = new Error(`网络错误：无法连接上传域名 uploads.github.com（目标：${uploadTarget}）`);
-      err.isNetwork = true;
-      reject(err);
-    };
-    xhr.ontimeout = () => {
-      const err = new Error('上传超时：请检查代理/网络是否放行 uploads.github.com');
-      err.isNetwork = true;
-      reject(err);
-    };
-    xhr.send(buffer);
-  });
 }
 
 // ── Fetch uploaded files list ──
@@ -2212,15 +2367,33 @@ async function fetchUploadedFiles(options = {}) {
   }
 
   try {
-    const res = await ghFetch(`/repos/${c.owner}/${c.repo}/releases/tags/${c.tag}`);
-    if (!res.ok) {
+    const dirEncoded = encodeGitHubPath(CONTENTS_UPLOAD_DIR);
+    const res = await ghFetch(`/repos/${c.owner}/${c.repo}/contents/${dirEncoded}`);
+    if (res.status === 404) {
       uploadedAssetsCache = [];
       renderWorkMediaLibraryPanel();
-      if (listEl) listEl.innerHTML = `<div style="color:#e53e3e;font-size:12px;padding:12px 0;">未找到 Release "${c.tag}"，请先点「检查/创建 Release」</div>`;
-      return false;
+      if (listEl) listEl.innerHTML = `<div style="color:var(--text-muted);font-size:12px;padding:12px 0;">目录 ${CONTENTS_UPLOAD_DIR} 为空（首次上传会自动创建）</div>`;
+      return true;
+    }
+    if (!res.ok) {
+      let msg = '读取文件列表失败';
+      try {
+        const err = await res.json();
+        msg = err.message || msg;
+      } catch (e) {}
+      throw new Error(msg);
     }
     const data = await res.json();
-    const assets = data.assets || [];
+    const assets = (Array.isArray(data) ? data : [])
+      .filter(x => x && x.type === 'file')
+      .map(x => ({
+        id: x.path,
+        name: x.name,
+        size: x.size || 0,
+        path: x.path,
+        sha: x.sha,
+        browser_download_url: x.download_url || '',
+      }));
     uploadedAssetsCache = assets;
     renderWorkMediaLibraryPanel();
     if (!assets.length) {
@@ -2241,7 +2414,7 @@ async function fetchUploadedFiles(options = {}) {
           <div style="font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(a.name)}</div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${size} · 点击复制直链</div>
         </div>
-        <button class="btn btn-danger" onclick="event.stopPropagation();deleteAsset(${a.id},'${esc(a.name)}')" title="删除">🗑</button>
+        <button class="btn btn-danger" onclick='event.stopPropagation();deleteAsset(${JSON.stringify(a.path)}, ${JSON.stringify(a.name)}, ${JSON.stringify(a.sha)})' title="删除">🗑</button>
       </div>`;
     }).join('');
     return true;
@@ -2263,12 +2436,20 @@ function copyUrl(url) {
 }
 
 // ── Delete asset ──
-async function deleteAsset(assetId, name) {
+async function deleteAsset(path, name, sha) {
   confirmDelete('删除文件', `确认删除文件 "${name}"？此操作不可撤销。`, async () => {
     const c = validateGhConfig(); if (!c) return;
     try {
-      const res = await ghFetch(`/repos/${c.owner}/${c.repo}/releases/assets/${assetId}`, { method: 'DELETE' });
-      if (res.status === 204) {
+      const encoded = encodeGitHubPath(path);
+      const res = await ghFetch(`/repos/${c.owner}/${c.repo}/contents/${encoded}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `chore: delete ${path}`,
+          sha,
+        }),
+      });
+      if (res.ok) {
         toast(`✓ "${name}" 已删除`, 'success');
         fetchUploadedFiles();
       } else {
@@ -2283,5 +2464,6 @@ async function deleteAsset(assetId, name) {
 // Load saved GitHub config on startup
 document.addEventListener('DOMContentLoaded', () => {
   loadGhConfig();
+  loadWorkLinkPresets();
   renderWorkMediaLibraryPanel();
 });

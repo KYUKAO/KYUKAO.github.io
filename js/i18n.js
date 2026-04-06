@@ -98,6 +98,12 @@
     // Remove existing cards (keep noResults)
     grid.querySelectorAll('.work-card').forEach(function (c) { c.remove(); });
 
+    function isMediaHref(href) {
+      var h = String(href || '').trim();
+      if (!h || h === '#') return false;
+      return /youtu\.be|youtube\.com|vimeo\.com|\.mp4($|\?)|\.webm($|\?)|\.mov($|\?)|\.m4v($|\?)|\.ogv($|\?)/i.test(h);
+    }
+
     works.forEach(function (w) {
       var thumbContent = w.bgText
         ? '<div class="work-thumb-bg" style="' + w.bgStyle + '">' + w.bgText + '</div>'
@@ -111,7 +117,9 @@
         return '<span class="work-tag">' + t + '</span>';
       }).join('');
 
-      var linksHtml = w.links.map(function (l) {
+      var linksHtml = (w.links || []).filter(function (l) {
+        return isMediaHref(l && l.href);
+      }).map(function (l) {
         return '<a href="' + l.href + '" class="work-link">' + l.label + '</a>';
       }).join('');
 
