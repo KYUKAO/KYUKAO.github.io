@@ -899,18 +899,25 @@ function renderWork6() {
     d.innerHTML = `
       <div class="card-header" onclick="toggleCard(this)">
         <div class="card-number">${i+1}</div>
-        <div class="card-title">${esc(w.company||'新公司')}<small> · ${w.period.zh||''}</small></div>
+        <div class="card-title">${esc((w.company&&(w.company.zh||w.company.en))||w.company||'新公司')}<small> · ${w.period.zh||''}</small></div>
         <button class="btn btn-danger" onclick="event.stopPropagation();removeWork6(${i})">删除</button>
         <span class="card-toggle">▾</span>
       </div>
       <div class="card-body">
         <div class="bilingual">
-          <div class="form-group"><label class="form-label">公司名称</label>
-            <input type="text" value="${esc(w.company)}" oninput="S.workExp[${i}].company=this.value;renderWork6()">
+          <div class="form-group"><label class="form-label">公司名称 <span class="lang-badge lang-en">EN</span>
+            <button class="translate-btn" title="翻译为中文" onclick="translateField('we_co_en_${i}','we_co_zh_${i}','zh-CN')">🌐→ZH</button>
+          </label>
+            <input type="text" id="we_co_en_${i}" value="${esc(w.company&&w.company.en!=null?w.company.en:w.company)}" oninput="S.workExp[${i}].company.en=this.value">
           </div>
-          <div class="form-group"><label class="form-label">项目链接 URL</label>
-            <input type="url" value="${esc(w.projectUrl)}" oninput="S.workExp[${i}].projectUrl=this.value">
+          <div class="form-group"><label class="form-label">公司名称 <span class="lang-badge lang-zh">ZH</span>
+            <button class="translate-btn" title="翻译为英文" onclick="translateField('we_co_zh_${i}','we_co_en_${i}','en')">🌐→EN</button>
+          </label>
+            <input type="text" id="we_co_zh_${i}" value="${esc(w.company&&w.company.zh!=null?w.company.zh:'')}" oninput="S.workExp[${i}].company.zh=this.value">
           </div>
+        </div>
+        <div class="form-group"><label class="form-label">项目链接 URL</label>
+          <input type="url" value="${esc(w.projectUrl)}" oninput="S.workExp[${i}].projectUrl=this.value">
         </div>
         <div class="bilingual">
           <div class="form-group"><label class="form-label">时间段 <span class="lang-badge lang-en">EN</span></label>
@@ -942,7 +949,7 @@ function renderWork6() {
   });
 }
 function addWork6() {
-  S.workExp.push({company:'',period:{en:'',zh:''},role:{en:'',zh:''},projectUrl:'',bullets:[]});
+  S.workExp.push({company:{en:'',zh:''},period:{en:'',zh:''},role:{en:'',zh:''},projectUrl:'',bullets:[]});
   renderWork6();
   snapshot();
   updateStatus();
@@ -952,7 +959,7 @@ function addWork6() {
   }, 50);
 }
 function removeWork6(i) {
-  confirmDelete('删除工作经历', `确认删除「${S.workExp[i].company||'此公司'}」？`, () => { S.workExp.splice(i,1); renderWork6(); snapshot(); updateStatus(); });
+  confirmDelete('删除工作经历', `确认删除「${(S.workExp[i].company&&(S.workExp[i].company.zh||S.workExp[i].company.en))||S.workExp[i].company||'此公司'}」？`, () => { S.workExp.splice(i,1); renderWork6(); snapshot(); updateStatus(); });
 }
 function addWorkBullet(i) { S.workExp[i].bullets.push({en:'',zh:''}); renderWork6(); snapshot(); }
 function removeWorkBullet(i,bi) {
@@ -1467,7 +1474,7 @@ ${s.education.map(e => `    {
 
   workExp: [
 ${s.workExp.map(w => `    {
-      company:    ${q(w.company)},
+      company:    { en: ${q(w.company&&w.company.en!=null?w.company.en:w.company)}, zh: ${q(w.company&&w.company.zh!=null?w.company.zh:'')} },
       period:     { en: ${q(w.period.en)}, zh: ${q(w.period.zh)} },
       role:       { en: ${q(w.role.en)},
                     zh: ${q(w.role.zh)} },

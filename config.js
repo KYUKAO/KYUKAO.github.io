@@ -276,7 +276,7 @@ const CONFIG = {
 
   workExp: [
     {
-      company:    'Tencent',
+      company:    { en: 'Tencent', zh: '腾讯' },
       period:     { en: 'Dec 2025 — Now', zh: '2025.12 — 至今' },
       role:       { en: '(Intern) Technical Artist for Golden Spatula (Teamfight Tactics China Edition)',
                     zh: '（实习）技术美术师 — 金铲铲之战（自走棋中国版）' },
@@ -297,7 +297,7 @@ const CONFIG = {
       ],
     },
     {
-      company:    'Perfect World',
+      company:    { en: 'Perfect World-Hotta Studio', zh: '完美世界-幻塔子公司' },
       period:     { en: 'May 2024 — Oct 2025', zh: '2024.05 — 2025.10' },
       role:       { en: 'Level Designer for Tower Of Fantasy (UE4 Open-world MMORPG)',
                     zh: '关卡设计师 — 幻塔（UE4 开放世界 MMORPG）' },
@@ -326,7 +326,7 @@ const CONFIG = {
       ],
     },
     {
-      company:    'NeoCast',
+      company:    { en: 'NeoCast', zh: '上海辛卡司' },
       period:     { en: 'Mar 2024 — May 2024', zh: '2024.03 — 2024.05' },
       role:       { en: 'Technical Artist for Nezha (AR Interactive Mini-game)',
                     zh: '技术美术师 — 哪吒（AR 互动小游戏）' },
@@ -347,7 +347,7 @@ const CONFIG = {
       ],
     },
     {
-      company:    'Neckom Games',
+      company:    { en: 'Neckom Games', zh: '铃空游戏' },
       period:     { en: 'Dec 2023 — Feb 2024', zh: '2023.12 — 2024.02' },
       role:       { en: 'Level Designer for Showa American Story (ARPG)',
                     zh: '关卡设计师 — 昭和米国物语（ARPG）' },
@@ -360,7 +360,7 @@ const CONFIG = {
       ],
     },
     {
-      company:    'Bug Inventor (Tencent)',
+      company:    { en: 'Bug Inventor (Tencent)', zh: '腾云摘星' },
       period:     { en: 'Dec 2022 — Feb 2023', zh: '2022.12 — 2023.02' },
       role:       { en: 'Intern Level Designer for Screaming Chicken',
                     zh: '（实习）关卡设计师 — 尖叫鸡' },

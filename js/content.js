@@ -167,7 +167,7 @@
   function buildWorkExp(lang) {
     return CONFIG.workExp.map(function (e) {
       return {
-        company:    e.company,
+        company:    t(e.company, lang),
         period:     t(e.period, lang),
         role:       t(e.role,   lang),
         projectUrl: e.projectUrl || '',
