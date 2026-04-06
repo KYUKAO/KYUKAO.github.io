@@ -81,6 +81,10 @@
       'portfolio.desc':  lang === 'zh'
         ? 'Shader、特效、工具开发与渲染实验——技术与美学的交叉探索。'
         : 'Shaders, VFX, tools, and rendering experiments — exploring the intersection of technique and aesthetics.',
+      'portfolio.section.project': lang === 'zh' ? '完整项目作品' : 'Complete Projects',
+      'portfolio.section.art':     lang === 'zh' ? '独立美术作品' : 'Independent Artworks',
+      'portfolio.empty.project':   lang === 'zh' ? '暂无完整项目作品' : 'No complete projects yet.',
+      'portfolio.empty.art':       lang === 'zh' ? '暂无独立美术作品' : 'No independent artworks yet.',
 
       'filter.all':    lang === 'zh' ? '全部'    : 'All',
       'filter.shader': lang === 'zh' ? 'Shader'  : 'Shader',
@@ -142,6 +146,7 @@
         : '';
       return {
         category: w.category,
+        group:    w.group || ((w.category === 'tool' || w.category === 'code') ? 'project' : 'art'),
         bgStyle:  bgStyle,
         hasVideo: !!w.hasVideo,
         tags:     w.tags,

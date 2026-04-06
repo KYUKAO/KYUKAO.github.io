@@ -662,9 +662,29 @@ const DEFAULT_WORK_LINK_PRESETS = [
 ];
 let workLinkPresets = DEFAULT_WORK_LINK_PRESETS.map(x => ({ en: x.en, zh: x.zh }));
 const WORK_CATS = ['shader','vfx','tool','render','code'];
+const WORK_GROUPS = [
+  { id: 'project', label: '完整项目' },
+  { id: 'art', label: '独立美术' },
+];
 const WORK_VIDEO_EXT_RE = /\.(mp4|webm|mov|m4v|ogv|avi|mkv)(\?.*)?$/i;
 let currentWorkIndex = 0;
 let uploadedAssetsCache = [];
+
+function inferWorkGroupFromCategory(cat) {
+  return (cat === 'tool' || cat === 'code') ? 'project' : 'art';
+}
+function normalizeWorkItem(w) {
+  if (!w || typeof w !== 'object') return;
+  if (!w.group) w.group = inferWorkGroupFromCategory(w.category);
+  if (!Array.isArray(w.links)) w.links = [];
+}
+function normalizeWorks() {
+  (S.works || []).forEach(normalizeWorkItem);
+}
+function getWorkGroupLabel(groupId) {
+  const g = WORK_GROUPS.find(x => x.id === groupId);
+  return g ? g.label : '未分组';
+}
 
 function getWorkLinkPreset(i) {
   const p = workLinkPresets[i] || {};
@@ -922,10 +942,19 @@ async function refreshWorkMediaLibrary(showToast) {
   return ok;
 }
 function renderWorks() {
+  normalizeWorks();
   const c = document.getElementById('works_list');
   c.innerHTML = '';
+  const groupBuckets = { project: [], art: [], other: [] };
   S.works.forEach((w, i) => {
+    const gid = w.group || inferWorkGroupFromCategory(w.category);
+    if (groupBuckets[gid]) groupBuckets[gid].push({ w, i });
+    else groupBuckets.other.push({ w, i });
+  });
+
+  const renderCard = (w, i) => {
     const catOpts = WORK_CATS.map(c => `<option value="${c}" ${w.category===c?'selected':''}>${c}</option>`).join('');
+    const groupOpts = WORK_GROUPS.map(g => `<option value="${g.id}" ${w.group===g.id?'selected':''}>${g.label}</option>`).join('');
     const tagsHtml = (w.tags||[]).map((t,ti) =>
       `<div class="chip"><span>${esc(t)}</span><button class="chip-del" onclick="removeWorkTag(${i},${ti})">×</button></div>`
     ).join('');
@@ -955,18 +984,22 @@ function renderWorks() {
     d.className = `card${i === currentWorkIndex ? ' work-card-active' : ''}`;
     d.dataset.workIndex = String(i);
     d.innerHTML = `
-      <div class="card-header" onclick="setCurrentWorkIndex(${i});toggleCard(this)">
+      <div class="card-header" onclick="setCurrentWorkIndex(${i}, true)">
         <div class="card-number">${i+1}</div>
-        <div class="card-title">${w.title.zh||w.title.en||'新作品'}<small> · ${w.category||'—'}</small></div>
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="event.stopPropagation();setCurrentWorkIndex(${i}, true)">设为当前</button>
+        <div class="card-title">${w.title.zh||w.title.en||'新作品'}<small> · ${getWorkGroupLabel(w.group)} / ${w.category||'—'}</small></div>
         <button class="btn btn-danger" onclick="event.stopPropagation();removeWork(${i})">删除</button>
         <span class="card-toggle">▾</span>
       </div>
       <div class="card-body">
         <div class="bilingual">
+          <div class="form-group"><label class="form-label">作品分组</label>
+            <select oninput="S.works[${i}].group=this.value;renderWorks()">${groupOpts}</select>
+          </div>
           <div class="form-group"><label class="form-label">分类</label>
             <select oninput="S.works[${i}].category=this.value;renderWorks()">${catOpts}</select>
           </div>
+        </div>
+        <div class="bilingual">
           <div class="form-group"><label class="form-label">是否有视频</label>
             <div class="toggle-row" style="margin-top:8px;">
               <label class="switch">
@@ -1020,11 +1053,37 @@ function renderWorks() {
         </div>
       </div>`;
     c.appendChild(d);
-  });
+  };
+
+  const appendGroup = (groupId, groupLabel) => {
+    const list = groupBuckets[groupId] || [];
+    const title = document.createElement('div');
+    title.style.cssText = 'margin:12px 0 8px;color:var(--pink);font-size:11px;letter-spacing:.08em;text-transform:uppercase;';
+    title.textContent = `${groupLabel}（${list.length}）`;
+    c.appendChild(title);
+    if (!list.length) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'font-size:11px;color:var(--text-muted);margin:4px 0 12px;padding:8px 10px;background:var(--bg3);border:1px dashed var(--border2);border-radius:6px;';
+      empty.textContent = '暂无作品';
+      c.appendChild(empty);
+      return;
+    }
+    list.forEach(item => renderCard(item.w, item.i));
+  };
+
+  appendGroup('project', '完整项目');
+  appendGroup('art', '独立美术');
+  if (groupBuckets.other.length) {
+    const extraTitle = document.createElement('div');
+    extraTitle.style.cssText = 'margin:12px 0 8px;color:var(--text-muted);font-size:11px;';
+    extraTitle.textContent = '未分组';
+    c.appendChild(extraTitle);
+    groupBuckets.other.forEach(item => renderCard(item.w, item.i));
+  }
   renderWorkMediaLibraryPanel();
 }
 function addWork() {
-  S.works.push({category:'shader',hasVideo:false,image:'',title:{en:'',zh:''},desc:{en:'',zh:''},tags:[],links:[]});
+  S.works.push({group:'project',category:'shader',hasVideo:false,image:'',title:{en:'',zh:''},desc:{en:'',zh:''},tags:[],links:[]});
   currentWorkIndex = S.works.length - 1;
   renderWorks();
   snapshot();
@@ -1392,6 +1451,7 @@ function populateSimple() {
 }
 
 function renderAll() {
+  normalizeWorks();
   populateSimple(); populateTY();
   renderStats(); renderSkills();
   renderInterests(); renderWorks();
@@ -1457,6 +1517,7 @@ function loadFromConfig(cfg) {
     });
   };
   merge(S, cfg);
+  normalizeWorks();
   renderAll();
   snapshot();
 }
@@ -1718,6 +1779,7 @@ ${s.about.interests.map(it => `      {
 
   works: [
 ${s.works.map(w => `    {
+      group: ${q(w.group || inferWorkGroupFromCategory(w.category))},
       category: ${q(w.category)},
       hasVideo: ${w.hasVideo},
       image: ${q(w.image)},

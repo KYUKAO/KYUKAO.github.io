@@ -86,17 +86,18 @@
      Portfolio page — render work cards from CONTENT.works
      ================================================================ */
   window.renderPortfolioCards = function (lang) {
-    var grid = document.getElementById('workGrid');
-    if (!grid) return;
+    var projectGrid = document.getElementById('workGridProject');
+    var artGrid = document.getElementById('workGridArt');
+    if (!projectGrid || !artGrid) return;
 
     var works = CONTENT.works[lang];
     if (!works) return;
 
-    // Keep the #noResults element
-    var noResults = document.getElementById('noResults');
+    var noResultsProject = document.getElementById('noResultsProject');
+    var noResultsArt = document.getElementById('noResultsArt');
 
-    // Remove existing cards (keep noResults)
-    grid.querySelectorAll('.work-card').forEach(function (c) { c.remove(); });
+    projectGrid.querySelectorAll('.work-card').forEach(function (c) { c.remove(); });
+    artGrid.querySelectorAll('.work-card').forEach(function (c) { c.remove(); });
 
     function isMediaHref(href) {
       var h = String(href || '').trim();
@@ -126,6 +127,7 @@
       var card = document.createElement('div');
       card.className = 'work-card reveal';
       card.dataset.category = w.category;
+      card.dataset.group = w.group || ((w.category === 'tool' || w.category === 'code') ? 'project' : 'art');
       card.innerHTML =
         '<div class="work-thumb">' +
           thumbContent +
@@ -138,20 +140,19 @@
           '<div class="work-links">' + linksHtml + '</div>' +
         '</div>';
 
-      grid.insertBefore(card, noResults);
+      var targetGrid = card.dataset.group === 'project' ? projectGrid : artGrid;
+      var targetNo = card.dataset.group === 'project' ? noResultsProject : noResultsArt;
+      targetGrid.insertBefore(card, targetNo);
     });
+
+    if (noResultsProject) noResultsProject.style.display = projectGrid.querySelectorAll('.work-card').length ? 'none' : 'block';
+    if (noResultsArt) noResultsArt.style.display = artGrid.querySelectorAll('.work-card').length ? 'none' : 'block';
 
     // Re-attach IntersectionObserver for new cards
     if (typeof revealObserver !== 'undefined') {
-      grid.querySelectorAll('.reveal').forEach(function (el) {
+      document.querySelectorAll('#workGridProject .reveal, #workGridArt .reveal').forEach(function (el) {
         revealObserver.observe(el);
       });
-    }
-
-    // Re-run filter if one is active
-    var activeBtn = document.querySelector('.filter-btn.active');
-    if (activeBtn) {
-      activeBtn.click();
     }
   };
 
