@@ -249,7 +249,7 @@ const CONFIG = {
       school: { en: 'Shanghai University', zh: '上海大学' },
       period: { en: 'Sep 2019 — Aug 2023', zh: '2019.09 — 2023.08' },
       degree: { en: 'Bachelor of Fine Arts (Broadcasting and Television Playwright-director)',
-                zh: '文学学士（广播电视编导）' },
+                zh: '艺术学学士（广播电视编导）' },
       detail: {
         en: '<strong>Core Courses:</strong> Image Technology and Art, Visual Plastic Arts, Film and Video Shoot, Film and Video Editor, Analysis on Audio-visual Element, New Digital Media Foundation and Application.',
         zh: '<strong>核心课程：</strong>影像技术与艺术、视觉造型艺术、影视摄制、影视剪辑、视听元素分析、新数字媒体基础与应用、影视音乐、新媒体影像、演播室制作。',

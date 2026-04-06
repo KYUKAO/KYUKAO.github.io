@@ -93,7 +93,7 @@
       /* ── Resume ── */
       'resume.eyebrow': t(C.role, lang),
       'resume.name':    lang === 'zh'
-        ? (C.name.en.split(' ')[0] + ' <span class="text-pink">' + C.name.en.split(' ').slice(1).join(' ') + '</span>')
+        ? C.name.zh
         : (C.name.en.split(' ')[0] + ' <span class="text-pink">' + C.name.en.split(' ').slice(1).join(' ') + '</span>'),
       'resume.tel':     'TEL: ' + C.contact.tel,
       'resume.email':   'EMAIL: ' + C.contact.email,
