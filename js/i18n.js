@@ -265,7 +265,7 @@
       }).join('');
 
       var card = document.createElement('div');
-      card.className = 'work-card reveal';
+      card.className = 'work-card reveal visible';
       card.dataset.category = w.category;
       card.dataset.group = w.group || ((w.category === 'tool' || w.category === 'code') ? 'project' : 'art');
       card.innerHTML =

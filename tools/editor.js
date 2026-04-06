@@ -957,6 +957,12 @@ function setCurrentWorkIndex(i, keepCardOpen) {
     if (arrow && !arrow.classList.contains('open')) arrow.classList.add('open');
   }, 0);
 }
+function onWorkCardHeaderClick(i) {
+  const body = document.querySelector(`#works_list .card[data-work-index="${i}"] .card-body`);
+  const isOpen = !!(body && body.classList.contains('open'));
+  const shouldOpen = !(i === currentWorkIndex && isOpen);
+  setCurrentWorkIndex(i, shouldOpen);
+}
 function applyLibraryVideoByUrl(url, name) {
   const assetUrl = String(url || '').trim();
   if (!assetUrl) return toast('未找到对应视频资源，请先刷新视频库。', 'error');
@@ -1233,7 +1239,7 @@ function renderWorks() {
     d.className = `card work-card${i === currentWorkIndex ? ' work-card-active' : ''}`;
     d.dataset.workIndex = String(i);
     d.innerHTML = `
-      <div class="card-header" onclick="setCurrentWorkIndex(${i}, true)">
+      <div class="card-header" onclick="onWorkCardHeaderClick(${i})">
         <button class="work-drag-handle" type="button" title="拖拽排序" onclick="event.stopPropagation()">⋮⋮</button>
         <div class="card-number">${i+1}</div>
         <div class="card-title">${w.title.zh||w.title.en||'新作品'}<small> · ${getWorkGroupLabel(w.group)} / ${w.category||'—'}</small></div>

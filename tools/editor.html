@@ -205,7 +205,7 @@
   .panel.active { display: block; }
   .panel.active.anim { animation: panelFadeIn 0.15s ease; }
   @keyframes panelFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-  .works-editor-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+  .works-editor-layout { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
   .works-media-panel {
     position: sticky; top: 16px; max-height: calc(100vh - 120px); overflow: auto;
     background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px;
@@ -218,7 +218,7 @@
   .works-media-meta .name { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
   .works-active-hint { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
   .work-card-active { border-color: rgba(255,45,117,0.65); box-shadow: 0 0 0 1px rgba(255,45,117,0.25); }
-  .works-group-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+  .works-group-grid { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
   #works_list .works-group-grid .card { margin-bottom: 0; }
   .works-toolbar {
     display: grid;
