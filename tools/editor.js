@@ -245,9 +245,75 @@ function confirmDelete(title, desc, onConfirm) {
 }
 
 // ════════════════════════════════════════════
+//  FSA HANDLE PERSISTENCE (IndexedDB)
+// ════════════════════════════════════════════
+const FSA_DB_NAME = 'kyukao_editor';
+const FSA_DB_VER  = 1;
+const FSA_STORE   = 'handles';
+const FSA_KEY     = 'config_js_handle';
+
+function openHandleDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(FSA_DB_NAME, FSA_DB_VER);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(FSA_STORE);
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function saveHandle(handle) {
+  try {
+    const db = await openHandleDB();
+    const tx = db.transaction(FSA_STORE, 'readwrite');
+    tx.objectStore(FSA_STORE).put(handle, FSA_KEY);
+    await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = rej; });
+    db.close();
+  } catch(e) { /* IndexedDB 不可用时静默失败 */ }
+}
+
+async function loadHandle() {
+  try {
+    const db = await openHandleDB();
+    const handle = await new Promise((res, rej) => {
+      const req = db.transaction(FSA_STORE, 'readonly').objectStore(FSA_STORE).get(FSA_KEY);
+      req.onsuccess = e => res(e.target.result);
+      req.onerror   = e => rej(e.target.error);
+    });
+    db.close();
+    return handle || null;
+  } catch(e) { return null; }
+}
+
+async function clearHandle() {
+  try {
+    const db = await openHandleDB();
+    const tx = db.transaction(FSA_STORE, 'readwrite');
+    tx.objectStore(FSA_STORE).delete(FSA_KEY);
+    await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = rej; });
+    db.close();
+  } catch(e) {}
+}
+
+// ════════════════════════════════════════════
 //  EXPORT DIALOG
 // ════════════════════════════════════════════
-function showExportDialog() {
+async function showExportDialog() {
+  // 尝试读取上次保存的路径并更新 UI
+  if (window.showSaveFilePicker) {
+    const handle = await loadHandle();
+    const hint = document.getElementById('fsaPathHint');
+    const resetBtn = document.getElementById('fsaResetBtn');
+    if (hint) {
+      if (handle) {
+        hint.textContent = '上次路径：' + handle.name;
+        hint.style.display = 'block';
+        if (resetBtn) resetBtn.style.display = 'inline-block';
+      } else {
+        hint.style.display = 'none';
+        if (resetBtn) resetBtn.style.display = 'none';
+      }
+    }
+  }
   openModal('exportModal');
 }
 
@@ -258,20 +324,41 @@ async function doExportFSA() {
     doExportDownload();
     return;
   }
-  const now = new Date();
-  const stamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
   try {
-    const handle = await window.showSaveFilePicker({
-      suggestedName: 'config.js',
-      types: [{ description: 'JavaScript', accept: {'text/javascript': ['.js']} }],
-    });
+    // 尝试复用上次保存的 handle
+    let handle = await loadHandle();
+    if (handle) {
+      // 验证权限（用户可能已撤销）
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') handle = null; // 权限被拒绝，重新选择
+      }
+    }
+    if (!handle) {
+      // 首次或权限失效：弹出文件选择框
+      handle = await window.showSaveFilePicker({
+        suggestedName: 'config.js',
+        types: [{ description: 'JavaScript', accept: {'text/javascript': ['.js']} }],
+      });
+      await saveHandle(handle); // 记住这次选的路径
+    }
     const writable = await handle.createWritable();
     await writable.write(buildConfigJs());
     await writable.close();
-    toast('✓ config.js 已保存！', 'success');
+    toast('✓ config.js 已保存至 ' + handle.name + '！', 'success');
   } catch(e) {
     if (e.name !== 'AbortError') toast('✗ 保存失败：' + e.message, 'error');
   }
+}
+
+async function fsaResetPath() {
+  await clearHandle();
+  const hint = document.getElementById('fsaPathHint');
+  const resetBtn = document.getElementById('fsaResetBtn');
+  if (hint) hint.style.display = 'none';
+  if (resetBtn) resetBtn.style.display = 'none';
+  toast('✓ 已清除保存路径，下次将重新选择', 'success');
 }
 
 function doExportDownload() {
