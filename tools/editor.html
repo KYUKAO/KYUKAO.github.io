@@ -289,7 +289,7 @@
   }
 
   /* ── File input hidden ── */
-  #fileInput { display: none; }
+  #fileInput, #tyFileInput { display: none; }
 
   /* responsive hint */
   @media (max-width: 768px) {
@@ -419,30 +419,30 @@
     </div>
     <div class="nav-divider"></div>
     <div class="nav-item active" data-panel="p1" onclick="switchPanel('p1',this)">
-      <span class="nav-icon">👤</span><span>§1 基本信息</span>
+      <span class="nav-icon">👤</span><span>1 基本信息</span>
     </div>
     <div class="nav-item" data-panel="p2" onclick="switchPanel('p2',this)">
-      <span class="nav-icon">🏠</span><span>§2 首页文字</span>
+      <span class="nav-icon">🏠</span><span>2 首页文字</span>
     </div>
     <div class="nav-item" data-panel="p3" onclick="switchPanel('p3',this)">
-      <span class="nav-icon">💬</span><span>§3 关于我</span>
+      <span class="nav-icon">💬</span><span>3 关于我</span>
     </div>
     <div class="nav-item" data-panel="p4" onclick="switchPanel('p4',this)">
-      <span class="nav-icon">🎨</span><span>§4 作品集</span>
+      <span class="nav-icon">🎨</span><span>4 作品集</span>
     </div>
     <div class="nav-divider"></div>
     <div class="nav-item" data-panel="p5" onclick="switchPanel('p5',this)">
-      <span class="nav-icon">🎓</span><span>§5 教育经历</span>
+      <span class="nav-icon">🎓</span><span>5 教育经历</span>
     </div>
     <div class="nav-item" data-panel="p6" onclick="switchPanel('p6',this)">
-      <span class="nav-icon">💼</span><span>§6 工作经历</span>
+      <span class="nav-icon">💼</span><span>6 工作经历</span>
     </div>
     <div class="nav-item" data-panel="p7" onclick="switchPanel('p7',this)">
-      <span class="nav-icon">🚀</span><span>§7 独立项目</span>
+      <span class="nav-icon">🚀</span><span>7 独立项目</span>
     </div>
     <div class="nav-divider"></div>
     <div class="nav-item" data-panel="p8" onclick="switchPanel('p8',this)">
-      <span class="nav-icon">📦</span><span>§8 媒体上传</span>
+      <span class="nav-icon">📦</span><span>8 媒体上传</span>
     </div>
     <div class="nav-divider"></div>
     <div class="nav-item" onclick="openModal('helpModal')">
@@ -762,6 +762,29 @@
         </div>
       </div>
       <button class="btn btn-ghost" onclick="applyWorkLinkPresetsToAllWorks()">应用到全部作品</button>
+
+      <hr class="field-divider">
+      <div class="section-header"><h2 style="font-size:0.7rem;">作品分组通用文案</h2></div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">完整项目标题 <span class="lang-badge lang-en">EN</span></label>
+          <input type="text" id="work_group_project_en" placeholder="Complete Projects" oninput="saveWorkGroupNamesFromInputs()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">完整项目标题 <span class="lang-badge lang-zh">ZH</span></label>
+          <input type="text" id="work_group_project_zh" placeholder="完整项目作品" oninput="saveWorkGroupNamesFromInputs()">
+        </div>
+      </div>
+      <div class="bilingual">
+        <div class="form-group">
+          <label class="form-label">独立美术标题 <span class="lang-badge lang-en">EN</span></label>
+          <input type="text" id="work_group_art_en" placeholder="Independent Artworks" oninput="saveWorkGroupNamesFromInputs()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">独立美术标题 <span class="lang-badge lang-zh">ZH</span></label>
+          <input type="text" id="work_group_art_zh" placeholder="独立美术作品" oninput="saveWorkGroupNamesFromInputs()">
+        </div>
+      </div>
     </div>
 
     <!-- §2 首页文字 -->

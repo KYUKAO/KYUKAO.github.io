@@ -101,6 +101,10 @@ let S = {
     photo:'',
     interests: [],
   },
+  workGroupNames: {
+    project: { en: 'Complete Projects', zh: '完整项目作品' },
+    art: { en: 'Independent Artworks', zh: '独立美术作品' },
+  },
   works: [],
   education: [],
   workExp: [],
@@ -687,9 +691,13 @@ const WORK_LINK_TYPE_PRESETS = {
 let workLinkPresets = DEFAULT_WORK_LINK_PRESETS.map(x => ({ en: x.en, zh: x.zh }));
 const WORK_CATS = ['shader','vfx','tool','render','code'];
 const WORK_GROUPS = [
-  { id: 'project', label: '完整项目' },
-  { id: 'art', label: '独立美术' },
+  { id: 'project' },
+  { id: 'art' },
 ];
+const WORK_GROUP_NAME_DEFAULTS = {
+  project: { en: 'Complete Projects', zh: '完整项目作品' },
+  art: { en: 'Independent Artworks', zh: '独立美术作品' },
+};
 const WORK_VIDEO_EXT_RE = /\.(mp4|webm|mov|m4v|ogv|avi|mkv)(\?.*)?$/i;
 let currentWorkIndex = 0;
 let worksSearchKeyword = '';
@@ -721,13 +729,58 @@ function normalizeWorkItem(w) {
     if (typeof item.href !== 'string') item.href = '';
     return item;
   });
+  const legacyEmpty = w.links.every(lk => {
+    const href = String((lk && lk.href) || '').trim();
+    return !href || href === '#';
+  });
+  if (legacyEmpty && w.links.length > 1) w.links = [w.links[0]];
+}
+function normalizeWorkGroupNames() {
+  if (!S.workGroupNames || typeof S.workGroupNames !== 'object') S.workGroupNames = {};
+  WORK_GROUPS.forEach(g => {
+    const raw = S.workGroupNames[g.id] || {};
+    const def = WORK_GROUP_NAME_DEFAULTS[g.id];
+    S.workGroupNames[g.id] = {
+      en: String(raw.en || def.en),
+      zh: String(raw.zh || def.zh),
+    };
+  });
 }
 function normalizeWorks() {
+  normalizeWorkGroupNames();
   (S.works || []).forEach(normalizeWorkItem);
 }
 function getWorkGroupLabel(groupId) {
-  const g = WORK_GROUPS.find(x => x.id === groupId);
-  return g ? g.label : '未分组';
+  const g = S.workGroupNames && S.workGroupNames[groupId];
+  return (g && (g.zh || g.en)) || '未分组';
+}
+function getWorkGroupName(groupId, lang) {
+  const g = S.workGroupNames && S.workGroupNames[groupId];
+  if (!g) return WORK_GROUP_NAME_DEFAULTS[groupId] ? WORK_GROUP_NAME_DEFAULTS[groupId][lang] : '';
+  return String(g[lang] || g.zh || g.en || '');
+}
+function renderWorkGroupNameInputs() {
+  const pEn = document.getElementById('work_group_project_en');
+  const pZh = document.getElementById('work_group_project_zh');
+  const aEn = document.getElementById('work_group_art_en');
+  const aZh = document.getElementById('work_group_art_zh');
+  if (pEn) pEn.value = getWorkGroupName('project', 'en');
+  if (pZh) pZh.value = getWorkGroupName('project', 'zh');
+  if (aEn) aEn.value = getWorkGroupName('art', 'en');
+  if (aZh) aZh.value = getWorkGroupName('art', 'zh');
+}
+function saveWorkGroupNamesFromInputs() {
+  normalizeWorkGroupNames();
+  const pEn = document.getElementById('work_group_project_en');
+  const pZh = document.getElementById('work_group_project_zh');
+  const aEn = document.getElementById('work_group_art_en');
+  const aZh = document.getElementById('work_group_art_zh');
+  if (pEn) S.workGroupNames.project.en = String(pEn.value || '').trim() || WORK_GROUP_NAME_DEFAULTS.project.en;
+  if (pZh) S.workGroupNames.project.zh = String(pZh.value || '').trim() || WORK_GROUP_NAME_DEFAULTS.project.zh;
+  if (aEn) S.workGroupNames.art.en = String(aEn.value || '').trim() || WORK_GROUP_NAME_DEFAULTS.art.en;
+  if (aZh) S.workGroupNames.art.zh = String(aZh.value || '').trim() || WORK_GROUP_NAME_DEFAULTS.art.zh;
+  renderWorks();
+  snapshot();
 }
 
 function getWorkLinkPreset(i) {
@@ -783,6 +836,7 @@ function loadWorkLinkPresets() {
     workLinkPresets.push({ en: DEFAULT_WORK_LINK_PRESETS[i].en, zh: DEFAULT_WORK_LINK_PRESETS[i].zh });
   }
   renderWorkLinkPresetInputs();
+  renderWorkGroupNameInputs();
 }
 function applyWorkLinkPresetsToAllWorks() {
   S.works.forEach(w => {
@@ -1145,7 +1199,7 @@ function onWorkDragStart(ev, index) {
     return;
   }
   workDragFromIndex = index;
-  const card = ev.currentTarget;
+  const card = ev.currentTarget && ev.currentTarget.closest ? ev.currentTarget.closest('.work-card') : null;
   if (card) card.classList.add('work-card-dragging');
   if (ev.dataTransfer) {
     ev.dataTransfer.effectAllowed = 'move';
@@ -1180,7 +1234,7 @@ function onWorkDrop(ev, index) {
   toast('已更新作品顺序', 'success');
 }
 function onWorkDragEnd(ev) {
-  const card = ev.currentTarget;
+  const card = ev.currentTarget && ev.currentTarget.closest ? ev.currentTarget.closest('.work-card') : null;
   if (card) card.classList.remove('work-card-dragging', 'work-card-drop-target');
   document.querySelectorAll('#works_list .work-card-drop-target').forEach(el => el.classList.remove('work-card-drop-target'));
   workDragFromIndex = -1;
@@ -1217,9 +1271,9 @@ function renderWorks() {
   const visibleCount = groupBuckets.project.length + groupBuckets.art.length + groupBuckets.other.length;
   if (statEl) statEl.textContent = `显示 ${visibleCount} / ${totalCount}`;
 
-  const renderCard = (w, i, mount) => {
+  const renderCard = (w, i, mount, groupIndex) => {
     const catOpts = WORK_CATS.map(c => `<option value="${c}" ${w.category===c?'selected':''}>${c}</option>`).join('');
-    const groupOpts = WORK_GROUPS.map(g => `<option value="${g.id}" ${w.group===g.id?'selected':''}>${g.label}</option>`).join('');
+    const groupOpts = WORK_GROUPS.map(g => `<option value="${g.id}" ${w.group===g.id?'selected':''}>${esc(getWorkGroupLabel(g.id))}</option>`).join('');
     const tagsHtml = (w.tags||[]).map((t,ti) =>
       `<div class="chip"><span>${esc(t)}</span><button class="chip-del" onclick="removeWorkTag(${i},${ti})">×</button></div>`
     ).join('');
@@ -1259,7 +1313,7 @@ function renderWorks() {
     d.innerHTML = `
       <div class="card-header" onclick="onWorkCardHeaderClick(${i})">
         <button class="work-drag-handle" type="button" title="拖拽排序" onclick="event.stopPropagation()">⋮⋮</button>
-        <div class="card-number">${i+1}</div>
+        <div class="card-number">${groupIndex}</div>
         <div class="card-title">${w.title.zh||w.title.en||'新作品'}<small> · ${getWorkGroupLabel(w.group)} / ${w.category||'—'}</small></div>
         <button class="btn btn-danger" onclick="event.stopPropagation();removeWork(${i})">删除</button>
         <span class="card-toggle">▾</span>
@@ -1338,12 +1392,15 @@ function renderWorks() {
           <div id="wvideo_preview_${i}">${buildWorkVideoPreviewHtml(w)}</div>
         </div>
       </div>`;
-    d.setAttribute('draggable', 'true');
-    d.addEventListener('dragstart', (ev) => onWorkDragStart(ev, i));
     d.addEventListener('dragover', onWorkDragOver);
     d.addEventListener('dragleave', onWorkDragLeave);
     d.addEventListener('drop', (ev) => onWorkDrop(ev, i));
-    d.addEventListener('dragend', onWorkDragEnd);
+    const handle = d.querySelector('.work-drag-handle');
+    if (handle) {
+      handle.setAttribute('draggable', 'true');
+      handle.addEventListener('dragstart', (ev) => onWorkDragStart(ev, i));
+      handle.addEventListener('dragend', onWorkDragEnd);
+    }
     mount.appendChild(d);
   };
 
@@ -1363,11 +1420,11 @@ function renderWorks() {
     const grid = document.createElement('div');
     grid.className = 'works-group-grid';
     c.appendChild(grid);
-    list.forEach(item => renderCard(item.w, item.i, grid));
+    list.forEach((item, idx) => renderCard(item.w, item.i, grid, idx + 1));
   };
 
-  appendGroup('project', '完整项目');
-  appendGroup('art', '独立美术');
+  appendGroup('project', getWorkGroupLabel('project'));
+  appendGroup('art', getWorkGroupLabel('art'));
   if (groupBuckets.other.length) {
     const extraTitle = document.createElement('div');
     extraTitle.style.cssText = 'margin:12px 0 8px;color:var(--text-muted);font-size:11px;';
@@ -1376,7 +1433,7 @@ function renderWorks() {
     const extraGrid = document.createElement('div');
     extraGrid.className = 'works-group-grid';
     c.appendChild(extraGrid);
-    groupBuckets.other.forEach(item => renderCard(item.w, item.i, extraGrid));
+    groupBuckets.other.forEach((item, idx) => renderCard(item.w, item.i, extraGrid, idx + 1));
   }
   renderWorkMediaLibraryPanel();
 }
@@ -1752,6 +1809,7 @@ function populateSimple() {
 
 function renderAll() {
   normalizeWorks();
+  renderWorkGroupNameInputs();
   populateSimple(); populateTY();
   renderStats(); renderSkills();
   renderInterests(); renderWorks();
@@ -2076,6 +2134,11 @@ ${s.about.interests.map(it => `      {
   /* ============================================================
      § 4. 作品集
      ============================================================ */
+
+  workGroupNames: {
+    project: { en: ${q((s.workGroupNames && s.workGroupNames.project && s.workGroupNames.project.en) || WORK_GROUP_NAME_DEFAULTS.project.en)}, zh: ${q((s.workGroupNames && s.workGroupNames.project && s.workGroupNames.project.zh) || WORK_GROUP_NAME_DEFAULTS.project.zh)} },
+    art: { en: ${q((s.workGroupNames && s.workGroupNames.art && s.workGroupNames.art.en) || WORK_GROUP_NAME_DEFAULTS.art.en)}, zh: ${q((s.workGroupNames && s.workGroupNames.art && s.workGroupNames.art.zh) || WORK_GROUP_NAME_DEFAULTS.art.zh)} },
+  },
 
   works: [
 ${s.works.map(w => `    {
