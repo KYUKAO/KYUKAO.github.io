@@ -153,7 +153,7 @@
         title:    t(w.title, lang),
         desc:     t(w.desc,  lang),
         links:    w.links.map(function (l) {
-          return { label: t(l.label, lang), href: l.href };
+          return { type: l.type || '', label: t(l.label, lang), href: l.href };
         }),
       };
     });

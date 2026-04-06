@@ -660,6 +660,12 @@ const DEFAULT_WORK_LINK_PRESETS = [
   { en: 'GitHub', zh: 'GitHub' },
   { en: 'View Details →', zh: '查看详情 →' },
 ];
+const WORK_LINK_TYPE_PRESETS = {
+  video:  { en: 'Watch Video →', zh: '观看视频 →' },
+  github: { en: 'GitHub',        zh: 'GitHub' },
+  detail: { en: 'View Details →',zh: '查看详情 →' },
+  custom: { en: '',              zh: '' },
+};
 let workLinkPresets = DEFAULT_WORK_LINK_PRESETS.map(x => ({ en: x.en, zh: x.zh }));
 const WORK_CATS = ['shader','vfx','tool','render','code'];
 const WORK_GROUPS = [
@@ -668,6 +674,9 @@ const WORK_GROUPS = [
 ];
 const WORK_VIDEO_EXT_RE = /\.(mp4|webm|mov|m4v|ogv|avi|mkv)(\?.*)?$/i;
 let currentWorkIndex = 0;
+let worksSearchKeyword = '';
+let worksGroupFilter = 'all';
+let workDragFromIndex = -1;
 let uploadedAssetsCache = [];
 
 function inferWorkGroupFromCategory(cat) {
@@ -676,7 +685,24 @@ function inferWorkGroupFromCategory(cat) {
 function normalizeWorkItem(w) {
   if (!w || typeof w !== 'object') return;
   if (!w.group) w.group = inferWorkGroupFromCategory(w.category);
+  if (typeof w.assetKey !== 'string') w.assetKey = '';
   if (!Array.isArray(w.links)) w.links = [];
+  if (!w.links.length) {
+    const p = getWorkLinkPresetByType('video');
+    w.links = [{ type: 'video', label: { en: p.en, zh: p.zh }, href: '' }];
+    return;
+  }
+  w.links = w.links.map((lk, idx) => {
+    const item = lk || {};
+    const t = inferLinkType(item, idx);
+    if (!item.label || typeof item.label !== 'object') item.label = { en: '', zh: '' };
+    const p = getWorkLinkPresetByType(t);
+    if (!item.label.en) item.label.en = p.en || '';
+    if (!item.label.zh) item.label.zh = p.zh || '';
+    item.type = t;
+    if (typeof item.href !== 'string') item.href = '';
+    return item;
+  });
 }
 function normalizeWorks() {
   (S.works || []).forEach(normalizeWorkItem);
@@ -692,6 +718,12 @@ function getWorkLinkPreset(i) {
     en: String(p.en || DEFAULT_WORK_LINK_PRESETS[i] && DEFAULT_WORK_LINK_PRESETS[i].en || `Link ${i+1}`),
     zh: String(p.zh || DEFAULT_WORK_LINK_PRESETS[i] && DEFAULT_WORK_LINK_PRESETS[i].zh || `链接${i+1}`),
   };
+}
+function getWorkLinkPresetByType(type) {
+  if (type === 'video') return getWorkLinkPreset(0);
+  if (type === 'github') return getWorkLinkPreset(1);
+  if (type === 'detail') return getWorkLinkPreset(2);
+  return { en: '', zh: '' };
 }
 function renderWorkLinkPresetInputs() {
   for (let i = 0; i < 3; i++) {
@@ -737,8 +769,8 @@ function loadWorkLinkPresets() {
 function applyWorkLinkPresetsToAllWorks() {
   S.works.forEach(w => {
     if (!Array.isArray(w.links)) return;
-    w.links.forEach((lk, i) => {
-      const p = getWorkLinkPreset(i);
+    w.links.forEach((lk) => {
+      const p = getWorkLinkPresetByType(inferLinkType(lk, 0));
       if (!lk.label || typeof lk.label !== 'object') lk.label = { en: '', zh: '' };
       lk.label.en = p.en;
       lk.label.zh = p.zh;
@@ -846,12 +878,67 @@ function ensureWorkVideoLink(work) {
   if (!work.links || !Array.isArray(work.links)) work.links = [];
   let idx = getWorkVideoLinkIndex(work);
   if (idx >= 0) return idx;
-  const p = getWorkLinkPreset(0);
-  work.links.push({ label: { en: p.en, zh: p.zh }, href: '' });
-  return work.links.length - 1;
+  const p = getWorkLinkPresetByType('video');
+  if (!work.links.length) {
+    work.links = [{ type: 'video', label: { en: p.en, zh: p.zh }, href: '' }];
+    return 0;
+  }
+  work.links[0].type = 'video';
+  if (!work.links[0].label || typeof work.links[0].label !== 'object') work.links[0].label = { en: '', zh: '' };
+  if (!work.links[0].label.en) work.links[0].label.en = p.en;
+  if (!work.links[0].label.zh) work.links[0].label.zh = p.zh;
+  return 0;
+}
+function inferLinkType(link, li) {
+  const lk = link || {};
+  if (lk.type) return lk.type;
+  const href = String(lk.href || '').toLowerCase();
+  if (/github\.com/.test(href)) return 'github';
+  if (isDirectVideoUrl(href) || getYoutubeEmbedUrl(href) || getVimeoEmbedUrl(href)) return 'video';
+  if (li === 0) return 'video';
+  if (li === 1) return 'github';
+  if (li === 2) return 'detail';
+  return 'custom';
+}
+function applyLinkTypePreset(workIndex, linkIndex, type) {
+  normalizeWorkItem(S.works[workIndex]);
+  const lk = S.works[workIndex].links[linkIndex];
+  if (!lk) return;
+  lk.type = type;
+  if (!lk.label || typeof lk.label !== 'object') lk.label = { en: '', zh: '' };
+  const p = getWorkLinkPresetByType(type);
+  if (p.en) lk.label.en = p.en;
+  if (p.zh) lk.label.zh = p.zh;
+  renderWorks();
+  snapshot();
 }
 function getUploadedVideoAssets() {
   return (uploadedAssetsCache || []).filter(a => WORK_VIDEO_EXT_RE.test(String((a && a.name) || '')));
+}
+function getUploadedImageAssets() {
+  return (uploadedAssetsCache || []).filter(a => /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(String((a && a.name) || '')));
+}
+function normMatchText(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '');
+}
+function getWorkAssetKeywords(work) {
+  const raw = [
+    work && work.assetKey,
+    work && work.title && work.title.en,
+    work && work.title && work.title.zh,
+  ].filter(Boolean).join(' ');
+  const words = String(raw)
+    .split(/[\s,_\-|/]+/)
+    .map(x => normMatchText(x))
+    .filter(x => x && x.length >= 2);
+  return Array.from(new Set(words)).slice(0, 8);
+}
+function scoreAssetByKeywords(asset, keywords) {
+  if (!asset || !keywords || !keywords.length) return 0;
+  const name = normMatchText(asset.name || '');
+  let score = 0;
+  keywords.forEach(k => { if (name.includes(k)) score += (k.length >= 4 ? 2 : 1); });
+  return score;
 }
 function setCurrentWorkIndex(i, keepCardOpen) {
   const next = normalizeWorkIndex(i);
@@ -885,6 +972,16 @@ function applyLibraryVideoByUrl(url, name) {
   snapshot();
   toast(`已绑定视频：${name || '已选文件'}`, 'success');
 }
+function applyLibraryImageByUrl(url, name) {
+  const imageUrl = String(url || '').trim();
+  if (!imageUrl) return toast('未找到对应图片资源，请先刷新媒体库。', 'error');
+  const wi = normalizeWorkIndex(currentWorkIndex);
+  if (wi < 0) return toast('请先创建作品后再绑定图片。', 'error');
+  S.works[wi].image = imageUrl;
+  renderWorks();
+  snapshot();
+  toast(`已绑定封面：${name || '已选图片'}`, 'success');
+}
 function renderWorkMediaLibraryPanel() {
   const listEl = document.getElementById('works_media_list');
   const hintEl = document.getElementById('works_active_hint');
@@ -904,15 +1001,25 @@ function renderWorkMediaLibraryPanel() {
   }
 
   const videos = getUploadedVideoAssets();
-  if (!videos.length) {
-    listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:6px 0;">视频库为空。可在 §8 上传后点击刷新。</div>';
+  const images = getUploadedImageAssets();
+  if (!videos.length && !images.length) {
+    listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:6px 0;">媒体库为空。可在 §8 上传后点击刷新。</div>';
     return;
   }
   const activeWork = wi >= 0 ? S.works[wi] : null;
   const activeLi = activeWork ? getWorkVideoLinkIndex(activeWork) : -1;
   const activeHref = activeLi >= 0 ? String(activeWork.links[activeLi].href || '').trim() : '';
-
-  listEl.innerHTML = videos.map(v => {
+  const activeImage = activeWork ? String(activeWork.image || '').trim() : '';
+  const keywords = getWorkAssetKeywords(activeWork || {});
+  const sortByRelevance = (arr) => arr.slice().sort((a, b) => {
+    const sa = scoreAssetByKeywords(a, keywords);
+    const sb = scoreAssetByKeywords(b, keywords);
+    if (sa !== sb) return sb - sa;
+    return String(a.name || '').localeCompare(String(b.name || ''));
+  });
+  const videosSorted = sortByRelevance(videos);
+  const imagesSorted = sortByRelevance(images);
+  const renderVideoItem = (v) => {
     const size = v.size > 1024 * 1024 ? `${(v.size / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(v.size / 1024))} KB`;
     const activeClass = activeHref && activeHref === v.browser_download_url ? ' active' : '';
     const safeUrl = JSON.stringify(v.browser_download_url || '');
@@ -921,13 +1028,45 @@ function renderWorkMediaLibraryPanel() {
       <video class="works-media-thumb" src="${esc(v.browser_download_url)}" preload="metadata" muted playsinline></video>
       <div class="works-media-meta">
         <div class="name">${esc(v.name)}</div>
+        <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${esc(v.browser_download_url)}">${esc(v.browser_download_url)}</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <span>${size}</span>
-          <button class="btn btn-add" style="padding:4px 10px;font-size:10px;" onclick='event.stopPropagation();applyLibraryVideoByUrl(${safeUrl}, ${safeName})'>绑定到当前作品</button>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;" onclick='event.stopPropagation();copyUrl(${safeUrl})'>复制</button>
+            <button class="btn btn-add" style="padding:4px 10px;font-size:10px;" onclick='event.stopPropagation();applyLibraryVideoByUrl(${safeUrl}, ${safeName})'>绑定视频</button>
+          </div>
         </div>
       </div>
     </div>`;
-  }).join('');
+  };
+  const renderImageItem = (v) => {
+    const size = v.size > 1024 * 1024 ? `${(v.size / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(v.size / 1024))} KB`;
+    const activeClass = activeImage && activeImage === v.browser_download_url ? ' active' : '';
+    const safeUrl = JSON.stringify(v.browser_download_url || '');
+    const safeName = JSON.stringify(v.name || '');
+    return `<div class="works-media-item${activeClass}" onclick='applyLibraryImageByUrl(${safeUrl}, ${safeName})'>
+      <img class="works-media-thumb" src="${esc(v.browser_download_url)}" alt="${esc(v.name)}" loading="lazy">
+      <div class="works-media-meta">
+        <div class="name">${esc(v.name)}</div>
+        <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${esc(v.browser_download_url)}">${esc(v.browser_download_url)}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span>${size}</span>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;" onclick='event.stopPropagation();copyUrl(${safeUrl})'>复制</button>
+            <button class="btn btn-add" style="padding:4px 10px;font-size:10px;" onclick='event.stopPropagation();applyLibraryImageByUrl(${safeUrl}, ${safeName})'>设为封面</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  };
+  const kwText = keywords.length ? `（关键词：${keywords.join(' / ')}）` : '';
+  listEl.innerHTML = `
+    <div style="font-size:11px;color:var(--text-muted);margin:2px 0 6px;">按当前作品相关资源优先排序${kwText}</div>
+    <div style="font-size:11px;color:var(--pink);letter-spacing:.08em;text-transform:uppercase;margin:8px 0 6px;">Videos</div>
+    ${videosSorted.length ? videosSorted.map(renderVideoItem).join('') : '<div style="font-size:11px;color:var(--text-muted);padding:6px 0;">暂无视频资源</div>'}
+    <div style="font-size:11px;color:var(--pink);letter-spacing:.08em;text-transform:uppercase;margin:12px 0 6px;">Images</div>
+    ${imagesSorted.length ? imagesSorted.map(renderImageItem).join('') : '<div style="font-size:11px;color:var(--text-muted);padding:6px 0;">暂无图片资源</div>'}
+  `;
 }
 async function refreshWorkMediaLibrary(showToast) {
   const c = getGhConfig();
@@ -941,24 +1080,129 @@ async function refreshWorkMediaLibrary(showToast) {
   if (showToast && ok) toast('视频库已刷新。', 'success');
   return ok;
 }
+function setWorksSearchKeyword(v) {
+  worksSearchKeyword = String(v || '').trim();
+  renderWorks();
+}
+function setWorksGroupFilter(v) {
+  const next = String(v || 'all');
+  worksGroupFilter = ['all', 'project', 'art', 'other'].includes(next) ? next : 'all';
+  renderWorks();
+}
+function clearWorksFilters() {
+  worksSearchKeyword = '';
+  worksGroupFilter = 'all';
+  renderWorks();
+}
+function moveWorkItem(fromIndex, toIndex) {
+  if (!Array.isArray(S.works)) return false;
+  const from = normalizeWorkIndex(fromIndex);
+  const to = normalizeWorkIndex(toIndex);
+  if (from < 0 || to < 0 || from === to) return false;
+
+  const moved = S.works[from];
+  if (!moved) return false;
+  S.works.splice(from, 1);
+  const insertAt = from < to ? to - 1 : to;
+  S.works.splice(insertAt, 0, moved);
+
+  if (currentWorkIndex === from) {
+    currentWorkIndex = insertAt;
+  } else if (from < currentWorkIndex && currentWorkIndex <= insertAt) {
+    currentWorkIndex -= 1;
+  } else if (insertAt <= currentWorkIndex && currentWorkIndex < from) {
+    currentWorkIndex += 1;
+  }
+  return true;
+}
+function onWorkDragStart(ev, index) {
+  if (!ev || !ev.target || !ev.target.closest('.work-drag-handle')) {
+    ev.preventDefault();
+    return;
+  }
+  workDragFromIndex = index;
+  const card = ev.currentTarget;
+  if (card) card.classList.add('work-card-dragging');
+  if (ev.dataTransfer) {
+    ev.dataTransfer.effectAllowed = 'move';
+    ev.dataTransfer.setData('text/plain', String(index));
+  }
+}
+function onWorkDragOver(ev) {
+  ev.preventDefault();
+  if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move';
+  const card = ev.currentTarget;
+  if (card) card.classList.add('work-card-drop-target');
+}
+function onWorkDragLeave(ev) {
+  const card = ev.currentTarget;
+  if (card) card.classList.remove('work-card-drop-target');
+}
+function onWorkDrop(ev, index) {
+  ev.preventDefault();
+  const card = ev.currentTarget;
+  if (card) card.classList.remove('work-card-drop-target');
+
+  let from = workDragFromIndex;
+  if (ev.dataTransfer) {
+    const raw = Number(ev.dataTransfer.getData('text/plain'));
+    if (!Number.isNaN(raw)) from = raw;
+  }
+  workDragFromIndex = -1;
+  if (!moveWorkItem(from, index)) return;
+  renderWorks();
+  snapshot();
+  updateStatus();
+  toast('已更新作品顺序', 'success');
+}
+function onWorkDragEnd(ev) {
+  const card = ev.currentTarget;
+  if (card) card.classList.remove('work-card-dragging', 'work-card-drop-target');
+  document.querySelectorAll('#works_list .work-card-drop-target').forEach(el => el.classList.remove('work-card-drop-target'));
+  workDragFromIndex = -1;
+}
 function renderWorks() {
   normalizeWorks();
   const c = document.getElementById('works_list');
   c.innerHTML = '';
+  const searchInput = document.getElementById('works_search_input');
+  const groupInput = document.getElementById('works_group_filter');
+  const statEl = document.getElementById('works_filter_stat');
+  if (searchInput && searchInput.value !== worksSearchKeyword) searchInput.value = worksSearchKeyword;
+  if (groupInput && groupInput.value !== worksGroupFilter) groupInput.value = worksGroupFilter;
+
+  const kw = worksSearchKeyword.toLowerCase();
+  const groupOnly = worksGroupFilter;
+  const totalCount = S.works.length;
   const groupBuckets = { project: [], art: [], other: [] };
   S.works.forEach((w, i) => {
     const gid = w.group || inferWorkGroupFromCategory(w.category);
+    if (groupOnly !== 'all' && gid !== groupOnly) return;
+    if (kw) {
+      const titleZh = (w.title && w.title.zh) || '';
+      const titleEn = (w.title && w.title.en) || '';
+      const descZh = (w.desc && w.desc.zh) || '';
+      const descEn = (w.desc && w.desc.en) || '';
+      const tags = Array.isArray(w.tags) ? w.tags.join(' ') : '';
+      const haystack = `${titleZh} ${titleEn} ${descZh} ${descEn} ${w.category || ''} ${w.assetKey || ''} ${tags}`.toLowerCase();
+      if (!haystack.includes(kw)) return;
+    }
     if (groupBuckets[gid]) groupBuckets[gid].push({ w, i });
     else groupBuckets.other.push({ w, i });
   });
+  const visibleCount = groupBuckets.project.length + groupBuckets.art.length + groupBuckets.other.length;
+  if (statEl) statEl.textContent = `显示 ${visibleCount} / ${totalCount}`;
 
-  const renderCard = (w, i) => {
+  const renderCard = (w, i, mount) => {
     const catOpts = WORK_CATS.map(c => `<option value="${c}" ${w.category===c?'selected':''}>${c}</option>`).join('');
     const groupOpts = WORK_GROUPS.map(g => `<option value="${g.id}" ${w.group===g.id?'selected':''}>${g.label}</option>`).join('');
     const tagsHtml = (w.tags||[]).map((t,ti) =>
       `<div class="chip"><span>${esc(t)}</span><button class="chip-del" onclick="removeWorkTag(${i},${ti})">×</button></div>`
     ).join('');
-    const linksHtml = (w.links||[]).map((lk,li) => `
+    const linksHtml = (w.links || []).map((lk, li) => {
+      const linkType = inferLinkType(lk, li);
+      const hrefBind = `S.works[${i}].links[${li}].href=this.value;renderWorkVideoPreview(${i});if(currentWorkIndex===${i})renderWorkMediaLibraryPanel()`;
+      return `
       <div class="card" style="margin-bottom:8px;">
         <div class="card-header" onclick="toggleCard(this)" style="padding:8px 12px;">
           <div class="card-title" style="font-size:11px;">链接 ${li+1}</div>
@@ -967,24 +1211,30 @@ function renderWorks() {
         </div>
         <div class="card-body">
           <div class="bilingual">
-            <div class="form-group"><label class="form-label">文字 <span class="lang-badge lang-en">EN</span></label>
-              <input type="text" value="${esc((lk.label&&lk.label.en)||getWorkLinkPreset(li).en)}" oninput="if(!S.works[${i}].links[${li}].label)S.works[${i}].links[${li}].label={en:'',zh:''};S.works[${i}].links[${li}].label.en=this.value">
+            <div class="form-group"><label class="form-label">类型</label>
+              <select oninput="applyLinkTypePreset(${i},${li},this.value)">
+                <option value="video" ${linkType==='video'?'selected':''}>视频</option>
+                <option value="github" ${linkType==='github'?'selected':''}>GitHub</option>
+                <option value="detail" ${linkType==='detail'?'selected':''}>详情页</option>
+                <option value="custom" ${linkType==='custom'?'selected':''}>自定义</option>
+              </select>
             </div>
-            <div class="form-group"><label class="form-label">文字 <span class="lang-badge lang-zh">ZH</span></label>
-              <input type="text" value="${esc((lk.label&&lk.label.zh)||getWorkLinkPreset(li).zh)}" oninput="if(!S.works[${i}].links[${li}].label)S.works[${i}].links[${li}].label={en:'',zh:''};S.works[${i}].links[${li}].label.zh=this.value">
+            <div class="form-group">
+              <label class="form-label">链接地址 ${linkType==='video'?'（资源库点击自动绑定）':'（可编辑）'}</label>
+              <input type="text" value="${esc(lk.href)}" ${linkType==='video'?'readonly style="opacity:.9;"':`oninput="${hrefBind}"`}>
             </div>
           </div>
-          <div class="form-group"><label class="form-label">URL</label>
-            <input type="url" value="${esc(lk.href)}" oninput="S.works[${i}].links[${li}].href=this.value;renderWorkVideoPreview(${i});if(currentWorkIndex===${i})renderWorkMediaLibraryPanel()">
-          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">按钮名已由「§1 → 作品链接通用文案」统一配置。</div>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
 
     const d = document.createElement('div');
-    d.className = `card${i === currentWorkIndex ? ' work-card-active' : ''}`;
+    d.className = `card work-card${i === currentWorkIndex ? ' work-card-active' : ''}`;
     d.dataset.workIndex = String(i);
     d.innerHTML = `
       <div class="card-header" onclick="setCurrentWorkIndex(${i}, true)">
+        <button class="work-drag-handle" type="button" title="拖拽排序" onclick="event.stopPropagation()">⋮⋮</button>
         <div class="card-number">${i+1}</div>
         <div class="card-title">${w.title.zh||w.title.en||'新作品'}<small> · ${getWorkGroupLabel(w.group)} / ${w.category||'—'}</small></div>
         <button class="btn btn-danger" onclick="event.stopPropagation();removeWork(${i})">删除</button>
@@ -1010,8 +1260,11 @@ function renderWorks() {
             </div>
           </div>
         </div>
-        <div class="form-group"><label class="form-label">缩略图路径</label>
-          <input type="text" value="${esc(w.image)}" placeholder="assets/works/xxx.jpg" oninput="S.works[${i}].image=this.value">
+        <div class="form-group"><label class="form-label">封面图地址（在右侧资源库点图片自动绑定）</label>
+          <input type="text" value="${esc(w.image)}" placeholder="点击右侧图片后自动填充" readonly style="opacity:.9;">
+        </div>
+        <div class="form-group"><label class="form-label">资源关键词（用于自动筛选相关视频/图片）</label>
+          <input type="text" value="${esc(w.assetKey || '')}" placeholder="例如：projectA 或 stylized_forest" oninput="S.works[${i}].assetKey=this.value; if(currentWorkIndex===${i})renderWorkMediaLibraryPanel()">
         </div>
         <div class="bilingual">
           <div class="form-group"><label class="form-label">标题 <span class="lang-badge lang-en">EN</span>
@@ -1043,16 +1296,31 @@ function renderWorks() {
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="margin-bottom:10px;">链接列表</label>
+          <label class="form-label" style="margin-bottom:10px;">链接配置（默认 1 条，可按需增加）</label>
           <div id="wlinks_${i}">${linksHtml}</div>
-          <button class="btn btn-add" style="margin-top:4px;" onclick="addWorkLink(${i})">＋ 添加链接</button>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+            <select id="w_add_link_type_${i}" style="max-width:180px;">
+              <option value="video">视频</option>
+              <option value="github">GitHub</option>
+              <option value="detail">详情页</option>
+              <option value="custom">自定义</option>
+            </select>
+            <button class="btn btn-add" onclick="addWorkLink(${i},document.getElementById('w_add_link_type_${i}').value)">＋ 添加链接</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">默认会有 1 条链接。视频链接建议直接从右侧资源索引点击绑定。</div>
         </div>
         <div class="form-group">
           <label class="form-label" style="margin-bottom:10px;">视频预览（自动匹配）</label>
           <div id="wvideo_preview_${i}">${buildWorkVideoPreviewHtml(w)}</div>
         </div>
       </div>`;
-    c.appendChild(d);
+    d.setAttribute('draggable', 'true');
+    d.addEventListener('dragstart', (ev) => onWorkDragStart(ev, i));
+    d.addEventListener('dragover', onWorkDragOver);
+    d.addEventListener('dragleave', onWorkDragLeave);
+    d.addEventListener('drop', (ev) => onWorkDrop(ev, i));
+    d.addEventListener('dragend', onWorkDragEnd);
+    mount.appendChild(d);
   };
 
   const appendGroup = (groupId, groupLabel) => {
@@ -1068,7 +1336,10 @@ function renderWorks() {
       c.appendChild(empty);
       return;
     }
-    list.forEach(item => renderCard(item.w, item.i));
+    const grid = document.createElement('div');
+    grid.className = 'works-group-grid';
+    c.appendChild(grid);
+    list.forEach(item => renderCard(item.w, item.i, grid));
   };
 
   appendGroup('project', '完整项目');
@@ -1078,13 +1349,18 @@ function renderWorks() {
     extraTitle.style.cssText = 'margin:12px 0 8px;color:var(--text-muted);font-size:11px;';
     extraTitle.textContent = '未分组';
     c.appendChild(extraTitle);
-    groupBuckets.other.forEach(item => renderCard(item.w, item.i));
+    const extraGrid = document.createElement('div');
+    extraGrid.className = 'works-group-grid';
+    c.appendChild(extraGrid);
+    groupBuckets.other.forEach(item => renderCard(item.w, item.i, extraGrid));
   }
   renderWorkMediaLibraryPanel();
 }
 function addWork() {
-  S.works.push({group:'project',category:'shader',hasVideo:false,image:'',title:{en:'',zh:''},desc:{en:'',zh:''},tags:[],links:[]});
+  S.works.push({group:'project',category:'shader',hasVideo:false,image:'',assetKey:'',title:{en:'',zh:''},desc:{en:'',zh:''},tags:[],links:[]});
   currentWorkIndex = S.works.length - 1;
+  worksSearchKeyword = '';
+  worksGroupFilter = 'all';
   renderWorks();
   snapshot();
   updateStatus();
@@ -1110,10 +1386,10 @@ function addWorkTag(e, i) {
 function removeWorkTag(i,ti) {
   confirmDelete('删除标签', `确认删除标签「${S.works[i].tags[ti]}」？`, () => { S.works[i].tags.splice(ti,1); renderWorks(); snapshot(); });
 }
-function addWorkLink(i) {
-  const idx = (S.works[i].links || []).length;
-  const p = getWorkLinkPreset(idx);
-  S.works[i].links.push({label:{en:p.en,zh:p.zh},href:''});
+function addWorkLink(i, type) {
+  const t = type || 'custom';
+  const p = getWorkLinkPresetByType(t);
+  S.works[i].links.push({type:t,label:{en:p.en||'',zh:p.zh||''},href:''});
   renderWorks(); snapshot();
 }
 function removeWorkLink(i,li) {
@@ -1783,6 +2059,7 @@ ${s.works.map(w => `    {
       category: ${q(w.category)},
       hasVideo: ${w.hasVideo},
       image: ${q(w.image)},
+      assetKey: ${q(w.assetKey || '')},
       title: { en: ${q(w.title.en)}, zh: ${q(w.title.zh)} },
       desc:  {
         en: ${q(w.desc.en)},

@@ -12,13 +12,129 @@
 
 (function () {
   'use strict';
+  var _portfolioVideoBound = false;
+
+  function _escAttr(v) {
+    return String(v || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  function _normalizeMediaUrl(href) {
+    var h = String(href || '').trim();
+    if (!h || h === '#') return h;
+
+    var raw = h.match(/^https:\/\/raw\.githubusercontent\.com\/([^\/]+)\/([^\/]+)\/[^\/]+\/(.+)$/i);
+    if (raw) {
+      var owner = raw[1];
+      var repo = raw[2];
+      var path = raw[3];
+      if (/\.github\.io$/i.test(repo)) return 'https://' + owner.toLowerCase() + '.github.io/' + path;
+      return 'https://' + owner.toLowerCase() + '.github.io/' + repo + '/' + path;
+    }
+
+    var blob = h.match(/^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/blob\/[^\/]+\/(.+)$/i);
+    if (blob) {
+      var bOwner = blob[1];
+      var bRepo = blob[2];
+      var bPath = blob[3];
+      if (/\.github\.io$/i.test(bRepo)) return 'https://' + bOwner.toLowerCase() + '.github.io/' + bPath;
+      return 'https://' + bOwner.toLowerCase() + '.github.io/' + bRepo + '/' + bPath;
+    }
+    return h;
+  }
+
+  function _ensurePortfolioVideoModal() {
+    if (document.getElementById('portfolioVideoModal')) return;
+    var modal = document.createElement('div');
+    modal.id = 'portfolioVideoModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:1200;';
+    modal.innerHTML =
+      '<div style="width:min(1100px,100%);">' +
+        '<div style="display:flex;justify-content:flex-end;margin-bottom:10px;">' +
+          '<button type="button" id="portfolioVideoClose" style="border:1px solid #444;background:#111;color:#eee;padding:6px 12px;cursor:pointer;">关闭</button>' +
+        '</div>' +
+        '<video id="portfolioVideoPlayer" controls autoplay playsinline style="width:100%;max-height:80vh;background:#000;"></video>' +
+      '</div>';
+    document.body.appendChild(modal);
+
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) _closePortfolioVideoModal();
+    });
+    var closeBtn = document.getElementById('portfolioVideoClose');
+    if (closeBtn) closeBtn.addEventListener('click', _closePortfolioVideoModal);
+  }
+
+  function _openPortfolioVideoModal(url) {
+    if (!url) return;
+    _ensurePortfolioVideoModal();
+    var modal = document.getElementById('portfolioVideoModal');
+    var player = document.getElementById('portfolioVideoPlayer');
+    if (!modal || !player) return;
+    player.src = url;
+    modal.style.display = 'flex';
+    var p = player.play();
+    if (p && typeof p.catch === 'function') p.catch(function () {});
+  }
+
+  function _closePortfolioVideoModal() {
+    var modal = document.getElementById('portfolioVideoModal');
+    var player = document.getElementById('portfolioVideoPlayer');
+    if (player) {
+      player.pause();
+      player.removeAttribute('src');
+      player.load();
+    }
+    if (modal) modal.style.display = 'none';
+  }
+
+  function _bindPortfolioVideoInteractions() {
+    if (_portfolioVideoBound) return;
+    _portfolioVideoBound = true;
+    document.addEventListener('click', function (e) {
+      var trigger = e.target.closest('.js-video-open');
+      if (!trigger) return;
+      e.preventDefault();
+      _openPortfolioVideoModal(trigger.getAttribute('data-video-url'));
+    });
+  }
+
+  function _t(field, lang) {
+    if (!field) return '';
+    if (typeof field === 'string') return field;
+    return field[lang] || field.en || '';
+  }
+
+  function _buildWorksFromConfig(lang) {
+    if (typeof CONFIG === 'undefined' || !Array.isArray(CONFIG.works)) return [];
+    return CONFIG.works.map(function (w) {
+      var links = Array.isArray(w.links) ? w.links : [];
+      var tags = Array.isArray(w.tags) ? w.tags : [];
+      var bgStyle = w.image
+        ? "background-image: url('" + w.image + "'); background-size: cover; background-position: center;"
+        : '';
+      return {
+        category: w.category || '',
+        group: w.group || ((w.category === 'tool' || w.category === 'code') ? 'project' : 'art'),
+        bgStyle: bgStyle,
+        hasVideo: !!w.hasVideo,
+        tags: tags,
+        title: _t(w.title, lang),
+        desc: _t(w.desc, lang),
+        links: links.map(function (l) {
+          return {
+            type: (l && l.type) || '',
+            label: _t(l && l.label, lang),
+            href: (l && l.href) || ''
+          };
+        })
+      };
+    });
+  }
 
   /* ================================================================
      Core: apply a language to the current page
      ================================================================ */
   function applyLang(lang) {
-    const strings = CONTENT[lang];
-    if (!strings) return;
+    const strings = (typeof CONTENT !== 'undefined' && CONTENT && CONTENT[lang]) ? CONTENT[lang] : {};
 
     // 1. Swap all data-i18n text nodes / innerHTML
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
@@ -86,11 +202,16 @@
      Portfolio page — render work cards from CONTENT.works
      ================================================================ */
   window.renderPortfolioCards = function (lang) {
+    _ensurePortfolioVideoModal();
+    _bindPortfolioVideoInteractions();
+
     var projectGrid = document.getElementById('workGridProject');
     var artGrid = document.getElementById('workGridArt');
     if (!projectGrid || !artGrid) return;
 
-    var works = CONTENT.works[lang];
+    var works = (typeof CONTENT !== 'undefined' && CONTENT && CONTENT.works && CONTENT.works[lang])
+      ? CONTENT.works[lang]
+      : _buildWorksFromConfig(lang);
     if (!works) return;
 
     var noResultsProject = document.getElementById('noResultsProject');
@@ -104,24 +225,43 @@
       if (!h || h === '#') return false;
       return /youtu\.be|youtube\.com|vimeo\.com|\.mp4($|\?)|\.webm($|\?)|\.mov($|\?)|\.m4v($|\?)|\.ogv($|\?)/i.test(h);
     }
+    function isDirectVideo(href) {
+      return /\.(mp4|webm|mov|m4v|ogv)(\?.*)?$/i.test(String(href || '').trim());
+    }
+    function getPreviewVideoUrl(links) {
+      if (!Array.isArray(links)) return '';
+      for (var i = 0; i < links.length; i++) {
+        var h = _normalizeMediaUrl(links[i] && links[i].href);
+        if (isDirectVideo(h)) return h;
+      }
+      return '';
+    }
 
     works.forEach(function (w) {
-      var thumbContent = w.bgText
-        ? '<div class="work-thumb-bg" style="' + w.bgStyle + '">' + w.bgText + '</div>'
-        : '<div class="work-thumb-bg" style="' + w.bgStyle + '">[ 替换为作品截图 ]</div>';
+      var previewVideo = getPreviewVideoUrl(w.links);
+      var thumbContent = previewVideo
+        ? '<video class="work-thumb-video" src="' + _escAttr(previewVideo) + '" muted playsinline loop autoplay preload="metadata"></video>'
+        : (w.bgText
+          ? '<div class="work-thumb-bg" style="' + w.bgStyle + '">' + w.bgText + '</div>'
+          : '<div class="work-thumb-bg" style="' + w.bgStyle + '">[ 替换为作品截图 ]</div>');
 
-      var videoBadge = w.hasVideo
-        ? '<span class="video-badge">▶ VIDEO</span><div class="play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>'
+      var videoBadge = (w.hasVideo && previewVideo)
+        ? '<span class="video-badge">VIDEO</span><a href="' + _escAttr(previewVideo) + '" class="play-icon js-video-open" data-video-url="' + _escAttr(previewVideo) + '" aria-label="播放视频"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></a>'
         : '';
 
-      var tagsHtml = w.tags.map(function (t) {
+      var tagsHtml = (Array.isArray(w.tags) ? w.tags : []).map(function (t) {
         return '<span class="work-tag">' + t + '</span>';
       }).join('');
 
       var linksHtml = (w.links || []).filter(function (l) {
-        return isMediaHref(l && l.href);
+        var href = l && l.href;
+        return href && href !== '#';
       }).map(function (l) {
-        return '<a href="' + l.href + '" class="work-link">' + l.label + '</a>';
+        var href = _normalizeMediaUrl(l && l.href);
+        if (isDirectVideo(href)) {
+          return '<a href="' + _escAttr(href) + '" class="work-link js-video-open" data-video-url="' + _escAttr(href) + '">' + l.label + '</a>';
+        }
+        return '<a href="' + _escAttr(href) + '" class="work-link" target="_blank" rel="noopener">' + l.label + '</a>';
       }).join('');
 
       var card = document.createElement('div');
@@ -142,7 +282,8 @@
 
       var targetGrid = card.dataset.group === 'project' ? projectGrid : artGrid;
       var targetNo = card.dataset.group === 'project' ? noResultsProject : noResultsArt;
-      targetGrid.insertBefore(card, targetNo);
+      if (targetNo) targetGrid.insertBefore(card, targetNo);
+      else targetGrid.appendChild(card);
     });
 
     if (noResultsProject) noResultsProject.style.display = projectGrid.querySelectorAll('.work-card').length ? 'none' : 'block';

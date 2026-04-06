@@ -137,6 +137,26 @@
   .card-title small { color: var(--text-muted); font-size: 11px; margin-left: 8px; }
   .card-toggle { color: var(--text-muted); font-size: 16px; transition: transform 0.2s; }
   .card-toggle.open { transform: rotate(180deg); }
+  .work-card { transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s; }
+  .work-card.work-card-dragging { opacity: 0.45; }
+  .work-card.work-card-drop-target { border-color: var(--pink); box-shadow: 0 0 0 1px rgba(255,45,117,0.3); }
+  .work-drag-handle {
+    border: 1px solid var(--border2);
+    background: var(--bg4);
+    color: var(--text-muted);
+    border-radius: 6px;
+    width: 24px;
+    height: 24px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .work-drag-handle:hover { color: var(--pink); border-color: rgba(255,45,117,0.45); }
+  .work-drag-handle:active { cursor: grabbing; }
   .card-body {
     padding: 0 16px; border-top: 1px solid transparent;
     max-height: 0; overflow: hidden;
@@ -193,11 +213,33 @@
   .works-media-list { display: flex; flex-direction: column; gap: 10px; }
   .works-media-item { border: 1px solid var(--border2); border-radius: 8px; overflow: hidden; background: var(--bg3); cursor: pointer; }
   .works-media-item.active { border-color: var(--pink); box-shadow: 0 0 0 1px rgba(255,45,117,0.3); }
-  .works-media-thumb { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: cover; }
+  .works-media-thumb { width: 100%; aspect-ratio: 16/9; background: #000; display: block; object-fit: contain; }
   .works-media-meta { padding: 8px; font-size: 11px; color: var(--text-muted); }
   .works-media-meta .name { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
   .works-active-hint { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
   .work-card-active { border-color: rgba(255,45,117,0.65); box-shadow: 0 0 0 1px rgba(255,45,117,0.25); }
+  .works-group-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+  #works_list .works-group-grid .card { margin-bottom: 0; }
+  .works-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 140px auto auto;
+    gap: 8px;
+    margin-bottom: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(17, 17, 17, 0.95);
+    backdrop-filter: blur(6px);
+  }
+  .works-filter-stat {
+    font-size: 11px;
+    color: var(--text-muted);
+    align-self: center;
+    white-space: nowrap;
+  }
 
   /* ── Divider ── */
   .field-divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
@@ -244,6 +286,9 @@
     .bilingual { grid-template-columns: 1fr; }
     .works-editor-layout { grid-template-columns: 1fr; }
     .works-media-panel { position: static; max-height: none; }
+    .works-group-grid { grid-template-columns: 1fr; }
+    .works-toolbar { grid-template-columns: 1fr; position: static; }
+    .works-filter-stat { order: 3; }
   }
 
   /* ── Confirm Modal ── */
@@ -671,35 +716,35 @@
       <hr class="field-divider">
       <div class="section-header"><h2 style="font-size:0.7rem;">作品链接通用文案</h2></div>
       <div style="padding:10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);font-size:11.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">
-        在这里统一配置“链接1/2/3”的按钮名称。点击“应用到全部作品”后，会覆盖每个作品对应序号的链接文案（URL 不会改）。
+        在这里统一配置不同链接类型的按钮名称（视频 / GitHub / 详情页）。点击“应用到全部作品”后，会按链接类型覆盖文案（URL 不会改）。
       </div>
       <div class="bilingual">
         <div class="form-group">
-          <label class="form-label">链接1名称 <span class="lang-badge lang-en">EN</span></label>
+          <label class="form-label">视频按钮名 <span class="lang-badge lang-en">EN</span></label>
           <input type="text" id="work_link_name_en_0" placeholder="Watch Video →" oninput="saveWorkLinkPresetsFromInputs()">
         </div>
         <div class="form-group">
-          <label class="form-label">链接1名称 <span class="lang-badge lang-zh">ZH</span></label>
+          <label class="form-label">视频按钮名 <span class="lang-badge lang-zh">ZH</span></label>
           <input type="text" id="work_link_name_zh_0" placeholder="观看视频 →" oninput="saveWorkLinkPresetsFromInputs()">
         </div>
       </div>
       <div class="bilingual">
         <div class="form-group">
-          <label class="form-label">链接2名称 <span class="lang-badge lang-en">EN</span></label>
+          <label class="form-label">GitHub按钮名 <span class="lang-badge lang-en">EN</span></label>
           <input type="text" id="work_link_name_en_1" placeholder="GitHub" oninput="saveWorkLinkPresetsFromInputs()">
         </div>
         <div class="form-group">
-          <label class="form-label">链接2名称 <span class="lang-badge lang-zh">ZH</span></label>
+          <label class="form-label">GitHub按钮名 <span class="lang-badge lang-zh">ZH</span></label>
           <input type="text" id="work_link_name_zh_1" placeholder="GitHub" oninput="saveWorkLinkPresetsFromInputs()">
         </div>
       </div>
       <div class="bilingual">
         <div class="form-group">
-          <label class="form-label">链接3名称 <span class="lang-badge lang-en">EN</span></label>
+          <label class="form-label">详情页按钮名 <span class="lang-badge lang-en">EN</span></label>
           <input type="text" id="work_link_name_en_2" placeholder="View Details →" oninput="saveWorkLinkPresetsFromInputs()">
         </div>
         <div class="form-group">
-          <label class="form-label">链接3名称 <span class="lang-badge lang-zh">ZH</span></label>
+          <label class="form-label">详情页按钮名 <span class="lang-badge lang-zh">ZH</span></label>
           <input type="text" id="work_link_name_zh_2" placeholder="查看详情 →" oninput="saveWorkLinkPresetsFromInputs()">
         </div>
       </div>
@@ -848,6 +893,18 @@
           <div class="expand-all-row">
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="expandAll('works_list')">全部展开</button>
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="collapseAll('works_list')">全部折叠</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin:-6px 0 10px;">提示：拖拽每个作品卡片标题左侧的 <b style="color:var(--text);">⋮⋮</b> 可调整顺序。</div>
+          <div class="works-toolbar">
+            <input id="works_search_input" type="text" placeholder="搜索标题 / 标签 / 关键词" oninput="setWorksSearchKeyword(this.value)">
+            <select id="works_group_filter" oninput="setWorksGroupFilter(this.value)">
+              <option value="all">全部分组</option>
+              <option value="project">完整项目</option>
+              <option value="art">独立美术</option>
+              <option value="other">未分组</option>
+            </select>
+            <div id="works_filter_stat" class="works-filter-stat">显示 0 / 0</div>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="clearWorksFilters()">清空筛选</button>
           </div>
           <div id="works_list"></div>
           <button class="btn btn-add" onclick="addWork()">＋ 添加作品</button>
