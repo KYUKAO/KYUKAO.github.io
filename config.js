@@ -151,13 +151,13 @@ const CONFIG = {
   works: [
     {
       category: 'shader',
-      group: 'art',
+      group: 'project',
       hasVideo: true,
       image: '',
-      title: { en: 'Shading Showreel', zh: '材质着色作品集' },
+      title: { en: 'Shader Scene Showreel', zh: 'Shader 场景作品集' },
       desc:  {
-        en: 'A focused reel of real-time shading, material studies, and visual development experiments.',
-        zh: '实时着色、材质研究与视觉开发实验的综合展示。',
+        en: 'A scene-based shader showreel focused on real-time material and rendering presentation.',
+        zh: '以场景展示为主的 Shader 作品集，聚焦实时材质与渲染表现。',
       },
       tags: ['Shader', 'Shading', 'Showreel'],
       links: [
@@ -196,7 +196,7 @@ const CONFIG = {
     },
     {
       category: 'render',
-      group: 'project',
+      group: 'art',
       hasVideo: true,
       image: '',
       title: { en: 'ShadowMan Remaster', zh: 'ShadowMan 重制版' },
@@ -237,21 +237,6 @@ const CONFIG = {
       tags: ['Tool', 'Workflow'],
       links: [
         { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/工具.mp4' },
-      ],
-    },
-    {
-      category: 'tool',
-      group: 'project',
-      hasVideo: true,
-      image: '',
-      title: { en: 'Technical Art Project Showreel', zh: '技术美术项目作品集' },
-      desc:  {
-        en: 'A technical art project showreel covering shader work, tool development, and production-facing visual solutions.',
-        zh: '技术美术项目作品集，涵盖 Shader、工具开发与面向生产的视觉方案。',
-      },
-      tags: ['Technical Art', 'Showreel', 'Tool'],
-      links: [
-        { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/TAProjShowreel.mp4' },
       ],
     },
   ],
