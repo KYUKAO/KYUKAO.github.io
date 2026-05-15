@@ -284,7 +284,9 @@
       var previewVideo = getPreviewVideoUrl(w.links);
       var thumbContent = previewVideo
         ? '<video class="work-thumb-video" src="' + _escAttr(previewVideo) + '" muted playsinline loop autoplay preload="metadata"></video>'
-        : (w.bgText
+        : (w.bgStyle
+          ? '<div class="work-thumb-bg has-image" style="' + w.bgStyle + '" aria-label="' + _escAttr(w.title) + '"></div>'
+          : w.bgText
           ? '<div class="work-thumb-bg" style="' + w.bgStyle + '">' + w.bgText + '</div>'
           : '<div class="work-thumb-bg" style="' + w.bgStyle + '">[ 替换为作品截图 ]</div>');
 

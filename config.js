@@ -255,6 +255,21 @@ const CONFIG = {
       ],
     },
     {
+      category: 'tool',
+      group: 'project',
+      hasVideo: false,
+      image: 'assets/uploads/ArtToolFlow.png',
+      title: { en: 'Art Tool Flow', zh: '美术工具流程' },
+      desc:  {
+        en: 'A workflow diagram for art tooling, showing production flow and tool integration.',
+        zh: '美术工具流程图，展示制作流程与工具链整合方式。',
+      },
+      tags: ['Tool', 'Workflow'],
+      links: [
+        { label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/ArtToolFlow.png' },
+      ],
+    },
+    {
       category: 'render',
       group: 'art',
       hasVideo: false,
