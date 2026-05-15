@@ -42,6 +42,19 @@
     return h;
   }
 
+  function _isDirectVideo(href) {
+    return /\.(mp4|webm|mov|m4v|ogv)(\?.*)?$/i.test(String(href || '').trim());
+  }
+
+  function _getPreviewVideoUrl(links) {
+    if (!Array.isArray(links)) return '';
+    for (var i = 0; i < links.length; i++) {
+      var h = _normalizeMediaUrl(links[i] && links[i].href);
+      if (_isDirectVideo(h)) return h;
+    }
+    return '';
+  }
+
   function _ensurePortfolioVideoModal() {
     if (document.getElementById('portfolioVideoModal')) return;
     var modal = document.createElement('div');
@@ -161,10 +174,40 @@
 
     // 5. Render dynamic sections if helpers are registered
     if (typeof renderPortfolioCards === 'function') renderPortfolioCards(lang);
+    if (typeof renderFeaturedWorks === 'function') renderFeaturedWorks(lang);
     if (typeof renderResumeEntries  === 'function') renderResumeEntries(lang);
     if (typeof renderAboutInterests === 'function') renderAboutInterests(lang);
     if (typeof renderContactButtons === 'function') renderContactButtons(lang);
   }
+
+  /* ================================================================
+     Home page — render featured works from CONFIG/CONTENT
+     ================================================================ */
+  window.renderFeaturedWorks = function (lang) {
+    var grid = document.getElementById('featuredWorksGrid');
+    if (!grid) return;
+
+    var works = (typeof CONTENT !== 'undefined' && CONTENT && CONTENT.works && CONTENT.works[lang])
+      ? CONTENT.works[lang]
+      : _buildWorksFromConfig(lang);
+    if (!works) return;
+
+    var featured = works.filter(function (w) {
+      return _getPreviewVideoUrl(w.links);
+    }).slice(0, 3);
+
+    grid.innerHTML = featured.map(function (w) {
+      var previewVideo = _getPreviewVideoUrl(w.links);
+      var tag = Array.isArray(w.tags) && w.tags.length ? w.tags[0] : '';
+      return '<a class="work-card reveal visible" href="portfolio.html">' +
+        '<video class="work-card-video" src="' + _escAttr(previewVideo) + '" muted playsinline loop autoplay preload="metadata"></video>' +
+        '<div class="work-card-overlay">' +
+          '<p class="work-card-tag">' + tag + '</p>' +
+          '<p class="work-card-title">' + w.title + '</p>' +
+        '</div>' +
+      '</a>';
+    }).join('');
+  };
 
   /* ================================================================
      Toggle helper
