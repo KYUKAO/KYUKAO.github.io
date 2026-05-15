@@ -229,12 +229,12 @@ const CONFIG = {
       group: 'project',
       hasVideo: true,
       image: '',
-      title: { en: 'Technical Tool Showcase', zh: '工具展示' },
+      title: { en: 'Unity Tools', zh: 'Unity工具' },
       desc:  {
-        en: 'A technical tool showcase focused on workflow support, production efficiency, and practical iteration.',
-        zh: '技术工具展示，聚焦流程支持、制作效率与实际迭代效果。',
+        en: 'A Unity tool showcase focused on workflow support, production efficiency, and practical iteration.',
+        zh: 'Unity 工具展示，聚焦流程支持、制作效率与实际迭代效果。',
       },
-      tags: ['Tool', 'Workflow'],
+      tags: ['Unity', 'Tool', 'Workflow'],
       links: [
         { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/工具.mp4' },
       ],
@@ -259,12 +259,12 @@ const CONFIG = {
       group: 'project',
       hasVideo: false,
       image: 'assets/uploads/ArtToolFlow.png',
-      title: { en: 'Art Tool Flow', zh: '美术工具流程' },
+      title: { en: 'VibeCoding Tool: AI Art Tool Canvas', zh: 'VibeCoding工具：AI美术工具画布' },
       desc:  {
-        en: 'A workflow diagram for art tooling, showing production flow and tool integration.',
-        zh: '美术工具流程图，展示制作流程与工具链整合方式。',
+        en: 'An AI art tool canvas for VibeCoding workflows, showing tool structure and creative production flow.',
+        zh: '面向 VibeCoding 工作流的 AI 美术工具画布，展示工具结构与创作流程。',
       },
-      tags: ['Tool', 'Workflow'],
+      tags: ['AI Art', 'Tool', 'VibeCoding'],
       links: [
         { label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/ArtToolFlow.png' },
       ],
@@ -391,19 +391,6 @@ const CONFIG = {
         {
           en: '<strong>Shader Development:</strong> Developed custom shader solutions utilizing ASE, CG, and HLSL for stylized rendering.',
           zh: '<strong>Shader 开发：</strong>使用 ASE、CG 和 HLSL 开发风格化渲染的自定义着色器方案。',
-        },
-      ],
-    },
-    {
-      company:    { en: 'Neckom Games', zh: '铃空游戏' },
-      period:     { en: 'Dec 2023 — Feb 2024', zh: '2023.12 — 2024.02' },
-      role:       { en: 'Level Designer for Showa American Story (ARPG)',
-                    zh: '关卡设计师 — 昭和米国物语（ARPG）' },
-      projectUrl: '',
-      bullets: [
-        {
-          en: '<strong>Level Creation:</strong> Made 2D layouts of levels, designed special mechanics and architectures to make white box.',
-          zh: '<strong>关卡制作：</strong>制作关卡 2D 布局图，设计特殊机制与建筑，完成白盒搭建。',
         },
       ],
     },
