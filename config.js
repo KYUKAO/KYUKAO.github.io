@@ -239,6 +239,37 @@ const CONFIG = {
         { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/工具.mp4' },
       ],
     },
+    {
+      category: 'tool',
+      group: 'project',
+      hasVideo: false,
+      image: 'assets/uploads/UE关卡工具.png',
+      title: { en: 'UE Level Tool', zh: 'UE 关卡工具' },
+      desc:  {
+        en: 'A Unreal Engine level tool showcase for improving scene-building workflow and iteration efficiency.',
+        zh: 'Unreal Engine 关卡工具展示，用于提升场景搭建流程与迭代效率。',
+      },
+      tags: ['Tool', 'Unreal Engine'],
+      links: [
+        { label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/UE关卡工具.png' },
+      ],
+    },
+    {
+      category: 'render',
+      group: 'art',
+      hasVideo: false,
+      image: 'assets/uploads/InsideThePaper1.png',
+      title: { en: 'Inside The Paper', zh: 'Inside The Paper' },
+      desc:  {
+        en: 'A two-image artwork set for Inside The Paper, collected as one portfolio entry.',
+        zh: 'Inside The Paper 的两张图像作品，合并为同一个作品集条目。',
+      },
+      tags: ['Artwork', 'Scene'],
+      links: [
+        { label: { en: 'Image 1 →', zh: '图片 1 →' }, href: 'assets/uploads/InsideThePaper1.png' },
+        { label: { en: 'Image 2 →', zh: '图片 2 →' }, href: 'assets/uploads/InsideThePaper2.png' },
+      ],
+    },
   ],
 
 
