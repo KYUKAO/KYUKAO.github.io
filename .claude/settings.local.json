@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:webfx.vercel.app)",
+      "PowerShell($items = Get-ChildItem 'D:\\\\GitRepos\\\\KYUKAO.github.io'; Write-Host \"Files and directories:\"; foreach \\($item in $items\\) { Write-Host \"$\\($item.Mode\\) $\\($item.Name\\)\" })",
+      "WebSearch",
+      "Bash(git *)"
+    ]
+  }
+}
