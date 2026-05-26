@@ -34,7 +34,7 @@
     a { color: inherit; text-decoration: none; }
     img, video { display: block; max-width: 100%; }
 
-    #bgCanvas {
+    .portfolio-bg-video {
       position: fixed;
       top: 0;
       left: 0;
@@ -42,6 +42,18 @@
       height: 100vh;
       z-index: -2;
       pointer-events: none;
+      object-fit: cover;
+      background: #070403;
+    }
+
+    .portfolio-bg-grade {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(255, 187, 95, 0.08), transparent 30%),
+        linear-gradient(180deg, rgba(7, 3, 2, 0.2), rgba(7, 3, 2, 0.36));
     }
 
     .portfolio-shell {
@@ -388,7 +400,8 @@
   </style>
 </head>
 <body class="portfolio-theater">
-  <canvas id="bgCanvas"></canvas>
+  <video id="portfolioBg" class="portfolio-bg-video" src="assets/entry/video/opening-2.mp4" preload="auto" playsinline muted aria-hidden="true"></video>
+  <div class="portfolio-bg-grade" aria-hidden="true"></div>
 
   <nav class="top-nav">
     <a href="index.html" class="nav-logo">KYUKAO</a>
@@ -433,7 +446,6 @@
     <span data-i18n="footer.copy">© 2026 Hanqing Li - All rights reserved</span>
   </footer>
 
-  <script src="js/depth-of-field-bg.js"></script>
   <script src="config.js?v=20260515b"></script>
   <script src="js/typography.js?v=20260515b"></script>
   <script src="js/content.js?v=20260515b"></script>
@@ -456,8 +468,24 @@
       });
     }
 
+    function holdPortfolioBackground() {
+      var bg = document.getElementById('portfolioBg');
+      if (!bg) return;
+      var seekToEnd = function () {
+        if (!Number.isFinite(bg.duration) || bg.duration <= 0) return;
+        bg.currentTime = Math.max(0, bg.duration - 0.08);
+        bg.pause();
+      };
+      if (Number.isFinite(bg.duration) && bg.duration > 0) {
+        seekToEnd();
+      } else {
+        bg.addEventListener('loadedmetadata', seekToEnd, { once: true });
+      }
+    }
+
     window.addEventListener('load', function () {
       try {
+        holdPortfolioBackground();
         var hasCard = document.querySelector('#workGridProject .work-card, #workGridArt .work-card');
         if (!hasCard && typeof renderPortfolioCards === 'function') {
           var lang = 'en';

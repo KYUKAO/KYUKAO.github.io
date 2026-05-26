@@ -73,10 +73,10 @@
 
     .brand {
       position: absolute;
-      top: clamp(28px, 6vh, 72px);
+      top: 50%;
       left: 50%;
       z-index: 5;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       width: min(86vw, 900px);
       text-align: center;
       pointer-events: none;
@@ -85,7 +85,7 @@
 
     .brand.is-hidden {
       opacity: 0;
-      transform: translate(-50%, -16px);
+      transform: translate(-50%, calc(-50% - 16px));
       filter: blur(8px);
     }
 
@@ -121,7 +121,11 @@
       color: inherit;
       background: transparent;
       cursor: pointer;
-      transition: opacity 500ms ease, visibility 500ms ease;
+      transition: opacity 500ms ease, visibility 500ms ease, background 500ms ease;
+    }
+
+    .start-layer.is-waiting {
+      background: rgba(0, 0, 0, 0.01);
     }
 
     .start-layer.is-hidden {
@@ -363,7 +367,7 @@
       }
 
       .brand {
-        top: 30px;
+        top: 38%;
       }
 
       .start-layer {
@@ -399,7 +403,7 @@
 <body>
   <main class="entry-stage" aria-label="KYUKAO portfolio entrance">
     <div class="video-layer" aria-hidden="true">
-      <video id="openingOne" class="opening-video is-active" src="assets/entry/video/opening-1.mp4" preload="auto" playsinline muted></video>
+      <video id="openingOne" class="opening-video is-active" src="assets/entry/video/opening-1.mp4" preload="auto" autoplay playsinline muted></video>
       <video id="openingTwo" class="opening-video" src="assets/entry/video/opening-2.mp4" preload="auto" playsinline muted></video>
     </div>
 
@@ -462,6 +466,8 @@
     const fallback = document.getElementById('fallback');
     let hasStarted = false;
     let hasRevealed = false;
+    let queuedStart = false;
+    let openingOneComplete = false;
 
     const revealEntries = () => {
       if (hasRevealed) return;
@@ -486,18 +492,27 @@
 
     const startExperience = async () => {
       if (hasStarted) return;
+      if (!openingOneComplete) {
+        queuedStart = true;
+        startLayer.classList.add('is-waiting');
+        return;
+      }
       hasStarted = true;
       startLayer.classList.add('is-hidden');
-      openingTwo.load();
-      await playVideo(openingOne);
-    };
-
-    openingOne.addEventListener('ended', async () => {
       brand.classList.add('is-hidden');
+      openingTwo.load();
       openingTwo.currentTime = 0;
       openingTwo.classList.add('is-active');
       openingOne.classList.remove('is-active');
       await playVideo(openingTwo);
+    };
+
+    openingOne.addEventListener('ended', () => {
+      openingOneComplete = true;
+      openingOne.pause();
+      openingOne.currentTime = Math.max(0, openingOne.duration - 0.04);
+      startLayer.classList.add('is-waiting');
+      if (queuedStart) startExperience();
     });
 
     openingTwo.addEventListener('ended', () => {
@@ -509,6 +524,9 @@
     openingOne.addEventListener('error', showFallback);
     openingTwo.addEventListener('error', showFallback);
     startLayer.addEventListener('click', startExperience);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') startExperience();
+    });
 
     document.querySelectorAll('.entry-item').forEach((item) => {
       item.addEventListener('click', (event) => {
@@ -520,6 +538,7 @@
 
     openingOne.load();
     openingTwo.load();
+    playVideo(openingOne);
   </script>
 </body>
 </html>
