@@ -8,7 +8,7 @@
 
 **类型**：纯静态作品集网站 + 配套可视化内容编辑器
 **技术栈**：Vanilla HTML/CSS/JavaScript（无框架，无构建步骤）
-**特殊点**：简历页（`index.html`）额外引入了 Tailwind CSS CDN
+**特殊点**：简历页（`resume.html`）额外引入了 Tailwind CSS CDN
 
 ---
 
@@ -16,7 +16,8 @@
 
 ```
 kyukao-portfolio/
-├── index.html          # 简历页，Tailwind CSS 页面
+├── index.html          # 作品集入口页
+├── resume.html         # 简历页，Tailwind CSS 页面
 ├── home.html           # 主页，CSS变量 + 自定义CSS
 ├── portfolio.html      # 作品集，卡片过滤功能
 ├── about.html          # 关于页
@@ -161,7 +162,7 @@ window.CONTENT = {
 - 构建 CSS 字符串，注入到 `document.head` 的 `<style id="typo-style">` 标签
 - 包含 Google Fonts `@import` URL
 - 对外暴露 `window.applyTypography()` 可手动重新触发
-- 简历页（index.html）有独立的 CSS 变量集合，与其他页面区分
+- 简历页（resume.html）有独立的 CSS 变量集合，与其他页面区分
 
 ---
 
@@ -230,5 +231,5 @@ window.CONTENT = {
 - **无测试框架**：无单元测试，修改后手动刷新页面验证
 - **跨域限制**：`editor.js` 用 `fetch('../config.js')` 加载配置，直接双击 `editor.html` 会因 `file://` 协议报错，必须通过本地服务器访问
 - **`saveToFile()` 仅支持 Chrome/Edge**：依赖 `window.showSaveFilePicker` API，Firefox/Safari 降级为普通下载
-- **Tailwind 仅在 index.html 使用**：其他页面不加载 Tailwind，勿混用
+- **Tailwind 仅在 resume.html 使用**：其他页面不加载 Tailwind，勿混用
 - **`config.js` 是普通 JS 文件**：不是 JSON，可以写注释，但 `editor.js` 解析时用了字符串替换技巧，修改格式时需小心

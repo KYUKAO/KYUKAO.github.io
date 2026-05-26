@@ -173,14 +173,14 @@ const TYPOGRAPHY = {
   function buildCSS() {
     var T = TYPOGRAPHY;
 
-    /* Detect resume page (index.html) by presence of .font-sync class usage */
+    /* Detect resume page (resume.html) by presence of .font-sync class usage */
     var isResume = !!document.querySelector('body.antialiased') ||
                    !!document.querySelector('.font-sync');
 
     var css = '';
 
     if (isResume) {
-      /* ───── RESUME PAGE (index.html, Tailwind + custom CSS) ───── */
+      /* ───── RESUME PAGE (resume.html, Tailwind + custom CSS) ───── */
       css += [
         /* Body */
         'body { font-family: ' + T.fontResume + ' !important; line-height: ' + T.resumeBodyLineH + ' !important; }',

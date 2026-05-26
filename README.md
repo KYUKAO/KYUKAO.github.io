@@ -12,7 +12,8 @@
 
 | 页面 | 文件 |
 |------|------|
-| 简历（首页入口） | `index.html` |
+| 作品集入口 | `index.html` |
+| 简历 | `resume.html` |
 | 主页 | `home.html` |
 | 作品集 | `portfolio.html` |
 | 关于我 | `about.html` |
@@ -94,7 +95,7 @@
 4. 访问 https://<用户名>.github.io/<仓库名>/
 ```
 
-入口页面默认是**简历页**（`index.html`）。
+入口页面默认是**作品集入口页**（`index.html`），简历页为 `resume.html`。
 
 ---
 
@@ -102,7 +103,8 @@
 
 ```
 kyukao-portfolio/
-├── index.html          # 简历页（GitHub Pages 入口）
+├── index.html          # 作品集入口页（GitHub Pages 入口）
+├── resume.html         # 简历页
 ├── home.html           # 主页
 ├── portfolio.html      # 作品集页
 ├── about.html          # 关于我页
