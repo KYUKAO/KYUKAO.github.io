@@ -76,20 +76,22 @@
             .nav-toggle { display: flex; }
         }
     </style>
+    <link rel="stylesheet" href="assets/entry/scene-pages.css?v=20260527" />
 </head>
-<body class="antialiased">
+<body class="antialiased scene-page resume-scene">
 
     <canvas id="bgCanvas"></canvas>
     <div class="grid-bg"></div>
 
     <!-- NAVIGATION -->
     <nav>
-        <a href="home.html" class="nav-logo">KYUKAO</a>
+        <a href="index.html" class="nav-logo">KYUKAO</a>
         <ul class="nav-links" id="navLinks">
-            <li><a href="home.html" data-i18n="nav.home">首页</a></li>
+            <li><a href="index.html" data-i18n="nav.home">Home</a></li>
             <li><a href="portfolio.html" data-i18n="nav.portfolio">作品集</a></li>
             <li><a href="resume.html" class="active" data-i18n="nav.resume">简历</a></li>
             <li><a href="about.html" data-i18n="nav.about">关于我</a></li>
+            <li><a href="contact.html">Contact</a></li>
         </ul>
         <!-- lang toggle injected by i18n.js -->
         <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
@@ -164,6 +166,7 @@
     <script src="js/typography.js"></script>
     <script src="js/content.js"></script>
     <script src="js/i18n.js"></script>
+    <script src="assets/entry/scene-background.js?v=20260527"></script>
     <script>
         document.getElementById('navToggle').addEventListener('click', () => {
             document.getElementById('navLinks').classList.toggle('open');

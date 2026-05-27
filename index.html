@@ -309,89 +309,6 @@
       opacity: 1;
     }
 
-    .content-panel {
-      position: fixed;
-      inset: clamp(18px, 3vw, 34px);
-      z-index: 12;
-      display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(20px) scale(0.985);
-      border: 1px solid rgba(255, 221, 167, 0.45);
-      background: rgba(10, 5, 3, 0.82);
-      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55), inset 0 0 28px rgba(255, 203, 128, 0.06);
-      backdrop-filter: blur(14px);
-      transition: opacity 360ms ease, visibility 360ms ease, transform 360ms ease;
-    }
-
-    .content-panel.is-visible {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0) scale(1);
-    }
-
-    .content-panel__bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      min-height: 54px;
-      padding: 10px 16px 10px 22px;
-      border-bottom: 1px solid rgba(255, 221, 167, 0.22);
-      color: rgba(255, 237, 206, 0.86);
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
-    .content-panel__close {
-      width: 36px;
-      height: 36px;
-      border: 1px solid rgba(255, 221, 167, 0.35);
-      border-radius: 50%;
-      color: rgba(255, 237, 206, 0.9);
-      background: rgba(18, 8, 4, 0.42);
-      cursor: pointer;
-      line-height: 1;
-      transition: background 180ms ease, color 180ms ease, transform 180ms ease;
-    }
-
-    .content-panel__close:hover {
-      color: #1d110c;
-      background: rgba(255, 221, 167, 0.86);
-      transform: rotate(90deg);
-    }
-
-    .content-panel__frame {
-      grid-row: 2;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      background: transparent;
-    }
-
-    .contact-card {
-      grid-row: 2;
-      display: none;
-      place-items: center;
-      min-height: 100%;
-      padding: 32px;
-      text-align: center;
-    }
-
-    .contact-card.is-visible {
-      display: grid;
-    }
-
-    .contact-card a {
-      font-family: "Cormorant Garamond", Georgia, serif;
-      font-size: clamp(2rem, 5vw, 4rem);
-      color: #fff0d1;
-      text-shadow: 0 0 28px rgba(255, 194, 120, 0.3);
-    }
-
     .fallback {
       position: absolute;
       left: 50%;
@@ -522,7 +439,7 @@
         <span class="entry-item__label">About</span>
       </a>
 
-      <a class="entry-item" href="mailto:kyuandart@sina.com" style="--x: 85.0%; --y: 58.2%; --w: 12.4%; --ratio: 698 / 929; --delay: 390ms;" data-target="contact">
+      <a class="entry-item" href="contact.html" style="--x: 85.0%; --y: 58.2%; --w: 12.4%; --ratio: 698 / 929; --delay: 390ms;" data-target="contact">
         <span class="entry-item__art">
           <span class="entry-item__preview"><img src="assets/entry/previews/preview-contact.webp" alt="" /></span>
           <img class="entry-item__frame" src="assets/entry/frames/contact-frame.png" alt="" />
@@ -538,16 +455,6 @@
     <div class="transition-wash" id="transitionWash" aria-hidden="true"></div>
     <p class="fallback" id="fallback">视频暂时无法播放，入口已开启。</p>
 
-    <section class="content-panel" id="contentPanel" aria-hidden="true">
-      <div class="content-panel__bar">
-        <span id="contentPanelTitle">Portfolio</span>
-        <button class="content-panel__close" id="contentPanelClose" type="button" aria-label="Close">×</button>
-      </div>
-      <iframe class="content-panel__frame" id="contentFrame" title="Section content"></iframe>
-      <div class="contact-card" id="contactCard">
-        <a href="mailto:kyuandart@sina.com">kyuandart@sina.com</a>
-      </div>
-    </section>
   </main>
 
   <script>
@@ -558,11 +465,6 @@
     const entryUi = document.getElementById('entryUi');
     const transitionWash = document.getElementById('transitionWash');
     const fallback = document.getElementById('fallback');
-    const contentPanel = document.getElementById('contentPanel');
-    const contentPanelTitle = document.getElementById('contentPanelTitle');
-    const contentPanelClose = document.getElementById('contentPanelClose');
-    const contentFrame = document.getElementById('contentFrame');
-    const contactCard = document.getElementById('contactCard');
     let hasStarted = false;
     let hasRevealed = false;
     let queuedStart = false;
@@ -630,41 +532,6 @@
       if (event.key === 'Enter' || event.key === ' ') startExperience();
     });
 
-    const openContentPanel = (title, href) => {
-      contentPanelTitle.textContent = title;
-      contactCard.classList.remove('is-visible');
-      contentFrame.style.display = '';
-      contentFrame.src = href;
-      contentPanel.classList.add('is-visible');
-      contentPanel.setAttribute('aria-hidden', 'false');
-    };
-
-    const openContactPanel = () => {
-      contentPanelTitle.textContent = 'Contact';
-      contentFrame.removeAttribute('src');
-      contentFrame.style.display = 'none';
-      contactCard.classList.add('is-visible');
-      contentPanel.classList.add('is-visible');
-      contentPanel.setAttribute('aria-hidden', 'false');
-    };
-
-    const closeContentPanel = () => {
-      contentPanel.classList.remove('is-visible');
-      contentPanel.setAttribute('aria-hidden', 'true');
-      window.setTimeout(() => {
-        if (!contentPanel.classList.contains('is-visible')) {
-          contentFrame.removeAttribute('src');
-          contentFrame.style.display = '';
-          contactCard.classList.remove('is-visible');
-        }
-      }, 380);
-    };
-
-    contentPanelClose.addEventListener('click', closeContentPanel);
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeContentPanel();
-    });
-
     document.querySelectorAll('.entry-item').forEach((item) => {
       item.addEventListener('click', (event) => {
         if (!entryUi.classList.contains('is-ready')) {
@@ -674,12 +541,15 @@
 
         event.preventDefault();
         const href = item.getAttribute('href') || '';
-        const label = item.querySelector('.entry-item__label')?.textContent?.trim() || 'Section';
-        if (href.startsWith('mailto:')) {
-          openContactPanel();
-        } else {
-          openContentPanel(label, href);
-        }
+        const rect = item.getBoundingClientRect();
+        item.classList.add('is-selected');
+        entryUi.classList.add('is-exiting');
+        transitionWash.style.setProperty('--wash-x', `${rect.left + rect.width / 2}px`);
+        transitionWash.style.setProperty('--wash-y', `${rect.top + rect.height / 2}px`);
+        transitionWash.classList.add('is-visible');
+        window.setTimeout(() => {
+          window.location.href = href;
+        }, 360);
       });
     });
 
