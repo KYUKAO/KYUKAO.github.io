@@ -83,14 +83,17 @@
         ? 'Shader、特效、工具开发与渲染实验——技术与美学的交叉探索。'
         : 'Shaders, VFX, tools, and rendering experiments — exploring the intersection of technique and aesthetics.',
       'portfolio.section.project': t((C.workGroupNames && C.workGroupNames.project) || { en: 'Complete Projects', zh: '完整项目作品' }, lang),
-      'portfolio.section.art':     t((C.workGroupNames && C.workGroupNames.art) || { en: 'Independent Artworks', zh: '独立美术作品' }, lang),
+      'portfolio.section.tool':    t((C.workGroupNames && C.workGroupNames.tool) || { en: 'Tools', zh: '工具作品' }, lang),
+      'portfolio.section.art':     t((C.workGroupNames && C.workGroupNames.art) || { en: 'Independent Works', zh: '独立作品' }, lang),
       'portfolio.empty.project':   lang === 'zh' ? '暂无完整项目作品' : 'No complete projects yet.',
-      'portfolio.empty.art':       lang === 'zh' ? '暂无独立美术作品' : 'No independent artworks yet.',
+      'portfolio.empty.tool':      lang === 'zh' ? '暂无工具作品' : 'No tools yet.',
+      'portfolio.empty.art':       lang === 'zh' ? '暂无独立作品' : 'No independent works yet.',
 
       'filter.all':    lang === 'zh' ? '全部'    : 'All',
       'filter.shader': lang === 'zh' ? 'Shader'  : 'Shader',
       'filter.vfx':    lang === 'zh' ? '特效 VFX': 'VFX',
       'filter.tool':   lang === 'zh' ? '工具 Tools':'Tools',
+      'filter.pcg':    lang === 'zh' ? 'PCG' : 'PCG',
       'filter.render': lang === 'zh' ? '渲染 Render':'Render',
       'filter.code':   lang === 'zh' ? '代码 Code': 'Code',
       'no.results':    lang === 'zh' ? '没有找到该分类的作品' : 'No works found in this category.',
@@ -150,7 +153,7 @@
         : '';
       return {
         category: w.category,
-        group:    w.group || ((w.category === 'tool' || w.category === 'code') ? 'project' : 'art'),
+        group:    w.group || (w.category === 'tool' ? 'tool' : ((w.category === 'code' || w.category === 'pcg') ? 'project' : 'art')),
         bgStyle:  bgStyle,
         hasVideo: !!w.hasVideo,
         tags:     w.tags,

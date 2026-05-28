@@ -162,6 +162,38 @@
     .works-heading span::before { right: calc(100% + 28px); }
     .works-heading span::after { left: calc(100% + 18px); }
 
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: -12px auto 34px;
+      padding: 0 18px;
+    }
+
+    .filter-btn {
+      min-width: 76px;
+      padding: 9px 14px;
+      border: 1px solid rgba(226, 176, 94, 0.4);
+      background: rgba(21, 11, 8, 0.48);
+      color: rgba(245, 213, 157, 0.72);
+      font-family: var(--font);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      color: var(--paper);
+      border-color: var(--gold-soft);
+      background: rgba(72, 35, 15, 0.56);
+      box-shadow: 0 0 18px rgba(226, 176, 94, 0.14);
+    }
+
     .portfolio-frame {
       position: relative;
       display: grid;
@@ -174,8 +206,45 @@
       display: contents;
     }
 
-    .works-section,
     .no-results {
+      display: none !important;
+    }
+
+    .works-section {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(70px, 1fr) auto minmax(70px, 1fr);
+      align-items: center;
+      gap: 18px;
+      width: min(640px, 74vw);
+      margin: 10px auto -10px;
+      color: var(--gold);
+    }
+
+    .works-section::before,
+    .works-section::after {
+      content: "";
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-soft));
+    }
+
+    .works-section::after {
+      background: linear-gradient(90deg, var(--gold-soft), transparent);
+    }
+
+    .works-section-title {
+      margin: 0;
+      font-family: var(--display);
+      font-size: clamp(1.45rem, 2.1vw, 2.1rem);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      text-align: center;
+      text-transform: uppercase;
+      text-shadow: 0 0 18px rgba(226, 176, 94, 0.22);
+    }
+
+    .works-section.is-filter-hidden {
       display: none !important;
     }
 
@@ -197,10 +266,6 @@
     .work-card.visible {
       opacity: 1;
       transform: translateY(0);
-    }
-
-    .work-card:nth-of-type(n + 5) {
-      display: none;
     }
 
     .work-card::before,
@@ -321,6 +386,10 @@
       opacity: 1;
     }
 
+    .work-card.is-filter-hidden {
+      display: none !important;
+    }
+
     footer {
       display: flex;
       align-items: center;
@@ -372,6 +441,14 @@
       .works-heading {
         width: 100%;
       }
+
+      .filter-bar {
+        margin-bottom: 28px;
+      }
+
+      .works-section {
+        width: 100%;
+      }
     }
 
     @media (max-width: 560px) {
@@ -398,7 +475,48 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="assets/entry/scene-pages.css?v=20260527" />
+  <link rel="stylesheet" href="assets/entry/scene-pages.css?v=20260528b" />
+  <style>
+    .portfolio-theater .works-section {
+      grid-column: 1 / -1 !important;
+      display: grid !important;
+      grid-template-columns: minmax(70px, 1fr) auto minmax(70px, 1fr) !important;
+      align-items: center !important;
+      gap: 18px !important;
+      width: min(640px, 74vw) !important;
+      margin: 10px auto -10px !important;
+    }
+
+    .portfolio-theater .works-section::before,
+    .portfolio-theater .works-section::after {
+      content: "" !important;
+      height: 1px !important;
+      background: linear-gradient(90deg, transparent, var(--scene-gold-soft)) !important;
+    }
+
+    .portfolio-theater .works-section::after {
+      background: linear-gradient(90deg, var(--scene-gold-soft), transparent) !important;
+    }
+
+    .portfolio-theater .works-section-title {
+      margin: 0 !important;
+      color: var(--scene-gold) !important;
+      font-family: var(--scene-display) !important;
+      font-size: clamp(1.45rem, 2.1vw, 2.1rem) !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.12em !important;
+      text-align: center !important;
+      text-transform: uppercase !important;
+    }
+
+    .portfolio-theater .works-section.is-filter-hidden {
+      display: none !important;
+    }
+
+    .portfolio-theater .work-card.is-filter-hidden {
+      display: none !important;
+    }
+  </style>
 </head>
 <body class="portfolio-theater scene-page">
   <div class="portfolio-bg-grade" aria-hidden="true"></div>
@@ -420,19 +538,35 @@
       <span>Works</span>
     </header>
 
+    <div class="filter-bar" aria-label="Portfolio categories">
+      <button type="button" class="filter-btn active" data-filter="all" data-i18n="filter.all">All</button>
+      <button type="button" class="filter-btn" data-filter="shader" data-i18n="filter.shader">Shader</button>
+      <button type="button" class="filter-btn" data-filter="pcg" data-i18n="filter.pcg">PCG</button>
+      <button type="button" class="filter-btn" data-filter="render" data-i18n="filter.render">Render</button>
+      <button type="button" class="filter-btn" data-filter="tool" data-i18n="filter.tool">Tools</button>
+      <button type="button" class="filter-btn" data-filter="code" data-i18n="filter.code">Code</button>
+    </div>
+
     <section class="portfolio-frame" aria-label="Portfolio works">
-      <div class="works-section">
+      <div class="works-section" data-group-heading="project">
         <h2 class="works-section-title" data-i18n="portfolio.section.project">完整项目作品</h2>
       </div>
       <div class="portfolio-grid" id="workGridProject">
         <div class="no-results" id="noResultsProject" data-i18n="portfolio.empty.project">暂无完整项目作品</div>
       </div>
 
-      <div class="works-section">
-        <h2 class="works-section-title" data-i18n="portfolio.section.art">独立美术作品</h2>
+      <div class="works-section" data-group-heading="tool">
+        <h2 class="works-section-title" data-i18n="portfolio.section.tool">工具作品</h2>
+      </div>
+      <div class="portfolio-grid" id="workGridTool">
+        <div class="no-results" id="noResultsTool" data-i18n="portfolio.empty.tool">暂无工具作品</div>
+      </div>
+
+      <div class="works-section" data-group-heading="art">
+        <h2 class="works-section-title" data-i18n="portfolio.section.art">独立作品</h2>
       </div>
       <div class="portfolio-grid" id="workGridArt">
-        <div class="no-results" id="noResultsArt" data-i18n="portfolio.empty.art">暂无独立美术作品</div>
+        <div class="no-results" id="noResultsArt" data-i18n="portfolio.empty.art">暂无独立作品</div>
       </div>
     </section>
   </main>
@@ -447,10 +581,10 @@
     <span data-i18n="footer.copy">© 2026 Hanqing Li - All rights reserved</span>
   </footer>
 
-  <script src="config.js?v=20260515b"></script>
-  <script src="js/typography.js?v=20260515b"></script>
-  <script src="js/content.js?v=20260515b"></script>
-  <script src="js/i18n.js?v=20260515b"></script>
+  <script src="config.js?v=20260528d"></script>
+  <script src="js/typography.js?v=20260528d"></script>
+  <script src="js/content.js?v=20260528d"></script>
+  <script src="js/i18n.js?v=20260528d"></script>
   <script src="assets/entry/scene-background.js?v=20260527"></script>
   <script>
     var revealObserver = new IntersectionObserver(function (entries) {
@@ -463,12 +597,11 @@
     }, { threshold: 0.1 });
 
     function refinePortfolioTheater() {
-      var cards = Array.from(document.querySelectorAll('#workGridProject .work-card, #workGridArt .work-card'));
+      var cards = Array.from(document.querySelectorAll('#workGridProject .work-card, #workGridTool .work-card, #workGridArt .work-card'));
       cards.forEach(function (card, index) {
         card.style.transitionDelay = Math.min(index, 3) * 90 + 'ms';
         card.classList.toggle('is-portfolio-picked', index < 4);
         card.classList.toggle('is-portfolio-extra', index >= 4);
-        card.style.display = '';
         var video = card.querySelector('.work-thumb-video');
         if (video && !video.dataset.hoverBound) {
           video.pause();
@@ -482,10 +615,34 @@
           });
         }
       });
+      applyPortfolioFilter();
     }
 
+    function applyPortfolioFilter() {
+      var active = document.querySelector('.filter-btn.active');
+      var category = active ? active.dataset.filter : 'all';
+      document.querySelectorAll('#workGridProject .work-card, #workGridTool .work-card, #workGridArt .work-card').forEach(function (card) {
+        var visible = category === 'all' || card.dataset.category === category;
+        card.classList.toggle('is-filter-hidden', !visible);
+      });
+      ['project', 'tool', 'art'].forEach(function (group) {
+        var hasVisibleCard = !!document.querySelector('.work-card[data-group="' + group + '"]:not(.is-filter-hidden)');
+        var heading = document.querySelector('[data-group-heading="' + group + '"]');
+        if (heading) heading.classList.toggle('is-filter-hidden', !hasVisibleCard);
+      });
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.filter-btn').forEach(function (item) {
+          item.classList.toggle('active', item === btn);
+        });
+        applyPortfolioFilter();
+      });
+    });
+
     var portfolioGridObserver = new MutationObserver(refinePortfolioTheater);
-    ['workGridProject', 'workGridArt'].forEach(function (id) {
+    ['workGridProject', 'workGridTool', 'workGridArt'].forEach(function (id) {
       var grid = document.getElementById(id);
       if (grid) portfolioGridObserver.observe(grid, { childList: true });
     });
@@ -508,7 +665,7 @@
     window.addEventListener('load', function () {
       try {
         holdPortfolioBackground();
-        var hasCard = document.querySelector('#workGridProject .work-card, #workGridArt .work-card');
+        var hasCard = document.querySelector('#workGridProject .work-card, #workGridTool .work-card, #workGridArt .work-card');
         if (!hasCard && typeof renderPortfolioCards === 'function') {
           var lang = 'en';
           try { lang = localStorage.getItem('lang') || 'en'; } catch (e) {}
@@ -521,7 +678,7 @@
     });
 
     var portfolioRefineTimer = window.setInterval(function () {
-      if (document.querySelector('#workGridProject .work-card, #workGridArt .work-card')) {
+      if (document.querySelector('#workGridProject .work-card, #workGridTool .work-card, #workGridArt .work-card')) {
         refinePortfolioTheater();
         window.clearInterval(portfolioRefineTimer);
       }

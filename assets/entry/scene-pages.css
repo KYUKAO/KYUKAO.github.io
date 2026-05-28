@@ -471,6 +471,10 @@ body.scene-page .top-nav .nav-logo,
   display: block !important;
 }
 
+.portfolio-theater .work-card.is-filter-hidden {
+  display: none !important;
+}
+
 .work-card {
   position: relative !important;
   min-width: 0 !important;

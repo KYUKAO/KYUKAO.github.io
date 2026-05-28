@@ -210,7 +210,7 @@ const CONFIG = {
       ],
     },
     {
-      category: 'code',
+      category: 'pcg',
       group: 'project',
       hasVideo: true,
       image: '',
@@ -226,7 +226,7 @@ const CONFIG = {
     },
     {
       category: 'tool',
-      group: 'project',
+      group: 'tool',
       hasVideo: true,
       image: '',
       title: { en: 'Unity Tools', zh: 'Unity工具' },
@@ -241,7 +241,7 @@ const CONFIG = {
     },
     {
       category: 'tool',
-      group: 'project',
+      group: 'tool',
       hasVideo: false,
       image: 'assets/uploads/UE关卡工具.webp',
       title: { en: 'UE Level Tool', zh: 'UE 关卡工具' },
@@ -256,7 +256,7 @@ const CONFIG = {
     },
     {
       category: 'tool',
-      group: 'project',
+      group: 'tool',
       hasVideo: false,
       image: 'assets/uploads/ArtToolFlow.webp',
       title: { en: 'VibeCoding Tool: AI Art Tool Canvas', zh: 'VibeCoding工具：AI美术工具画布' },

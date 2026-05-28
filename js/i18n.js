@@ -126,7 +126,7 @@
         : '';
       return {
         category: w.category || '',
-        group: w.group || ((w.category === 'tool' || w.category === 'code') ? 'project' : 'art'),
+        group: w.group || (w.category === 'tool' ? 'tool' : ((w.category === 'code' || w.category === 'pcg') ? 'project' : 'art')),
         bgStyle: bgStyle,
         hasVideo: !!w.hasVideo,
         tags: tags,
@@ -251,8 +251,9 @@
     _bindPortfolioVideoInteractions();
 
     var projectGrid = document.getElementById('workGridProject');
+    var toolGrid = document.getElementById('workGridTool');
     var artGrid = document.getElementById('workGridArt');
-    if (!projectGrid || !artGrid) return;
+    if (!projectGrid || !toolGrid || !artGrid) return;
 
     var works = (typeof CONTENT !== 'undefined' && CONTENT && CONTENT.works && CONTENT.works[lang])
       ? CONTENT.works[lang]
@@ -260,9 +261,11 @@
     if (!works) return;
 
     var noResultsProject = document.getElementById('noResultsProject');
+    var noResultsTool = document.getElementById('noResultsTool');
     var noResultsArt = document.getElementById('noResultsArt');
 
     projectGrid.querySelectorAll('.work-card').forEach(function (c) { c.remove(); });
+    toolGrid.querySelectorAll('.work-card').forEach(function (c) { c.remove(); });
     artGrid.querySelectorAll('.work-card').forEach(function (c) { c.remove(); });
 
     function isMediaHref(href) {
@@ -314,7 +317,7 @@
       var card = document.createElement('div');
       card.className = 'work-card reveal visible';
       card.dataset.category = w.category;
-      card.dataset.group = w.group || ((w.category === 'tool' || w.category === 'code') ? 'project' : 'art');
+      card.dataset.group = w.group || (w.category === 'tool' ? 'tool' : ((w.category === 'code' || w.category === 'pcg') ? 'project' : 'art'));
       card.innerHTML =
         '<div class="work-thumb">' +
           thumbContent +
@@ -327,18 +330,19 @@
           '<div class="work-links">' + linksHtml + '</div>' +
         '</div>';
 
-      var targetGrid = card.dataset.group === 'project' ? projectGrid : artGrid;
-      var targetNo = card.dataset.group === 'project' ? noResultsProject : noResultsArt;
+      var targetGrid = card.dataset.group === 'tool' ? toolGrid : (card.dataset.group === 'project' ? projectGrid : artGrid);
+      var targetNo = card.dataset.group === 'tool' ? noResultsTool : (card.dataset.group === 'project' ? noResultsProject : noResultsArt);
       if (targetNo) targetGrid.insertBefore(card, targetNo);
       else targetGrid.appendChild(card);
     });
 
     if (noResultsProject) noResultsProject.style.display = projectGrid.querySelectorAll('.work-card').length ? 'none' : 'block';
+    if (noResultsTool) noResultsTool.style.display = toolGrid.querySelectorAll('.work-card').length ? 'none' : 'block';
     if (noResultsArt) noResultsArt.style.display = artGrid.querySelectorAll('.work-card').length ? 'none' : 'block';
 
     // Re-attach IntersectionObserver for new cards
     if (typeof revealObserver !== 'undefined') {
-      document.querySelectorAll('#workGridProject .reveal, #workGridArt .reveal').forEach(function (el) {
+      document.querySelectorAll('#workGridProject .reveal, #workGridTool .reveal, #workGridArt .reveal').forEach(function (el) {
         revealObserver.observe(el);
       });
     }
