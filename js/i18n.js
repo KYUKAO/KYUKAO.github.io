@@ -178,6 +178,8 @@
     if (typeof renderResumeEntries  === 'function') renderResumeEntries(lang);
     if (typeof renderAboutInterests === 'function') renderAboutInterests(lang);
     if (typeof renderContactButtons === 'function') renderContactButtons(lang);
+    if (typeof renderContactPage === 'function') renderContactPage(lang);
+    if (typeof renderAboutProfilePhoto === 'function') renderAboutProfilePhoto(lang);
   }
 
   /* ================================================================
@@ -438,6 +440,21 @@
     }).join('');
   };
 
+  window.renderAboutProfilePhoto = function (lang) {
+    var holder = document.querySelector('.avatar-placeholder');
+    if (!holder || typeof CONFIG === 'undefined') return;
+    var photo = CONFIG.about && CONFIG.about.photo ? String(CONFIG.about.photo).trim() : '';
+    if (photo) {
+      holder.classList.add('has-photo');
+      holder.innerHTML = '<img src="' + _escAttr(photo) + '" alt="' + (lang === 'zh' ? '个人照片' : 'Profile photo') + '">';
+      return;
+    }
+    holder.classList.remove('has-photo');
+    holder.innerHTML =
+      '<span>' + (lang === 'zh' ? '[ 替换为你的照片 ]' : '[ Add your photo ]') + '</span>' +
+      '<span style="font-size:0.7rem">config.js -> about.photo</span>';
+  };
+
   window.renderContactButtons = function (lang) {
     var contacts = CONFIG.contact || {};
     var map = [
@@ -466,6 +483,39 @@
         valEl.textContent = value;
         valEl.setAttribute('data-contact-key', item.key);
       }
+    });
+  };
+
+  window.renderContactPage = function () {
+    var contacts = (typeof CONFIG !== 'undefined' && CONFIG.contact) ? CONFIG.contact : {};
+    var name = (typeof CONFIG !== 'undefined' && CONFIG.name) ? CONFIG.name.en : '';
+    var values = {
+      email: {
+        href: contacts.email ? 'mailto:' + contacts.email : '',
+        text: contacts.email || ''
+      },
+      linkedin: {
+        href: contacts.linkedin || '',
+        text: name || contacts.linkedin || ''
+      },
+      website: {
+        href: contacts.github || '',
+        text: contacts.github ? String(contacts.github).replace(/^https?:\/\//, '').replace(/\/index\.html$/, '').replace(/\/$/, '') : ''
+      }
+    };
+
+    Object.keys(values).forEach(function (key) {
+      var link = document.querySelector('[data-contact-page-key="' + key + '"]');
+      if (!link) return;
+      var value = values[key];
+      if (!value.href) {
+        link.style.display = 'none';
+        return;
+      }
+      link.style.display = '';
+      link.href = value.href;
+      var text = link.querySelector('.contact-value');
+      if (text) text.textContent = value.text;
     });
   };
 

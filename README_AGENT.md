@@ -1,235 +1,168 @@
-# Agent Reference — KYUKAO Portfolio
+# Agent Reference - KYUKAO Portfolio
 
-> 给下一个接手此项目的前端 Agent 看的速查文档。省去阅读全部源码的时间。
-
----
-
-## 项目概述
-
-**类型**：纯静态作品集网站 + 配套可视化内容编辑器
-**技术栈**：Vanilla HTML/CSS/JavaScript（无框架，无构建步骤）
-**特殊点**：简历页（`resume.html`）额外引入了 Tailwind CSS CDN
+给接手本项目的前端 Agent 使用的速查文档。项目是纯静态站点，没有构建步骤。
 
 ---
 
-## 文件结构与职责
+## 项目概览
 
-```
-kyukao-portfolio/
-├── index.html          # 作品集入口页
-├── resume.html         # 简历页，Tailwind CSS 页面
-├── home.html           # 主页，CSS变量 + 自定义CSS
-├── portfolio.html      # 作品集，卡片过滤功能
-├── about.html          # 关于页
-│
-├── config.js           # ★ 唯一数据源，所有内容在此定义
-│
-├── js/
-│   ├── content.js      # 读取CONFIG，构建CONTENT对象（双语分离）
-│   ├── i18n.js         # 语言切换，渲染动态DOM
-│   └── typography.js   # 排版配置，运行时注入<style>标签
-│
-├── tools/
-│   ├── editor.html     # 可视化编辑器（独立SPA）
-│   └── editor.js       # 编辑器全部逻辑（~1800行）
-│
-└── assets/
-    ├── photo.jpg
-    └── works/          # 作品图片
-```
+- 类型：个人作品集网站 + 本地可视化编辑器
+- 技术栈：Vanilla HTML/CSS/JavaScript
+- 部署：GitHub Pages root
+- 主要数据源：`config.js`
+- 主要排版配置：`js/typography.js`
+- 动态渲染：`js/content.js` + `js/i18n.js`
+- 特例：`resume.html` 使用 Tailwind CDN
 
 ---
 
-## 核心数据流
+## 文件职责
 
-```
-config.js (CONFIG对象)
-    └→ content.js       → 构建 window.CONTENT = { zh:{...}, en:{...}, works:{...}, ... }
-        └→ i18n.js      → 读取CONTENT，更新[data-i18n]元素，渲染动态卡片/列表
-            └→ typography.js → 注入CSS字符串到<style>
-
-脚本加载顺序（所有页面一致）：
-  1. typography.js  2. config.js  3. content.js  4. i18n.js
-  ⚠️ 顺序不可改变，每个文件依赖前一个暴露的全局变量
+```text
+index.html                    # 开场入口，使用 4K opening 视频
+menu.html                     # 跳过开场后的快速菜单
+home.html                     # 主页，使用 depth-of-field Canvas 背景
+portfolio.html                # 作品集，动态渲染作品卡片
+resume.html                   # 简历，动态渲染教育/工作/项目经历
+about.html                    # 关于，动态渲染个人信息/联系方式/兴趣
+contact.html                  # 联系，动态读取 CONFIG.contact
+config.js                     # 内容数据源
+js/content.js                 # 构建 window.CONTENT
+js/i18n.js                    # 语言切换、动态 DOM 渲染
+js/typography.js              # 注入全站排版 CSS
+js/depth-of-field-bg.js       # home.html 背景 Canvas
+assets/entry/                 # 入口页与场景背景资源
+assets/uploads/               # 作品媒体资源
+tools/editor.html             # 编辑器界面
+tools/editor.js               # 编辑器逻辑
 ```
 
 ---
 
-## config.js 数据结构
+## 数据流与加载顺序
+
+```text
+config.js
+  -> content.js    # 读取 CONFIG，构建 CONTENT
+  -> i18n.js       # 读取 CONTENT，更新 data-i18n 与动态列表
+
+typography.js      # 读取 TYPOGRAPHY，注入 CSS
+```
+
+动态内容页的脚本顺序：
+
+```html
+<script src="config.js"></script>
+<script src="js/typography.js"></script>
+<script src="js/content.js"></script>
+<script src="js/i18n.js"></script>
+```
+
+`content.js` 依赖 `CONFIG`，`i18n.js` 依赖 `CONTENT`。`typography.js` 不依赖内容数据，但建议保持在 `content.js` 之前加载。
+
+---
+
+## config.js 结构要点
+
+`config.js` 声明全局 `CONFIG` 常量：
 
 ```javascript
-window.CONFIG = {
-  // §1 基本信息
-  name: { en: 'Hanqing Li', zh: '李含青', alias: 'KYUKAO' },
-  role: { en: '...', zh: '...' },
-  contact: { email, github, linkedin, tel },
-  languages: [...],
-
-  // §2 主页
-  home: {
-    subtitle: { en, zh },
-    about: { en, zh },       // 支持 <span style="..."> 内联HTML
-    stats: [{ num, label:{en,zh} }],
-    skills: ['HLSL', ...]    // 纯字符串数组（无需双语）
-  },
-
-  // §3 关于页
-  about: {
-    bio: { en, zh },
-    description: { en, zh },
-    photo: 'assets/photo.jpg',
-    interests: [{ icon, title:{en,zh}, description:{en,zh} }]
-  },
-
-  // §4 作品集
-  works: [{
-    category: 'shader'|'vfx'|'tool'|'render'|'code',
-    image: 'assets/works/xxx.jpg',  // 或外链URL
-    title: { en, zh },
-    description: { en, zh },
-    tags: ['Tag1'],                 // 纯字符串
-    links: [{ label:{en,zh}, href }]
-  }],
-
-  // §5 教育
-  education: [{
-    school: { en, zh },
-    degree: { en, zh },
-    major: { en, zh },
-    period: '2019-2023',
-    awards: [{ en, zh }]
-  }],
-
-  // §6 工作经历
-  workExp: [{
-    company: { en, zh },
-    role: { en, zh },
-    period: { en, zh },
-    bullets: [{ en, zh }]   // 工作描述要点，数组
-  }],
-
-  // §7 独立项目
-  indieProjects: [{
-    name: { en, zh },
-    role: { en, zh },
-    period: { en, zh },
-    description: { en, zh },
-    links: [{ label:{en,zh}, href }]
-  }]
-}
+const CONFIG = {
+  name: { en: 'Hanqing Li', zh: '李涵清', alias: 'KYUKAO' },
+  role: { en: 'Technical Artist · Game Creator', zh: '技术美术师 · 游戏创作者' },
+  location: { en: 'Shanghai, China', zh: '中国 · 上海' },
+  contact: { email, github, artstation, linkedin, tel },
+  home: { subtitle, about, stats, skills },
+  about: { bio, desc, interests },
+  works: [{ group, category, image, hasVideo, title, desc, tags, links }],
+  education: [{ school, period, degree, detail, award }],
+  workExp: [{ company, period, role, projectUrl, bullets }],
+  indieProjects: [{ title, period, role, projectUrl, award, bullets }]
+};
 ```
 
-**双语字段统一规范**：`{ en: '...', zh: '...' }`
-**t() 解析函数**（在 content.js 中定义）：
-```javascript
-function t(field, lang) {
-  if (!field) return '';
-  if (typeof field === 'string') return field;
-  return field[lang] || field['en'] || '';
-}
+双语字段使用 `{ en, zh }`。纯技术标签、URL、文件路径通常保持字符串即可。
+
+---
+
+## 动态渲染入口
+
+`i18n.js` 暴露并自动调用：
+
+- `window.applyLang(lang)`
+- `window.toggleLang()`
+- `window.renderFeaturedWorks(lang)`
+- `window.renderPortfolioCards(lang)`
+- `window.renderResumeEntries(lang)`
+- `window.renderAboutInterests(lang)`
+- `window.renderContactButtons(lang)`
+- `window.renderContactPage(lang)`
+
+静态文本通过 HTML 的 `data-i18n="key"` 更新。作品、简历、兴趣、联系按钮等列表由上述函数重建 DOM。
+
+默认语言从 `localStorage.lang` 读取；没有缓存时默认英文。
+
+---
+
+## 入口页资源
+
+`index.html` 当前使用：
+
+```text
+assets/entry/video/opening-1-ui.mp4
+assets/entry/video/opening-2-ui.mp4
+assets/entry/frames/*.webp
+assets/entry/previews/*.webp
+```
+
+`menu.html` 使用：
+
+```text
+assets/entry/small-garden-4k.webp
+assets/entry/frames/*.webp
+assets/entry/previews/*.webp
+```
+
+内容页统一使用：
+
+```text
+assets/entry/scene-pages.css
+assets/entry/scene-background.js
+assets/entry/universal-bg-4k.webp
 ```
 
 ---
 
-## content.js 输出结构
+## 常见修改
 
-```javascript
-window.CONTENT = {
-  zh: { /* 扁平化的UI文案字符串 */ },
-  en: { /* 同上 */ },
-  works:         { zh: [...], en: [...] },
-  education:     { zh: [...], en: [...] },
-  workExp:       { zh: [...], en: [...] },
-  indieProjects: { zh: [...], en: [...] },
-  interests:     { zh: [...], en: [...] }
-}
-```
+### 新增作品
 
----
+1. 在 `config.js` 的 `works` 数组中增加条目。
+2. 媒体文件放入 `assets/uploads/`，或使用外链。
+3. `group` 可用 `project` 或 `art`。
+4. `category` 会用于作品过滤。
 
-## i18n.js 工作机制
+### 新增可翻译文案
 
-- **静态文本**：通过 `[data-i18n="key"]` 属性声明，`applyLang()` 批量更新 `innerHTML`
-- **动态列表**：`renderPortfolioCards()` / `renderResumeEntries()` 清空容器后重新生成DOM
-- **语言持久化**：`localStorage.setItem('lang', 'zh'|'en')`
-- **初始化**：`DOMContentLoaded` 时自动执行，默认语言为 `'en'`
+1. 在 `js/content.js` 的 `buildStrings(lang)` 中增加 key。
+2. 在 HTML 中添加 `data-i18n="new.key"`。
+3. 如需动态列表，优先扩展 `i18n.js` 的现有 render 函数。
 
----
+### 修改联系信息
 
-## typography.js 工作机制
+优先改 `config.js` 的 `contact` 对象。`about.html` 和 `contact.html` 都会读取它。
 
-- 定义 `window.TYPOGRAPHY` 对象（字体名、字号、行高等50+变量）
-- 构建 CSS 字符串，注入到 `document.head` 的 `<style id="typo-style">` 标签
-- 包含 Google Fonts `@import` URL
-- 对外暴露 `window.applyTypography()` 可手动重新触发
-- 简历页（resume.html）有独立的 CSS 变量集合，与其他页面区分
+### 修改背景
 
----
-
-## editor.js 架构
-
-```
-全局状态：window.S = { ...镜像CONFIG的结构... }
-
-关键函数：
-  loadConfig()      → fetch('../config.js') → 解析字符串 → 填充S
-  snapshot()        → 推送到undoStack（最多50条）
-  exportConfig()    → 将S序列化为config.js文件格式
-  saveToFile()      → showSaveFilePicker() API（Chrome/Edge限定）
-  uploadToGitHub()  → GitHub REST API，上传到Releases资源
-
-自动备份：setInterval(30000) → localStorage.setItem('editorState', JSON.stringify(S))
-```
-
-编辑器是**独立运行**的 SPA，与主站不共享任何运行时状态，只通过 `config.js` 文件交换数据。
-
----
-
-## CSS 变量（主站主题）
-
-```css
-:root {
-  --pink:       #ff2d75;   /* 主强调色 */
-  --pink-glow:  0 0 18px #ff2d7888;
-  --bg:         #080808;   /* 背景色 */
-  --text:       #f0f0f0;   /* 主文字 */
-  --text-dim:   #888;
-  --border:     #222;
-}
-```
-
----
-
-## 常见修改场景
-
-### 新增作品分类过滤器
-1. 在 `portfolio.html` 找到 `.filter-btn` 按钮组，添加新按钮
-2. 在 `config.js` 的 `works[].category` 使用新分类名
-3. 过滤逻辑在 `i18n.js` 的 `renderPortfolioCards()` 中，检查 `data-category` 属性
-
-### 新增 config.js 字段
-1. 在 `config.js` 添加字段（`{ en, zh }` 格式）
-2. 在 `content.js` 的对应 `buildXxx(lang)` 函数中读取并加入 CONTENT 对象
-3. 在对应 HTML 中添加 `data-i18n` 属性或在 `i18n.js` 中手动绑定
-4. 如需编辑器支持，在 `editor.html` 添加表单字段，在 `editor.js` 的 `exportConfig()` 中加入序列化逻辑
-
-### 修改简历页样式
-- 简历页使用 **Tailwind CSS**，直接修改 HTML 中的 class 即可
-- 自定义样式在 `<style>` 块或 typography.js 的简历专属变量区
-
-### 添加新页面
-1. 新建 HTML 文件，按顺序引入 4 个 JS 文件
-2. 在 `config.js` 中添加对应内容区块
-3. 在 `content.js` 中添加 `buildXxx()` 函数并挂载到 CONTENT
-4. 在各页面导航栏 HTML 中添加链接
+- `home.html`：`js/depth-of-field-bg.js`
+- 内容页：`assets/entry/scene-pages.css` 中的 `universal-bg-4k.webp`
+- 入口页：`assets/entry/video/`、`assets/entry/frames/`、`assets/entry/previews/`
 
 ---
 
 ## 注意事项
 
-- **无 `console.log` 调试**：项目不含任何日志，调试时自行添加
-- **无测试框架**：无单元测试，修改后手动刷新页面验证
-- **跨域限制**：`editor.js` 用 `fetch('../config.js')` 加载配置，直接双击 `editor.html` 会因 `file://` 协议报错，必须通过本地服务器访问
-- **`saveToFile()` 仅支持 Chrome/Edge**：依赖 `window.showSaveFilePicker` API，Firefox/Safari 降级为普通下载
-- **Tailwind 仅在 resume.html 使用**：其他页面不加载 Tailwind，勿混用
-- **`config.js` 是普通 JS 文件**：不是 JSON，可以写注释，但 `editor.js` 解析时用了字符串替换技巧，修改格式时需小心
+- 没有测试框架，改动后需要用浏览器手动验证关键页面。
+- `tools/editor.js` 会解析 `config.js` 字符串，调整 `config.js` 顶层格式时要谨慎。
+- `showSaveFilePicker` 只在部分现代浏览器可用，其他浏览器会降级为下载文件。
+- 不要把临时日志提交进仓库；`.gitignore` 已忽略 `*.log`。

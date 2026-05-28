@@ -86,11 +86,11 @@
   <nav>
     <a href="menu.html" class="nav-logo">KYUKAO</a>
     <ul class="nav-links" id="navLinks">
-      <li><a href="menu.html">Home</a></li>
-      <li><a href="portfolio.html">Portfolio</a></li>
-      <li><a href="resume.html">Resume</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="contact.html" class="active">Contact</a></li>
+      <li><a href="menu.html" data-i18n="nav.home">Home</a></li>
+      <li><a href="portfolio.html" data-i18n="nav.portfolio">Portfolio</a></li>
+      <li><a href="resume.html" data-i18n="nav.resume">Resume</a></li>
+      <li><a href="about.html" data-i18n="nav.about">About</a></li>
+      <li><a href="contact.html" class="active" data-i18n="nav.contact">Contact</a></li>
     </ul>
     <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
   </nav>
@@ -98,26 +98,30 @@
   <main class="contact-page">
     <section class="contact-hero">
       <header>
-        <h1 class="contact-title">Contact</h1>
-        <p class="contact-role">Technical Artist / Game Creator</p>
+        <h1 class="contact-title" data-i18n="contact.page.title">Contact</h1>
+        <p class="contact-role" data-i18n="contact.page.role">Technical Artist / Game Creator</p>
       </header>
       <div class="contact-list">
-        <a class="contact-link" href="mailto:kyuandart@sina.com">
-          <span class="contact-label">Email</span>
+        <a class="contact-link" data-contact-page-key="email" href="mailto:kyuandart@sina.com">
+          <span class="contact-label" data-i18n="contact.email.label">Email</span>
           <span class="contact-value">kyuandart@sina.com</span>
         </a>
-        <a class="contact-link" href="https://www.linkedin.com/in/hanqing-li-000069223" target="_blank" rel="noreferrer">
-          <span class="contact-label">LinkedIn</span>
+        <a class="contact-link" data-contact-page-key="linkedin" href="https://www.linkedin.com/in/hanqing-li-000069223" target="_blank" rel="noreferrer">
+          <span class="contact-label" data-i18n="contact.linkedin.label">LinkedIn</span>
           <span class="contact-value">Hanqing Li</span>
         </a>
-        <a class="contact-link" href="https://kyukao.github.io/index.html" target="_blank" rel="noreferrer">
-          <span class="contact-label">Website</span>
+        <a class="contact-link" data-contact-page-key="website" href="https://kyukao.github.io/index.html" target="_blank" rel="noreferrer">
+          <span class="contact-label" data-i18n="contact.website.label">Website</span>
           <span class="contact-value">kyukao.github.io</span>
         </a>
       </div>
     </section>
   </main>
 
+  <script src="config.js"></script>
+  <script src="js/typography.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="assets/entry/scene-background.js?v=20260527"></script>
   <script>
     document.getElementById('navToggle').addEventListener('click', function () {

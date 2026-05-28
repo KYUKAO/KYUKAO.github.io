@@ -20,7 +20,6 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body { background: var(--bg); color: var(--text); font-family: var(--font); overflow-x: hidden; }
-    #bgCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; }
     a { color: inherit; text-decoration: none; }
 
     /* 导航 */
@@ -129,6 +128,13 @@
     }
     .avatar-placeholder::before { content: '👤'; font-size: 4rem; opacity: 0.2; }
     .avatar-placeholder span { opacity: 0.4; }
+    .avatar-placeholder.has-photo::before { display: none; }
+    .avatar-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
     .avatar-deco {
       position: absolute;
       bottom: -16px; right: -16px;
@@ -252,8 +258,6 @@
 </head>
 <body class="scene-page about-scene">
 
-  <canvas id="bgCanvas"></canvas>
-
   <!-- 导航 -->
   <nav>
     <a href="menu.html" class="nav-logo">KYUKAO</a>
@@ -262,7 +266,7 @@
       <li><a href="portfolio.html" data-i18n="nav.portfolio">作品集</a></li>
       <li><a href="resume.html" data-i18n="nav.resume">简历</a></li>
       <li><a href="about.html" class="active" data-i18n="nav.about">关于我</a></li>
-      <li><a href="contact.html">Contact</a></li>
+      <li><a href="contact.html" data-i18n="nav.contact">Contact</a></li>
     </ul>
     <!-- lang toggle injected by i18n.js -->
     <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
@@ -289,7 +293,7 @@
     <div class="avatar-wrap reveal">
       <div class="avatar-placeholder">
         <span>[ 替换为你的照片 ]</span>
-        <span style="font-size:0.7rem">assets/photo.jpg</span>
+        <span style="font-size:0.7rem">config.js -> about.photo</span>
       </div>
       <div class="avatar-deco"></div>
     </div>
@@ -372,12 +376,11 @@
     <div class="footer-links">
       <a href="portfolio.html" data-i18n="footer.portfolio">作品集</a>
       <a href="resume.html" data-i18n="footer.resume">简历</a>
-      <a href="about.html" data-i18n="footer.contact">联系</a>
+      <a href="contact.html" data-i18n="footer.contact">联系</a>
     </div>
     <span data-i18n="footer.copy">© 2026 Hanqing Li · All rights reserved</span>
   </footer>
 
-  <script src="js/depth-of-field-bg.js"></script>
   <script src="config.js"></script>
   <script src="js/typography.js"></script>
   <script src="js/content.js"></script>

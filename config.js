@@ -243,7 +243,7 @@ const CONFIG = {
       category: 'tool',
       group: 'project',
       hasVideo: false,
-      image: 'assets/uploads/UE关卡工具.png',
+      image: 'assets/uploads/UE关卡工具.webp',
       title: { en: 'UE Level Tool', zh: 'UE 关卡工具' },
       desc:  {
         en: 'A Unreal Engine level tool showcase for improving scene-building workflow and iteration efficiency.',
@@ -251,14 +251,14 @@ const CONFIG = {
       },
       tags: ['Tool', 'Unreal Engine'],
       links: [
-        { label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/UE关卡工具.png' },
+        { label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/UE关卡工具.webp' },
       ],
     },
     {
       category: 'tool',
       group: 'project',
       hasVideo: false,
-      image: 'assets/uploads/ArtToolFlow.png',
+      image: 'assets/uploads/ArtToolFlow.webp',
       title: { en: 'VibeCoding Tool: AI Art Tool Canvas', zh: 'VibeCoding工具：AI美术工具画布' },
       desc:  {
         en: 'An AI art tool canvas for VibeCoding workflows, showing tool structure and creative production flow.',
@@ -266,14 +266,14 @@ const CONFIG = {
       },
       tags: ['AI Art', 'Tool', 'VibeCoding'],
       links: [
-        { label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/ArtToolFlow.png' },
+        { label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/ArtToolFlow.webp' },
       ],
     },
     {
       category: 'render',
       group: 'art',
       hasVideo: false,
-      image: 'assets/uploads/InsideThePaper1.png',
+      image: 'assets/uploads/InsideThePaper1.webp',
       title: { en: 'Inside The Paper', zh: 'Inside The Paper' },
       desc:  {
         en: 'A two-image artwork set for Inside The Paper, collected as one portfolio entry.',
@@ -281,8 +281,8 @@ const CONFIG = {
       },
       tags: ['Artwork', 'Scene'],
       links: [
-        { label: { en: 'Image 1 →', zh: '图片 1 →' }, href: 'assets/uploads/InsideThePaper1.png' },
-        { label: { en: 'Image 2 →', zh: '图片 2 →' }, href: 'assets/uploads/InsideThePaper2.png' },
+        { label: { en: 'Image 1 →', zh: '图片 1 →' }, href: 'assets/uploads/InsideThePaper1.webp' },
+        { label: { en: 'Image 2 →', zh: '图片 2 →' }, href: 'assets/uploads/InsideThePaper2.webp' },
       ],
     },
   ],

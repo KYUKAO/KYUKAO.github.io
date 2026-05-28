@@ -76,23 +76,23 @@ Layer 6: 点击栏目后的过渡遮罩
 assets/entry/
 ```
 
-视频文件：
+当前入口页使用的网页优化视频文件：
 
 ```text
-assets/entry/video/opening-1.mp4
-assets/entry/video/opening-2.mp4
+assets/entry/video/opening-1-ui.mp4
+assets/entry/video/opening-2-ui.mp4
 ```
 
 四个门框文件：
 
 ```text
-assets/entry/frames/resume-frame.png
-assets/entry/frames/portfolio-frame.png
-assets/entry/frames/about-frame.png
-assets/entry/frames/contact-frame.png
+assets/entry/frames/resume-frame.webp
+assets/entry/frames/portfolio-frame.webp
+assets/entry/frames/about-frame.webp
+assets/entry/frames/contact-frame.webp
 ```
 
-当前未使用中央大拱和底部按钮。后续如果视频最后一帧需要中央主入口，可以再把 `entrance_03_center_arch.png` 接回页面。
+当前未使用中央大拱和底部按钮。四个入口均由 HTML 链接、预览图和门框 PNG 叠加实现。
 
 ## 每个入口的结构
 

@@ -32,6 +32,7 @@
       'nav.portfolio': lang === 'zh' ? '作品集' : 'Portfolio',
       'nav.resume':    lang === 'zh' ? '简历'  : 'Resume',
       'nav.about':     lang === 'zh' ? '关于我' : 'About',
+      'nav.contact':   lang === 'zh' ? '联系'  : 'Contact',
       'nav.toggle':    lang === 'zh' ? 'EN'    : '中文',
 
       /* ── Footer ── */
@@ -134,6 +135,9 @@
       'contact.github.label':   lang === 'zh' ? 'GitHub'    : 'GitHub',
       'contact.artstation.label': lang === 'zh' ? 'ArtStation' : 'ArtStation',
       'contact.linkedin.label': lang === 'zh' ? 'LinkedIn'  : 'LinkedIn',
+      'contact.website.label':  lang === 'zh' ? '网站'      : 'Website',
+      'contact.page.title':     lang === 'zh' ? '联系'      : 'Contact',
+      'contact.page.role':      t(C.role, lang),
       'about.interests.title': lang === 'zh' ? '兴趣与方向' : 'Interests & Directions',
     };
   }
