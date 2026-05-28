@@ -283,7 +283,7 @@
     works.forEach(function (w) {
       var previewVideo = getPreviewVideoUrl(w.links);
       var thumbContent = previewVideo
-        ? '<video class="work-thumb-video" src="' + _escAttr(previewVideo) + '" muted playsinline loop autoplay preload="metadata"></video>'
+        ? '<video class="work-thumb-video" src="' + _escAttr(previewVideo) + '" muted playsinline loop preload="metadata"></video>'
         : (w.bgStyle
           ? '<div class="work-thumb-bg has-image" style="' + w.bgStyle + '" aria-label="' + _escAttr(w.title) + '"></div>'
           : w.bgText

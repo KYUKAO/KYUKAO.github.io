@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;700&display=swap');
 
 :root {
-  --scene-gold: #d9ad6d;
-  --scene-gold-soft: rgba(232, 187, 111, 0.58);
-  --scene-gold-faint: rgba(232, 187, 111, 0.2);
+  --scene-gold: #f0c77f;
+  --scene-gold-soft: rgba(248, 207, 132, 0.66);
+  --scene-gold-faint: rgba(248, 207, 132, 0.26);
   --scene-ink: #180c07;
-  --scene-paper: #fff0cf;
-  --scene-muted: rgba(255, 234, 197, 0.72);
+  --scene-paper: #fff6df;
+  --scene-muted: rgba(255, 241, 213, 0.8);
   --scene-panel: rgba(35, 16, 10, 0.52);
   --scene-display: "Cormorant Garamond", Georgia, serif;
   --scene-font: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -35,18 +35,18 @@ body {
 }
 
 .scene-bg-image {
-  background-image: url("universal-bg-4k.png");
+  background-image: url("universal-bg-4k.webp");
   background-size: cover;
   background-position: center center;
-  filter: saturate(1.02) brightness(0.8);
-  transform: scale(1.01);
+  filter: blur(3px) saturate(1.06) brightness(0.82);
+  transform: scale(1.015);
 }
 
 .scene-bg-video,
 .portfolio-bg-video {
   object-fit: cover !important;
-  filter: blur(12px) saturate(1.04) brightness(0.82) !important;
-  transform: scale(1.045) !important;
+  filter: blur(3px) saturate(1.06) brightness(0.86) !important;
+  transform: scale(1.015) !important;
 }
 
 .scene-bg-grade,
@@ -95,13 +95,24 @@ nav,
   text-transform: uppercase !important;
 }
 
+body.scene-page nav .nav-logo,
+body.scene-page .top-nav .nav-logo,
 .nav-logo,
 .footer-logo {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
   color: var(--scene-paper) !important;
   font-family: var(--scene-display) !important;
   font-size: 1.28rem !important;
   font-weight: 700 !important;
   letter-spacing: 0 !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+  text-decoration: none !important;
   text-shadow: 0 0 20px rgba(232, 187, 111, 0.32) !important;
 }
 
@@ -248,7 +259,7 @@ nav,
 
 .resume-scene > main.max-w-5xl > section:nth-of-type(1) {
   grid-column: 2;
-  grid-row: 2;
+  grid-row: 1;
 }
 
 .resume-scene > main.max-w-5xl > section:nth-of-type(2) {
@@ -263,7 +274,7 @@ nav,
 
 .resume-scene > main.max-w-5xl > section:nth-of-type(4) {
   grid-column: 2;
-  grid-row: 1;
+  grid-row: 2;
 }
 
 .resume-scene > main.max-w-5xl .grid {
@@ -417,7 +428,7 @@ nav,
 }
 
 .portfolio-shell {
-  width: min(1880px, calc(100vw - 72px)) !important;
+  width: min(1720px, calc(100vw - 150px)) !important;
 }
 
 .works-heading {
@@ -439,7 +450,7 @@ nav,
 .portfolio-frame {
   display: grid !important;
   grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: clamp(14px, 1.3vw, 24px) !important;
+  gap: clamp(34px, 3.2vw, 58px) clamp(34px, 3.1vw, 56px) !important;
   width: 100% !important;
   padding: 0 !important;
 }
@@ -463,49 +474,57 @@ nav,
 .work-card {
   position: relative !important;
   min-width: 0 !important;
-  border: 2px solid rgba(202, 143, 63, 0.74) !important;
+  display: grid !important;
+  grid-template-rows: auto 54px !important;
+  border: 2px solid rgba(241, 187, 95, 0.84) !important;
   border-radius: 0 !important;
   background: rgba(28, 12, 7, 0.5) !important;
   box-shadow:
     0 24px 42px rgba(24, 7, 3, 0.46),
-    0 0 0 1px rgba(94, 48, 19, 0.72),
+    0 0 0 1px rgba(147, 82, 32, 0.76),
     inset 0 0 0 1px rgba(255, 239, 197, 0.08) !important;
   clip-path: polygon(0 10%, 7% 0, 93% 0, 100% 10%, 100% 90%, 93% 100%, 7% 100%, 0 90%) !important;
   overflow: visible !important;
 }
 
-.work-card::before,
-.work-card::after {
+.work-card::before {
   content: "" !important;
   position: absolute !important;
   inset: -7px !important;
   z-index: 4 !important;
   pointer-events: none !important;
-  border: 1px solid rgba(234, 179, 91, 0.58) !important;
+  border: 1px solid rgba(255, 211, 128, 0.68) !important;
   clip-path: polygon(0 11%, 7% 0, 93% 0, 100% 11%, 100% 89%, 93% 100%, 7% 100%, 0 89%) !important;
-}
-
-.work-card::after {
-  inset: auto 34% -18px 34% !important;
-  height: 30px !important;
-  border: 2px solid rgba(202, 143, 63, 0.66) !important;
-  border-top: 0 !important;
-  background: rgba(54, 24, 11, 0.48) !important;
-  clip-path: none !important;
 }
 
 .work-thumb {
   aspect-ratio: 1.52 / 1 !important;
+  width: 100% !important;
   border: 0 !important;
   border-bottom-width: 0 !important;
   background: rgba(12, 5, 3, 0.62) !important;
   clip-path: polygon(0 10%, 7% 0, 93% 0, 100% 10%, 100% 100%, 0 100%) !important;
+  overflow: hidden !important;
+}
+
+.work-thumb-bg,
+.work-thumb-video {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  object-fit: cover !important;
+  background-size: cover !important;
+  background-position: center center !important;
 }
 
 .work-info {
-  min-height: 42px !important;
-  padding: 9px 12px 11px !important;
-  border-top: 2px solid rgba(202, 143, 63, 0.7) !important;
+  display: grid !important;
+  place-items: center !important;
+  height: 54px !important;
+  min-height: 54px !important;
+  padding: 8px 12px !important;
+  border-top: 2px solid rgba(241, 187, 95, 0.8) !important;
   background: linear-gradient(90deg, rgba(36, 15, 8, 0.84), rgba(92, 47, 20, 0.5), rgba(36, 15, 8, 0.84)) !important;
   text-align: center !important;
 }
@@ -602,6 +621,10 @@ footer {
 }
 
 @media (max-width: 1180px) {
+  .portfolio-shell {
+    width: min(92vw, 980px) !important;
+  }
+
   .portfolio-frame {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
@@ -670,5 +693,211 @@ footer {
   .resume-scene > main.max-w-5xl > section:nth-of-type(n) {
     grid-column: auto;
     grid-row: auto;
+  }
+}
+
+/* Final shared typography/layout pass for all non-index pages. */
+body.scene-page > nav,
+body.scene-page > .top-nav {
+  height: 34px !important;
+  padding: 0 !important;
+  font-family: var(--scene-font) !important;
+}
+
+body.scene-page > nav .nav-logo,
+body.scene-page > .top-nav .nav-logo {
+  width: 92px !important;
+  flex: 0 0 92px !important;
+  justify-content: flex-start !important;
+  font-family: var(--scene-display) !important;
+  font-size: 1.34rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  color: var(--scene-paper) !important;
+}
+
+body.scene-page > nav .nav-links,
+body.scene-page > .top-nav .nav-links {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: clamp(16px, 2vw, 28px) !important;
+  min-height: 34px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+body.scene-page > nav .nav-links a,
+body.scene-page > .top-nav .nav-links a,
+body.scene-page .lang-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  color: rgba(255, 234, 197, 0.74) !important;
+  font-family: var(--scene-font) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+body.scene-page > nav .nav-links a::after,
+body.scene-page > .top-nav .nav-links a::after {
+  bottom: 4px !important;
+  height: 1px !important;
+  background: var(--scene-gold) !important;
+}
+
+body.scene-page > nav .nav-links a:hover,
+body.scene-page > nav .nav-links a.active,
+body.scene-page > .top-nav .nav-links a:hover,
+body.scene-page > .top-nav .nav-links a.active,
+body.scene-page .lang-toggle:hover {
+  color: var(--scene-gold) !important;
+}
+
+body.scene-page .works-heading,
+body.scene-page .section-label,
+body.scene-page .section-title,
+body.scene-page .block-title,
+body.scene-page .contact-title,
+body.scene-page .hero-name,
+body.resume-scene > header h1 {
+  font-family: var(--scene-display) !important;
+}
+
+body.scene-page .works-heading {
+  display: grid !important;
+  grid-template-columns: minmax(80px, 1fr) auto minmax(80px, 1fr) !important;
+  align-items: center !important;
+  gap: 24px !important;
+  width: min(760px, 72vw) !important;
+  margin: 0 auto 34px !important;
+  color: var(--scene-gold) !important;
+}
+
+body.scene-page .works-heading span,
+body.scene-page .contact-title,
+body.scene-page .hero-name,
+body.resume-scene > header h1 {
+  font-size: clamp(2.4rem, 4.4vw, 4.6rem) !important;
+  font-weight: 700 !important;
+  line-height: 0.95 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
+  color: var(--scene-paper) !important;
+  text-shadow: 0 0 28px rgba(232, 187, 111, 0.26) !important;
+}
+
+body.scene-page .hero-name span {
+  color: var(--scene-paper) !important;
+}
+
+body.scene-page .works-heading span {
+  color: var(--scene-gold) !important;
+  font-size: clamp(2rem, 3vw, 3rem) !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+}
+
+body.scene-page .works-heading span::before,
+body.scene-page .works-heading span::after {
+  display: none !important;
+}
+
+body.scene-page .section-title,
+body.scene-page .block-title {
+  font-family: var(--scene-font) !important;
+  font-size: clamp(1.25rem, 1.8vw, 2rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: var(--scene-gold) !important;
+}
+
+body.scene-page footer,
+body.scene-page footer a,
+body.scene-page footer span,
+body.scene-page footer p {
+  font-family: var(--scene-font) !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+body.resume-scene > header h1 {
+  font-family: var(--scene-display) !important;
+  font-size: clamp(2.15rem, 3.25vw, 3.75rem) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
+}
+
+body.resume-scene > header p {
+  font-family: var(--scene-display) !important;
+  font-size: clamp(1.25rem, 2.15vw, 2.35rem) !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: none !important;
+}
+
+body.resume-scene > header > div {
+  font-size: clamp(0.78rem, 0.95vw, 1rem) !important;
+}
+
+body.resume-scene .section-title {
+  font-size: clamp(1.15rem, 1.45vw, 1.65rem) !important;
+}
+
+body.resume-scene .glass-card h3 {
+  font-size: clamp(0.98rem, 1.05vw, 1.12rem) !important;
+}
+
+body.resume-scene .glass-card p,
+body.resume-scene .glass-card li {
+  font-size: clamp(0.86rem, 0.92vw, 0.98rem) !important;
+}
+
+body.resume-scene .glass-card span,
+body.resume-scene .text-slate-500,
+body.resume-scene .text-slate-400,
+body.resume-scene .text-slate-300,
+body.resume-scene .text-slate-200 {
+  color: rgba(255, 241, 213, 0.78) !important;
+}
+
+body.resume-scene .glass-card .text-pink,
+body.resume-scene .tag {
+  color: var(--scene-gold) !important;
+}
+
+body.resume-scene .font-sync {
+  font-family: var(--scene-display) !important;
+  letter-spacing: 0.08em !important;
+}
+
+@media (max-width: 760px) {
+  body.scene-page > nav .nav-links,
+  body.scene-page > .top-nav .nav-links {
+    display: none !important;
+  }
+
+  body.scene-page > nav .nav-links.open,
+  body.scene-page > .top-nav .nav-links.open {
+    display: flex !important;
+  }
+
+  body.scene-page .works-heading {
+    width: 100% !important;
+    grid-template-columns: 1fr auto 1fr !important;
+    gap: 14px !important;
   }
 }
