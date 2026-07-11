@@ -21,8 +21,8 @@ const CONFIG = {
   },
 
   role: {
-    en: 'Technical Artist · Game Creator',
-    zh: '技术美术师 · 游戏创作者',
+    en: 'Technical Artist',
+    zh: '技术美术师',
   },
 
   location: {
@@ -46,7 +46,7 @@ const CONFIG = {
   },
 
   contact: {
-    email:      'kyuandart@sina.com',
+    email:      'kyuandart@gmail.com',
     github:     'https://kyukao.github.io/index.html',
     artstation: 'N/A',
     linkedin:   'https://www.linkedin.com/in/hanqing-li-000069223',
@@ -154,7 +154,7 @@ const CONFIG = {
       group: 'project',
       hasVideo: true,
       image: '',
-      title: { en: 'Shader Scene Showreel', zh: 'Shader 场景作品集' },
+      title: { en: 'PBR Shaders', zh: 'PBR Shaders' },
       desc:  {
         en: 'A scene-based shader showreel focused on real-time material and rendering presentation.',
         zh: '以场景展示为主的 Shader 作品集，聚焦实时材质与渲染表现。',
@@ -199,7 +199,7 @@ const CONFIG = {
       group: 'art',
       hasVideo: true,
       image: '',
-      title: { en: 'ShadowMan Remaster', zh: 'ShadowMan 重制版' },
+      title: { en: 'Shadow Man', zh: 'Shadow Man' },
       desc:  {
         en: 'A remastered presentation of ShadowMan, refining atmosphere, rendering, and scene mood.',
         zh: 'ShadowMan 的重制展示，重点优化氛围、渲染表现与场景情绪。',
@@ -222,21 +222,6 @@ const CONFIG = {
       tags: ['PCG', 'Procedural', 'Tool'],
       links: [
         { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/PCG.mp4' },
-      ],
-    },
-    {
-      category: 'tool',
-      group: 'tool',
-      hasVideo: true,
-      image: '',
-      title: { en: 'Unity Tools', zh: 'Unity工具' },
-      desc:  {
-        en: 'A Unity tool showcase focused on workflow support, production efficiency, and practical iteration.',
-        zh: 'Unity 工具展示，聚焦流程支持、制作效率与实际迭代效果。',
-      },
-      tags: ['Unity', 'Tool', 'Workflow'],
-      links: [
-        { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/工具.mp4' },
       ],
     },
     {
@@ -267,22 +252,6 @@ const CONFIG = {
       tags: ['AI Art', 'Tool', 'VibeCoding'],
       links: [
         { label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/ArtToolFlow.webp' },
-      ],
-    },
-    {
-      category: 'render',
-      group: 'art',
-      hasVideo: false,
-      image: 'assets/uploads/InsideThePaper1.webp',
-      title: { en: 'Inside The Paper', zh: 'Inside The Paper' },
-      desc:  {
-        en: 'A two-image artwork set for Inside The Paper, collected as one portfolio entry.',
-        zh: 'Inside The Paper 的两张图像作品，合并为同一个作品集条目。',
-      },
-      tags: ['Artwork', 'Scene'],
-      links: [
-        { label: { en: 'Image 1 →', zh: '图片 1 →' }, href: 'assets/uploads/InsideThePaper1.webp' },
-        { label: { en: 'Image 2 →', zh: '图片 2 →' }, href: 'assets/uploads/InsideThePaper2.webp' },
       ],
     },
   ],

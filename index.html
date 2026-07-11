@@ -101,10 +101,12 @@
     }
 
     .brand__role {
-      margin: 18px 0 0;
+      width: min(92vw, 680px);
+      margin: 18px auto 0;
       font-size: clamp(0.72rem, 1.4vw, 0.95rem);
       font-weight: 700;
       letter-spacing: 0.22em;
+      line-height: 1.6;
       text-transform: uppercase;
       color: rgba(255, 234, 197, 0.82);
       text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
@@ -651,9 +653,7 @@
       z-index: 7;
       opacity: 0;
       pointer-events: none;
-      background:
-        radial-gradient(circle at var(--wash-x, 50%) var(--wash-y, 50%), rgba(255, 214, 142, 0.72), transparent 18%),
-        rgba(10, 4, 2, 0.76);
+      background: rgba(7, 4, 3, 0.78);
       transition: opacity 620ms ease;
     }
 
@@ -728,8 +728,20 @@
         top: 38%;
       }
 
+    }
+
+    @media (max-height: 600px) {
+      .brand {
+        top: 40%;
+      }
+
       .start-layer {
-        place-items: center;
+        padding-bottom: 20px;
+      }
+
+      .start-prompt {
+        min-height: 40px;
+        padding: 8px 20px;
       }
     }
 
@@ -756,101 +768,84 @@
         transition-duration: 1ms !important;
       }
     }
+    .portfolio-embed {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #090504;
+    }
+
+    .entry-stage {
+      z-index: 2;
+      transition: opacity 760ms ease, visibility 760ms ease;
+    }
+
+    .entry-stage.is-complete {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
+  <iframe class="portfolio-embed" src="portfolio.html" title="KYUKAO portfolio"></iframe>
   <main class="entry-stage" aria-label="KYUKAO portfolio entrance">
     <div class="video-layer" aria-hidden="true">
       <video id="openingOne" class="opening-video is-active" src="assets/entry/video/opening-1-ui.mp4" preload="auto" autoplay playsinline muted></video>
-      <video id="openingTwo" class="opening-video" src="assets/entry/video/opening-2-ui.mp4" preload="auto" playsinline muted></video>
     </div>
 
     <div class="grade" aria-hidden="true"></div>
 
     <section class="brand" id="brand">
       <h1 class="brand__name">KYUKAO</h1>
-      <p class="brand__role">Technical Artist / Level Designer</p>
+      <p class="brand__role">Technical Artist</p>
     </section>
 
-    <nav class="entry-ui" id="entryUi" aria-label="Portfolio sections">
-      <a class="entry-item" href="resume.html" style="--x: 12.7%; --y: 58.4%; --w: 12.4%; --ratio: 697 / 929; --delay: 0ms;" data-target="resume">
-        <span class="entry-item__art">
-          <span class="entry-item__preview"><img src="assets/entry/previews/preview-resume.webp" alt="" /></span>
-          <img class="entry-item__frame" src="assets/entry/frames/resume-frame.webp" alt="" />
-        </span>
-        <span class="entry-item__label">Resume</span>
-      </a>
-
-      <a class="entry-item" href="portfolio.html" style="--x: 30.0%; --y: 58.2%; --w: 12.4%; --ratio: 699 / 926; --delay: 130ms;" data-target="portfolio">
-        <span class="entry-item__art">
-          <span class="entry-item__preview"><img src="assets/entry/previews/preview-portfolio.webp" alt="" /></span>
-          <img class="entry-item__frame" src="assets/entry/frames/portfolio-frame.webp" alt="" />
-        </span>
-        <span class="entry-item__label">Portfolio</span>
-      </a>
-
-      <a class="entry-item" href="about.html" style="--x: 68.0%; --y: 58.2%; --w: 12.3%; --ratio: 693 / 927; --delay: 260ms;" data-target="about">
-        <span class="entry-item__art">
-          <span class="entry-item__preview"><img src="assets/entry/previews/preview-about.webp" alt="" /></span>
-          <img class="entry-item__frame" src="assets/entry/frames/about-frame.webp" alt="" />
-        </span>
-        <span class="entry-item__label">About</span>
-      </a>
-
-      <a class="entry-item" href="contact.html" style="--x: 85.0%; --y: 58.2%; --w: 12.4%; --ratio: 698 / 929; --delay: 390ms;" data-target="contact">
-        <span class="entry-item__art">
-          <span class="entry-item__preview"><img src="assets/entry/previews/preview-contact.webp" alt="" /></span>
-          <img class="entry-item__frame" src="assets/entry/frames/contact-frame.webp" alt="" />
-        </span>
-        <span class="entry-item__label">Contact</span>
-      </a>
-    </nav>
-
-    <svg class="entry-flow" viewBox="0 0 100 56.25" preserveAspectRatio="none" aria-hidden="true">
-      <path class="flow-glow" data-flow="resume" d="M 12.7 34.8 C 13.5 42.2, 25.2 43.8, 36.8 40.4 C 43.2 38.5, 46.8 35.6, 50 33.8" />
-      <path class="flow-core" data-flow="resume" d="M 12.7 34.8 C 13.5 42.2, 25.2 43.8, 36.8 40.4 C 43.2 38.5, 46.8 35.6, 50 33.8" />
-      <path class="flow-glow" data-flow="portfolio" d="M 30 34.8 C 29.6 40.3, 34.4 42.8, 40.8 40.2 C 45.2 38.4, 47.3 35.7, 50 33.8" />
-      <path class="flow-core" data-flow="portfolio" d="M 30 34.8 C 29.6 40.3, 34.4 42.8, 40.8 40.2 C 45.2 38.4, 47.3 35.7, 50 33.8" />
-      <path class="flow-glow" data-flow="about" d="M 68 34.8 C 68.4 40.3, 63.6 42.8, 57.2 40.2 C 52.8 38.4, 50.7 35.7, 50 33.8" />
-      <path class="flow-core" data-flow="about" d="M 68 34.8 C 68.4 40.3, 63.6 42.8, 57.2 40.2 C 52.8 38.4, 50.7 35.7, 50 33.8" />
-      <path class="flow-glow" data-flow="contact" d="M 85 34.8 C 84.5 42.2, 72.8 43.8, 61.2 40.4 C 54.8 38.5, 51.2 35.6, 50 33.8" />
-      <path class="flow-core" data-flow="contact" d="M 85 34.8 C 84.5 42.2, 72.8 43.8, 61.2 40.4 C 54.8 38.5, 51.2 35.6, 50 33.8" />
-    </svg>
 
     <button class="start-layer" id="startLayer" type="button" aria-label="Enter KYUKAO portfolio">
       <span class="start-prompt">Click to Enter</span>
     </button>
 
     <div class="transition-wash" id="transitionWash" aria-hidden="true"></div>
-    <p class="fallback" id="fallback">视频暂时无法播放，入口已开启。</p>
+    <p class="fallback" id="fallback">Video unavailable. Opening portfolio...</p>
 
   </main>
 
   <script>
     const openingOne = document.getElementById('openingOne');
-    const openingTwo = document.getElementById('openingTwo');
     const startLayer = document.getElementById('startLayer');
     const brand = document.getElementById('brand');
-    const entryUi = document.getElementById('entryUi');
     const transitionWash = document.getElementById('transitionWash');
     const fallback = document.getElementById('fallback');
-    const entryStage = document.querySelector('.entry-stage');
     let hasStarted = false;
-    let hasRevealed = false;
     let queuedStart = false;
     let openingOneComplete = false;
 
-    const revealEntries = () => {
-      if (hasRevealed) return;
-      hasRevealed = true;
-      entryUi.classList.add('is-visible', 'is-ready');
+    const goToPortfolio = () => {
+      if (hasStarted) return;
+      hasStarted = true;
+      startLayer.classList.add('is-hidden');
+      brand.classList.add('is-hidden');
+      transitionWash.style.setProperty('--wash-x', '50vw');
+      transitionWash.style.setProperty('--wash-y', '50vh');
+      window.setTimeout(() => {
+        transitionWash.classList.add('is-visible');
+      }, 80);
+      window.setTimeout(() => {
+        document.querySelector('.entry-stage').classList.add('is-complete');
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+      }, 420);
     };
 
     const showFallback = () => {
       fallback.classList.add('is-visible');
       brand.classList.add('is-hidden');
       startLayer.classList.add('is-hidden');
-      revealEntries();
+      window.setTimeout(goToPortfolio, 500);
     };
 
     const playVideo = async (video) => {
@@ -868,14 +863,7 @@
         startLayer.classList.add('is-waiting');
         return;
       }
-      hasStarted = true;
-      startLayer.classList.add('is-hidden');
-      brand.classList.add('is-hidden');
-      openingTwo.load();
-      openingTwo.currentTime = 0;
-      openingTwo.classList.add('is-active');
-      openingOne.classList.remove('is-active');
-      await playVideo(openingTwo);
+      goToPortfolio();
     };
 
     openingOne.addEventListener('ended', () => {
@@ -883,69 +871,24 @@
       openingOne.pause();
       openingOne.currentTime = Math.max(0, openingOne.duration - 0.04);
       startLayer.classList.add('is-waiting');
-      if (queuedStart) startExperience();
-    });
-
-    openingTwo.addEventListener('ended', () => {
-      openingTwo.pause();
-      openingTwo.currentTime = Math.max(0, openingTwo.duration - 0.04);
-      revealEntries();
+      if (queuedStart) {
+        startExperience();
+        return;
+      }
+      goToPortfolio();
     });
 
     openingOne.addEventListener('error', showFallback);
-    openingTwo.addEventListener('error', showFallback);
     openingOne.addEventListener('loadedmetadata', () => {
-      openingOne.playbackRate = 2;
-    });
-    openingTwo.addEventListener('loadedmetadata', () => {
-      openingTwo.playbackRate = 2;
+      openingOne.playbackRate = 3;
     });
     startLayer.addEventListener('click', startExperience);
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') startExperience();
     });
 
-    document.querySelectorAll('.entry-item').forEach((item) => {
-      item.addEventListener('pointerdown', () => {
-        if (entryUi.classList.contains('is-ready')) item.classList.add('is-pressing');
-      });
-      ['pointerup', 'pointerleave', 'pointercancel'].forEach((type) => {
-        item.addEventListener(type, () => item.classList.remove('is-pressing'));
-      });
-
-      item.addEventListener('click', (event) => {
-        if (!entryUi.classList.contains('is-ready')) {
-          event.preventDefault();
-          return;
-        }
-        if (entryUi.classList.contains('is-exiting')) {
-          event.preventDefault();
-          return;
-        }
-
-        event.preventDefault();
-        const href = item.getAttribute('href') || '';
-        const route = item.dataset.target || '';
-        const rect = item.getBoundingClientRect();
-        entryStage.dataset.route = route;
-        entryStage.classList.add('is-routing');
-        item.classList.add('is-selected');
-        entryUi.classList.add('is-exiting');
-        transitionWash.style.setProperty('--wash-x', `${rect.left + rect.width / 2}px`);
-        transitionWash.style.setProperty('--wash-y', `${rect.top + rect.height / 2}px`);
-        window.setTimeout(() => {
-          transitionWash.classList.add('is-visible');
-        }, 760);
-        window.setTimeout(() => {
-          window.location.href = href;
-        }, 1120);
-      });
-    });
-
     openingOne.load();
-    openingTwo.load();
-    openingOne.playbackRate = 2;
-    openingTwo.playbackRate = 2;
+    openingOne.playbackRate = 3;
     playVideo(openingOne);
   </script>
 </body>

@@ -634,6 +634,22 @@ footer {
   }
 }
 
+@media (max-width: 1280px) {
+  .resume-scene > header,
+  .resume-scene > main.max-w-5xl {
+    width: min(92vw, 820px) !important;
+  }
+
+  .resume-scene > main.max-w-5xl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resume-scene > main.max-w-5xl > section:nth-of-type(n) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
 @media (max-width: 760px) {
   nav,
   .top-nav {
@@ -648,7 +664,7 @@ footer {
   .nav-links.open {
     display: flex !important;
     position: absolute !important;
-    top: 34px !important;
+    top: 64px !important;
     left: 0 !important;
     right: 0 !important;
     flex-direction: column !important;
@@ -887,6 +903,19 @@ body.resume-scene .font-sync {
   font-family: var(--scene-display) !important;
   letter-spacing: 0.08em !important;
 }
+body.scene-page > nav,
+body.scene-page > .top-nav {
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 64px !important;
+  padding: 0 clamp(18px, 4vw, 50px) !important;
+  background: rgba(20, 10, 7, 0.94) !important;
+  border-bottom: 1px solid rgba(240, 199, 127, 0.22) !important;
+  box-shadow: 0 18px 28px rgba(12, 5, 3, 0.28) !important;
+  backdrop-filter: blur(16px) !important;
+}
+
 
 @media (max-width: 760px) {
   body.scene-page > nav .nav-links,
@@ -904,4 +933,613 @@ body.resume-scene .font-sync {
     grid-template-columns: 1fr auto 1fr !important;
     gap: 14px !important;
   }
+}
+
+
+
+/* Editorial resume layout, aligned with the portfolio typography. */
+body.resume-scene {
+  font-family: var(--scene-font) !important;
+}
+
+body.resume-scene > header {
+  display: flex !important;
+  min-height: 42vh;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  width: min(920px, calc(100vw - 48px)) !important;
+  margin: 64px auto 24px !important;
+  padding: clamp(64px, 10vh, 112px) 24px clamp(44px, 7vh, 76px) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  text-align: center !important;
+}
+
+body.resume-scene > header::before {
+  display: none !important;
+}
+
+body.resume-scene > header p {
+  margin: 0 0 16px !important;
+  color: var(--scene-gold) !important;
+  font-family: var(--scene-font) !important;
+  font-size: 0.72rem !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+}
+
+body.resume-scene > header h1 {
+  margin: 0 !important;
+  color: var(--scene-paper) !important;
+  font-family: var(--scene-display) !important;
+  font-size: clamp(3.6rem, 8vw, 7rem) !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  line-height: 0.9 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+body.resume-scene > header > div {
+  justify-content: center !important;
+  gap: 10px 28px !important;
+  margin-top: 30px;
+  color: var(--scene-muted) !important;
+  font-family: var(--scene-font) !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.1em !important;
+}
+
+body.resume-scene > main.max-w-5xl {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.85fr) !important;
+  gap: 42px 64px !important;
+  width: min(1200px, calc(100vw - 72px)) !important;
+  padding: 30px 0 90px !important;
+}
+
+body.resume-scene > main.max-w-5xl > section {
+  padding: 28px 0 0 !important;
+  border: 0 !important;
+  border-top: 1px solid var(--scene-gold-faint) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+body.resume-scene .section-title {
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  color: var(--scene-gold) !important;
+  font-family: var(--scene-display) !important;
+  font-size: clamp(1.9rem, 2.6vw, 2.7rem) !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+body.resume-scene .glass-card {
+  margin: 0 !important;
+  padding: 26px 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(240, 199, 127, 0.14) !important;
+  background: transparent !important;
+}
+
+body.resume-scene .glass-card:last-child {
+  border-bottom: 0 !important;
+}
+
+body.resume-scene .glass-card h3 {
+  color: var(--scene-paper) !important;
+  font-family: var(--scene-display) !important;
+  font-size: clamp(1.45rem, 2vw, 1.9rem) !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0 !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+}
+
+body.resume-scene .glass-card .font-sync {
+  font-family: var(--scene-font) !important;
+  font-size: 0.68rem !important;
+  font-style: normal !important;
+  letter-spacing: 0.1em !important;
+}
+
+body.resume-scene .glass-card > p.text-pink {
+  color: var(--scene-gold) !important;
+  font-family: var(--scene-font) !important;
+  font-size: 0.82rem !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
+}
+
+body.resume-scene .glass-card p,
+body.resume-scene .glass-card li {
+  color: rgba(255, 245, 224, 0.82) !important;
+  font-family: var(--scene-font) !important;
+  font-size: 0.95rem !important;
+  font-style: normal !important;
+  line-height: 1.75 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+body.resume-scene .glass-card strong {
+  color: rgba(255, 248, 232, 0.96);
+  font-weight: 600;
+}
+
+body.resume-scene .tag {
+  border-color: var(--scene-gold-faint) !important;
+  background: rgba(240, 199, 127, 0.08) !important;
+  color: var(--scene-gold) !important;
+  font-style: normal !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
+}
+
+@media (max-width: 1280px) {
+  body.resume-scene > main.max-w-5xl {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: min(900px, calc(100vw - 48px)) !important;
+    gap: 38px !important;
+  }
+
+  body.resume-scene > main.max-w-5xl > section:nth-of-type(n) {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+}
+
+@media (max-width: 620px) {
+  body.resume-scene > header {
+    min-height: 38vh;
+    width: calc(100vw - 32px) !important;
+    padding-inline: 0 !important;
+  }
+
+  body.resume-scene > main.max-w-5xl {
+    width: calc(100vw - 32px) !important;
+  }
+
+  body.resume-scene .glass-card > div:first-child {
+    gap: 8px;
+  }
+}
+
+body.resume-scene > header h1 span {
+  color: inherit !important;
+}
+
+body.resume-scene > main.max-w-5xl > section:last-child h4 {
+  color: var(--scene-gold) !important;
+  font-family: var(--scene-display) !important;
+  font-size: 1.2rem !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+
+
+/* Editorial About layout, aligned with the portfolio and resume. */
+body.about-scene .about-hero {
+  display: flex !important;
+  min-height: 48vh !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: min(980px, calc(100vw - 48px));
+  margin: 0 auto;
+  padding: 118px 24px 58px !important;
+  text-align: center;
+}
+
+body.about-scene .hero-text {
+  width: min(760px, 100%);
+  max-width: none;
+  margin: 0 auto;
+}
+
+body.about-scene .section-label {
+  margin-bottom: 14px;
+  color: var(--scene-gold) !important;
+  font-family: var(--scene-font) !important;
+  font-size: 0.7rem !important;
+  font-weight: 700;
+  letter-spacing: 0.18em !important;
+}
+
+body.about-scene .hero-name {
+  margin: 0 !important;
+  font-family: var(--scene-display) !important;
+  font-size: clamp(3.4rem, 7vw, 6.5rem) !important;
+  font-weight: 600 !important;
+  line-height: 0.9 !important;
+}
+
+body.about-scene .hero-name span {
+  color: inherit !important;
+}
+
+body.about-scene .hero-role {
+  margin: 22px 0 0 !important;
+  font-family: var(--scene-font) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase;
+}
+
+body.about-scene .divider {
+  width: 72px;
+  height: 1px;
+  margin: 26px auto;
+  background: var(--scene-gold-soft) !important;
+  box-shadow: none !important;
+}
+
+body.about-scene .hero-bio {
+  max-width: 650px;
+  margin: 0 auto;
+  color: var(--scene-muted) !important;
+  font-size: 0.98rem !important;
+  line-height: 1.85 !important;
+}
+
+body.about-scene .about-body {
+  display: block !important;
+  width: min(1100px, calc(100vw - 64px));
+  max-width: none !important;
+  padding: 34px 0 76px !important;
+}
+
+body.about-scene .about-info {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.15fr);
+  gap: 22px 64px;
+}
+
+body.about-scene .about-info > .block-title {
+  grid-column: 1 / -1;
+}
+
+body.about-scene .block-title {
+  display: block !important;
+  margin: 0 !important;
+  padding: 18px 0 12px !important;
+  border: 0 !important;
+  border-top: 1px solid var(--scene-gold-faint) !important;
+  color: var(--scene-gold) !important;
+  font-family: var(--scene-display) !important;
+  font-size: clamp(1.8rem, 2.8vw, 2.5rem) !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+body.about-scene .block-title::before {
+  display: none !important;
+}
+
+body.about-scene .info-list {
+  margin: 0 !important;
+}
+
+body.about-scene .info-list li {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 16px;
+  padding: 13px 0 !important;
+  border-bottom: 1px solid rgba(240, 199, 127, 0.13) !important;
+  font-family: var(--scene-font) !important;
+  font-size: 0.86rem !important;
+}
+
+body.about-scene .info-key {
+  min-width: 0;
+  color: rgba(255, 241, 213, 0.52) !important;
+}
+
+body.about-scene .info-val {
+  color: rgba(255, 246, 226, 0.9) !important;
+}
+
+body.about-scene .info-text {
+  align-self: start;
+  margin: 0 !important;
+  padding: 8px 0 0;
+  color: var(--scene-muted) !important;
+  font-size: 0.96rem !important;
+  line-height: 1.9 !important;
+}
+
+body.about-scene .about-info > .block-title:nth-of-type(2) {
+  margin-top: 28px !important;
+}
+
+body.about-scene .contact-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0;
+  margin: 0 !important;
+  border-top: 1px solid rgba(240, 199, 127, 0.13);
+}
+
+body.about-scene .contact-btn {
+  min-width: 0;
+  padding: 18px 20px !important;
+  border: 0 !important;
+  border-right: 1px solid rgba(240, 199, 127, 0.13) !important;
+  border-bottom: 1px solid rgba(240, 199, 127, 0.13) !important;
+  border-radius: 0 !important;
+  background: rgba(24, 11, 7, 0.24) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+body.about-scene .contact-btn:hover {
+  transform: none !important;
+  background: rgba(240, 199, 127, 0.07) !important;
+  box-shadow: none !important;
+}
+
+body.about-scene .contact-btn-icon {
+  display: none;
+}
+
+body.about-scene .contact-btn-label {
+  font-size: 0.66rem !important;
+  letter-spacing: 0.12em !important;
+}
+
+body.about-scene .contact-btn-val {
+  overflow-wrap: anywhere;
+  color: rgba(255, 246, 226, 0.9) !important;
+  font-size: 0.82rem !important;
+}
+
+body.about-scene .interests {
+  width: min(1100px, calc(100vw - 64px));
+  max-width: none !important;
+  padding: 0 0 96px !important;
+}
+
+body.about-scene .interests-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0 42px !important;
+  margin-top: 18px !important;
+}
+
+body.about-scene .interest-item {
+  min-width: 0;
+  padding: 24px 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(240, 199, 127, 0.13) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+body.about-scene .interest-item::before,
+body.about-scene .interest-icon {
+  display: none !important;
+}
+
+body.about-scene .interest-title {
+  margin: 0 0 8px;
+  color: var(--scene-paper) !important;
+  font-family: var(--scene-display) !important;
+  font-size: 1.45rem !important;
+  font-weight: 600 !important;
+}
+
+body.about-scene .interest-desc {
+  color: var(--scene-muted) !important;
+  font-size: 0.84rem !important;
+  line-height: 1.7 !important;
+}
+
+@media (max-width: 820px) {
+  body.about-scene .about-body,
+  body.about-scene .interests {
+    width: calc(100vw - 36px);
+  }
+
+  body.about-scene .about-info {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  body.about-scene .about-info > * {
+    grid-column: 1 !important;
+  }
+
+  body.about-scene .interests-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  body.about-scene .about-hero {
+    width: calc(100vw - 32px);
+    padding-inline: 0 !important;
+  }
+
+  body.about-scene .contact-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.about-scene .contact-btn {
+    border-right: 0 !important;
+  }
+}
+
+
+/* Compact resume contact and skills overview. */
+body.resume-scene > header > div span {
+  color: rgba(255, 246, 226, 0.9) !important;
+  font-family: var(--scene-font) !important;
+  font-size: 0.82rem !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
+  text-shadow: 0 1px 12px rgba(8, 3, 2, 0.7);
+}
+
+body.resume-scene .resume-skills-section {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 !important;
+  padding-top: 24px !important;
+}
+
+body.resume-scene > main.max-w-5xl > section:nth-of-type(2) {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+}
+
+body.resume-scene > main.max-w-5xl > section:nth-of-type(3) {
+  grid-column: 1 !important;
+  grid-row: 2 / span 2 !important;
+}
+
+body.resume-scene > main.max-w-5xl > section:nth-of-type(4) {
+  grid-column: 1 / -1 !important;
+  grid-row: 4 !important;
+}
+
+body.resume-scene .skill-overview {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.42fr) minmax(0, 1.58fr);
+  gap: 28px 52px;
+  align-items: start;
+  padding: 18px 0 8px;
+}
+
+body.resume-scene .skill-overview h3 {
+  margin: 0 0 12px;
+  color: var(--scene-paper) !important;
+  font-family: var(--scene-display) !important;
+  font-size: 1.35rem !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+body.resume-scene .skill-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+body.resume-scene .skill-stack--language {
+  gap: 7px 16px;
+}
+
+body.resume-scene .skill-stack--language span {
+  color: rgba(255, 245, 224, 0.82) !important;
+  font-family: var(--scene-font) !important;
+  font-size: 0.84rem !important;
+  line-height: 1.4 !important;
+  white-space: nowrap;
+}
+
+body.resume-scene .skill-stack .tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  margin: 0 !important;
+  padding: 5px 10px !important;
+  font-family: var(--scene-font) !important;
+  font-size: 0.76rem !important;
+  line-height: 1 !important;
+}
+
+@media (max-width: 1280px) {
+  body.resume-scene .resume-skills-section,
+  body.resume-scene > main.max-w-5xl > section:nth-of-type(n) {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+}
+
+@media (max-width: 680px) {
+  body.resume-scene .skill-overview {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  body.resume-scene > header > div {
+    flex-direction: column;
+    gap: 8px !important;
+  }
+}
+
+
+/* Final resume hero spacing and typography alignment. */
+body.resume-scene > header p {
+  margin: 30px 0 0 !important;
+  font-family: var(--scene-display) !important;
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.1em !important;
+}
+
+body.resume-scene > header > div {
+  margin-top: 34px !important;
+}
+
+body.resume-scene > header > div span {
+  font-family: var(--scene-display) !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+}
+
+
+/* Shared identity typography across Portfolio, Resume, and About. */
+.portfolio-theater .intro__title,
+body.resume-scene > header h1,
+body.about-scene .hero-name {
+  color: var(--scene-paper) !important;
+  font-family: var(--scene-display) !important;
+  font-size: clamp(3.6rem, 7vw, 6.5rem) !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  line-height: 0.92 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+body.resume-scene > header h1 span,
+body.about-scene .hero-name span {
+  color: inherit !important;
+  font: inherit !important;
 }

@@ -62,6 +62,45 @@
       margin: 0 auto;
       padding: 92px 0 72px;
     }
+    .intro {
+      min-height: 48vh;
+      display: flex;
+      align-items: center;
+      padding: 72px 22px 38px;
+    }
+
+    .intro__inner {
+      width: min(760px, 100%);
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .intro__eyebrow {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .intro__title {
+      margin: 0;
+      color: var(--paper);
+      font-family: var(--display);
+      font-size: clamp(2.7rem, 6vw, 5.6rem);
+      line-height: 0.94;
+      letter-spacing: 0;
+      text-shadow: 0 0 28px rgba(226, 176, 94, 0.24);
+    }
+
+    .intro__copy {
+      width: min(610px, 100%);
+      margin: 22px auto 0;
+      color: var(--muted);
+      font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+      line-height: 1.8;
+    }
 
     .top-nav {
       position: fixed;
@@ -459,6 +498,10 @@
       .portfolio-shell {
         padding-top: 76px;
       }
+      .intro {
+        min-height: 44vh;
+        padding: 56px 4px 26px;
+      }
 
       .works-heading {
         gap: 14px;
@@ -522,9 +565,8 @@
   <div class="portfolio-bg-grade" aria-hidden="true"></div>
 
   <nav class="top-nav">
-    <a href="menu.html" class="nav-logo">KYUKAO</a>
+    <a href="#introTitle" class="nav-logo">KYUKAO</a>
     <ul class="nav-links" id="navLinks">
-      <li><a href="menu.html" data-i18n="nav.home">Home</a></li>
       <li><a href="portfolio.html" class="active" data-i18n="nav.portfolio">Portfolio</a></li>
       <li><a href="resume.html" data-i18n="nav.resume">Resume</a></li>
       <li><a href="about.html" data-i18n="nav.about">About</a></li>
@@ -534,8 +576,16 @@
   </nav>
 
   <main class="portfolio-shell">
+    <section class="intro" aria-labelledby="introTitle">
+      <div class="intro__inner">
+        <p class="intro__eyebrow" data-i18n="portfolio.intro.role">Technical Artist</p>
+        <h1 class="intro__title" id="introTitle" data-i18n="portfolio.intro.name">Hanqing Li</h1>
+        <p class="intro__copy" data-i18n="portfolio.intro.copy">Shaders / Tools / Animation / PCG</p>
+      </div>
+    </section>
+
     <header class="works-heading" aria-label="Works">
-      <span>Works</span>
+      <span data-i18n="portfolio.works">Works</span>
     </header>
 
     <div class="filter-bar" aria-label="Portfolio categories">
@@ -548,22 +598,11 @@
     </div>
 
     <section class="portfolio-frame" aria-label="Portfolio works">
-      <div class="works-section" data-group-heading="project">
-        <h2 class="works-section-title" data-i18n="portfolio.section.project">完整项目作品</h2>
-      </div>
       <div class="portfolio-grid" id="workGridProject">
         <div class="no-results" id="noResultsProject" data-i18n="portfolio.empty.project">暂无完整项目作品</div>
       </div>
-
-      <div class="works-section" data-group-heading="tool">
-        <h2 class="works-section-title" data-i18n="portfolio.section.tool">工具作品</h2>
-      </div>
       <div class="portfolio-grid" id="workGridTool">
         <div class="no-results" id="noResultsTool" data-i18n="portfolio.empty.tool">暂无工具作品</div>
-      </div>
-
-      <div class="works-section" data-group-heading="art">
-        <h2 class="works-section-title" data-i18n="portfolio.section.art">独立作品</h2>
       </div>
       <div class="portfolio-grid" id="workGridArt">
         <div class="no-results" id="noResultsArt" data-i18n="portfolio.empty.art">暂无独立作品</div>
@@ -624,11 +663,6 @@
       document.querySelectorAll('#workGridProject .work-card, #workGridTool .work-card, #workGridArt .work-card').forEach(function (card) {
         var visible = category === 'all' || card.dataset.category === category;
         card.classList.toggle('is-filter-hidden', !visible);
-      });
-      ['project', 'tool', 'art'].forEach(function (group) {
-        var hasVisibleCard = !!document.querySelector('.work-card[data-group="' + group + '"]:not(.is-filter-hidden)');
-        var heading = document.querySelector('[data-group-heading="' + group + '"]');
-        if (heading) heading.classList.toggle('is-filter-hidden', !hasVisibleCard);
       });
     }
 

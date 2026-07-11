@@ -18,14 +18,14 @@ const TYPOGRAPHY = {
 
   /* ── Google Fonts
      Set to '' to disable (use system fonts only)            */
-  googleFonts: 'https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;600;700&display=swap',
+  googleFonts: 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap',
 
   /* ── Font Families
      fontBody    : used on home / portfolio / about pages
      fontDisplay : used on resume page headings & nav logo
      fontResume  : used on resume page body text             */
   fontBody:    "'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif",
-  fontDisplay: "'Syncopate', sans-serif",
+  fontDisplay: "'Cormorant Garamond', Georgia, serif",
   fontResume:  "'Inter', sans-serif",
 
   /* ── Base Body                                            */

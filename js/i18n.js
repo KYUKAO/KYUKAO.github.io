@@ -179,7 +179,6 @@
     if (typeof renderAboutInterests === 'function') renderAboutInterests(lang);
     if (typeof renderContactButtons === 'function') renderContactButtons(lang);
     if (typeof renderContactPage === 'function') renderContactPage(lang);
-    if (typeof renderAboutProfilePhoto === 'function') renderAboutProfilePhoto(lang);
   }
 
   /* ================================================================
@@ -442,21 +441,6 @@
         '<p class="interest-desc">' + item.desc + '</p>' +
       '</div>';
     }).join('');
-  };
-
-  window.renderAboutProfilePhoto = function (lang) {
-    var holder = document.querySelector('.avatar-placeholder');
-    if (!holder || typeof CONFIG === 'undefined') return;
-    var photo = CONFIG.about && CONFIG.about.photo ? String(CONFIG.about.photo).trim() : '';
-    if (photo) {
-      holder.classList.add('has-photo');
-      holder.innerHTML = '<img src="' + _escAttr(photo) + '" alt="' + (lang === 'zh' ? '个人照片' : 'Profile photo') + '">';
-      return;
-    }
-    holder.classList.remove('has-photo');
-    holder.innerHTML =
-      '<span>' + (lang === 'zh' ? '[ 替换为你的照片 ]' : '[ Add your photo ]') + '</span>' +
-      '<span style="font-size:0.7rem">config.js -> about.photo</span>';
   };
 
   window.renderContactButtons = function (lang) {

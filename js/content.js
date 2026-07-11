@@ -22,9 +22,7 @@
 
   function buildStrings(lang) {
     var C = CONFIG;
-    var nameDisplay = lang === 'zh'
-      ? (C.name.alias + '<br><span style="color:var(--pink)">' + C.name.zh + '</span>')
-      : (C.name.alias + '<br><span style="color:var(--pink)">' + C.name.en + '</span>');
+    var nameDisplay = t(C.name, lang);
 
     return {
       /* ── Nav ── */
@@ -79,6 +77,10 @@
       /* ── Portfolio ── */
       'portfolio.label': 'Portfolio',
       'portfolio.title': lang === 'zh' ? '作品集' : 'Portfolio',
+      'portfolio.intro.role': t(C.role, lang),
+      'portfolio.intro.name': lang === 'zh' ? C.name.zh : C.name.en,
+      'portfolio.intro.copy': 'Shaders / Tools / Animation / PCG',
+      'portfolio.works': lang === 'zh' ? '作品集' : 'Works',
       'portfolio.desc':  lang === 'zh'
         ? 'Shader、特效、工具开发与渲染实验——技术与美学的交叉探索。'
         : 'Shaders, VFX, tools, and rendering experiments — exploring the intersection of technique and aesthetics.',
@@ -88,21 +90,18 @@
       'portfolio.empty.project':   lang === 'zh' ? '暂无完整项目作品' : 'No complete projects yet.',
       'portfolio.empty.tool':      lang === 'zh' ? '暂无工具作品' : 'No tools yet.',
       'portfolio.empty.art':       lang === 'zh' ? '暂无独立作品' : 'No independent works yet.',
-
-      'filter.all':    lang === 'zh' ? '全部'    : 'All',
-      'filter.shader': lang === 'zh' ? 'Shader'  : 'Shader',
+      'filter.all': lang === 'zh' ? '全部' : 'All',
+      'filter.shader': lang === 'zh' ? '着色器' : 'Shader',
       'filter.vfx':    lang === 'zh' ? '特效 VFX': 'VFX',
-      'filter.tool':   lang === 'zh' ? '工具 Tools':'Tools',
-      'filter.pcg':    lang === 'zh' ? 'PCG' : 'PCG',
-      'filter.render': lang === 'zh' ? '渲染 Render':'Render',
-      'filter.code':   lang === 'zh' ? '代码 Code': 'Code',
+      'filter.tool': lang === 'zh' ? '工具' : 'Tools',
+      'filter.pcg': lang === 'zh' ? '程序化生成' : 'PCG',
+      'filter.render': lang === 'zh' ? '渲染' : 'Render',
+      'filter.code': lang === 'zh' ? '代码' : 'Code',
       'no.results':    lang === 'zh' ? '没有找到该分类的作品' : 'No works found in this category.',
 
       /* ── Resume ── */
       'resume.eyebrow': t(C.role, lang),
-      'resume.name':    lang === 'zh'
-        ? C.name.zh
-        : (C.name.en.split(' ')[0] + ' <span class="text-pink">' + C.name.en.split(' ').slice(1).join(' ') + '</span>'),
+      'resume.name': t(C.name, lang),
       'resume.tel':     'TEL: ' + C.contact.tel,
       'resume.email':   'EMAIL: ' + C.contact.email,
       'resume.contact': lang === 'zh' ? '联系我' : 'Contact Me',
@@ -115,7 +114,7 @@
       /* ── About ── */
       'about.label': 'About Me',
       'about.name':  nameDisplay,
-      'about.role':  t(C.role, lang).replace('·', '·').replace(/ · /, ' · <span style="color:var(--pink)">').replace(/([^>]+)$/, '$1</span>'),
+      'about.role': t(C.role, lang),
       'about.bio':   t(C.about.bio, lang),
 
       'about.info.title':      lang === 'zh' ? '个人信息'  : 'Personal Info',
