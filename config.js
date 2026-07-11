@@ -370,8 +370,8 @@ const CONFIG = {
     {
       company:    { en: 'Bug Inventor (Tencent)', zh: '腾云摘星' },
       period:     { en: 'Dec 2022 — Feb 2023', zh: '2022.12 — 2023.02' },
-      role:       { en: 'Intern Level Designer for Screaming Chicken',
-                    zh: '（实习）关卡设计师 — 尖叫鸡' },
+      role:       { en: 'Intern Level Designer for Fried Chicken Battle',
+                    zh: '（实习）关卡设计师 — 炸鸡大作战' },
       projectUrl: 'https://www.youtube.com/watch?v=jxHt0R11O-o',
       bullets: [
         {
