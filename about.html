@@ -347,9 +347,6 @@
   <script src="js/i18n.js"></script>
   <script src="assets/entry/scene-background.js?v=20260527"></script>
   <script>
-    document.getElementById('navToggle').addEventListener('click', () => {
-      document.getElementById('navLinks').classList.toggle('open');
-    });
     const observer = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }

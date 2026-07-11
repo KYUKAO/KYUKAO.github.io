@@ -242,6 +242,47 @@
     }
   }
 
+
+
+  function bindMobileNavigation() {
+    var nav = document.querySelector('nav');
+    var toggle = document.getElementById('navToggle');
+    var links = document.getElementById('navLinks');
+    if (!nav || !toggle || !links || toggle.dataset.navBound === 'true') return;
+
+    toggle.dataset.navBound = 'true';
+    toggle.setAttribute('role', 'button');
+    toggle.setAttribute('tabindex', '0');
+    toggle.setAttribute('aria-controls', 'navLinks');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Toggle navigation');
+
+    function setOpen(open) {
+      links.classList.toggle('open', open);
+      toggle.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    toggle.addEventListener('click', function () {
+      setOpen(!links.classList.contains('open'));
+    });
+    toggle.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        setOpen(!links.classList.contains('open'));
+      }
+    });
+    links.addEventListener('click', function (event) {
+      if (event.target.closest('a')) setOpen(false);
+    });
+    document.addEventListener('click', function (event) {
+      if (!nav.contains(event.target)) setOpen(false);
+    });
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 760) setOpen(false);
+    });
+  }
+
   /* ================================================================
      Portfolio page — render work cards from CONTENT.works
      ================================================================ */
@@ -515,6 +556,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     injectToggleButton();
+    bindMobileNavigation();
     var saved = 'en';
     try { saved = localStorage.getItem('lang') || 'en'; } catch (e) {}
     applyLang(saved);

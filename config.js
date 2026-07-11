@@ -300,8 +300,12 @@ const CONFIG = {
       projectUrl: '',
       bullets: [
         {
-          en: '<strong>Custom Shader Development:</strong> Designed and implemented custom shaders in Unity using HLSL/CG and ASE for VFX and PBR environment assets.',
-          zh: '<strong>自定义 Shader 开发：</strong>使用 HLSL/CG 和 ASE 在 Unity 中设计并实现用于 VFX 和 PBR 环境资产的自定义着色器。',
+          en: '<strong>Shader Maintenance & Pipeline R&D:</strong> Maintained shader variant effects triggered by piece skills and integrated the variant-switching workflow with gameplay systems; researched and migrated shader effects across rendering pipelines; designed shaders for board environments.',
+          zh: '<strong>Shader 维护与管线预研：</strong>维护棋子技能效果触发时的 Shader 变体效果，整合变体切换方式与程序功能的连接；完成不同渲染管线下 Shader 效果的预研与迁移；负责棋盘场景 Shader 设计。',
+        },
+        {
+          en: '<strong>Art Asset Coordination & Iteration:</strong> Coordinated with co-development partners on art assets required for target effects; reviewed deliveries, requested revisions, and drove iterative improvements.',
+          zh: '<strong>美术资产沟通与迭代：</strong>与 CP 方沟通制作效果所需的美术资产，审核交付内容并提出打回修改意见，推动后续迭代。',
         },
         {
           en: '<strong>AI Pipeline & Automated Testing:</strong> Engineered a multi-agent collaborative workflow to automate Python-based TA tool generation.',
