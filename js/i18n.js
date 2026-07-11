@@ -116,6 +116,55 @@
     return field[lang] || field.en || '';
   }
 
+  function _normalizeLang(lang) {
+    return lang === 'zh' || lang === 'en' ? lang : '';
+  }
+
+  function _getUrlLang() {
+    try {
+      return _normalizeLang(new URLSearchParams(window.location.search).get('lang'));
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function _getSavedLang() {
+    try {
+      return _normalizeLang(localStorage.getItem('lang'));
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function _setUrlLang(lang) {
+    if (!window.history || !window.history.replaceState) return;
+    try {
+      var url = new URL(window.location.href);
+      url.searchParams.set('lang', lang);
+      window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+    } catch (e) {}
+  }
+
+  function _withLang(href, lang) {
+    if (!href || href.charAt(0) === '#' || /^(mailto:|tel:|https?:\/\/)/i.test(href)) return href;
+    try {
+      var url = new URL(href, window.location.href);
+      if (url.origin !== window.location.origin) return href;
+      url.searchParams.set('lang', lang);
+      return url.pathname.split('/').pop() + url.search + url.hash;
+    } catch (e) {
+      return href;
+    }
+  }
+
+  function _syncLanguageLinks(lang) {
+    document.querySelectorAll('a[href]').forEach(function (link) {
+      var href = link.getAttribute('href');
+      var nextHref = _withLang(href, lang);
+      if (nextHref !== href) link.setAttribute('href', nextHref);
+    });
+  }
+
   function _buildWorksFromConfig(lang) {
     if (typeof CONFIG === 'undefined' || !Array.isArray(CONFIG.works)) return [];
     return CONFIG.works.map(function (w) {
@@ -179,6 +228,7 @@
     if (typeof renderAboutInterests === 'function') renderAboutInterests(lang);
     if (typeof renderContactButtons === 'function') renderContactButtons(lang);
     if (typeof renderContactPage === 'function') renderContactPage(lang);
+    _syncLanguageLinks(lang);
   }
 
   /* ================================================================
@@ -215,9 +265,11 @@
      ================================================================ */
   function toggleLang() {
     var current = (document.getElementById('langToggle') || {}).dataset.currentLang
-      || localStorage.getItem('lang')
+      || _getSavedLang()
       || 'zh';
-    applyLang(current === 'zh' ? 'en' : 'zh');
+    var next = current === 'zh' ? 'en' : 'zh';
+    _setUrlLang(next);
+    applyLang(next);
   }
 
   /* ================================================================
@@ -557,8 +609,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     injectToggleButton();
     bindMobileNavigation();
-    var saved = 'en';
-    try { saved = localStorage.getItem('lang') || 'en'; } catch (e) {}
+    var saved = _getUrlLang() || _getSavedLang() || 'zh';
     applyLang(saved);
   });
 

@@ -791,7 +791,7 @@
   </style>
 </head>
 <body>
-  <iframe class="portfolio-embed" src="portfolio.html" title="KYUKAO portfolio"></iframe>
+  <iframe class="portfolio-embed" id="portfolioEmbed" src="portfolio.html" title="KYUKAO portfolio"></iframe>
   <main class="entry-stage" aria-label="KYUKAO portfolio entrance">
     <div class="video-layer" aria-hidden="true">
       <video id="openingOne" class="opening-video is-active" src="assets/entry/video/opening-1-ui.mp4" preload="auto" autoplay playsinline muted></video>
@@ -815,6 +815,12 @@
   </main>
 
   <script>
+    const urlLang = new URLSearchParams(window.location.search).get('lang');
+    let entryLang = urlLang === 'zh' || urlLang === 'en' ? urlLang : 'zh';
+    try { entryLang = urlLang === 'zh' || urlLang === 'en' ? urlLang : localStorage.getItem('lang') || 'zh'; } catch (e) {}
+    const portfolioEmbed = document.getElementById('portfolioEmbed');
+    if (portfolioEmbed) portfolioEmbed.src = 'portfolio.html?lang=' + entryLang;
+
     const openingOne = document.getElementById('openingOne');
     const startLayer = document.getElementById('startLayer');
     const brand = document.getElementById('brand');
