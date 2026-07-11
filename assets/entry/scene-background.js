@@ -1,4 +1,41 @@
 (function () {
+  function prefetchNavigation() {
+    var links = document.querySelectorAll('a[href]');
+    var seen = {};
+
+    links.forEach(function (link) {
+      var rawHref = link.getAttribute('href');
+      if (!rawHref || rawHref.charAt(0) === '#' || /^(mailto:|tel:|https?:\/\/)/i.test(rawHref)) return;
+
+      var url;
+      try {
+        url = new URL(rawHref, window.location.href);
+      } catch (e) {
+        return;
+      }
+      if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return;
+
+      var key = url.pathname + url.search;
+      if (seen[key]) return;
+      seen[key] = true;
+
+      var prefetched = false;
+      var prefetch = function () {
+        if (prefetched) return;
+        prefetched = true;
+        var hint = document.createElement('link');
+        hint.rel = 'prefetch';
+        hint.as = 'document';
+        hint.href = url.href;
+        document.head.appendChild(hint);
+      };
+
+      link.addEventListener('mouseenter', prefetch, { once: true, passive: true });
+      link.addEventListener('focus', prefetch, { once: true, passive: true });
+      link.addEventListener('touchstart', prefetch, { once: true, passive: true });
+    });
+  }
+
   function ensureBackground() {
     var existingVideo = document.getElementById('portfolioBg') || document.querySelector('.scene-bg-video');
     if (existingVideo) existingVideo.style.display = 'none';
@@ -18,9 +55,12 @@
     }
   }
 
+  // Mount the background before DOMContentLoaded so the first paint never
+  // falls back to a plain dark page while the shared image layer is created.
+  ensureBackground();
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', ensureBackground);
+    document.addEventListener('DOMContentLoaded', prefetchNavigation, { once: true });
   } else {
-    ensureBackground();
+    prefetchNavigation();
   }
 })();

@@ -24,7 +24,7 @@ menu.html                     # 跳过开场后的快速菜单
 home.html                     # 主页，使用 depth-of-field Canvas 背景
 portfolio.html                # 作品集，动态渲染作品卡片
 resume.html                   # 简历，动态渲染教育/工作/项目经历
-about.html                    # 关于，动态渲染个人信息/联系方式/兴趣
+contact.html                  # 联系，动态渲染个人信息/联系方式
 contact.html                  # 联系，动态读取 CONFIG.contact
 config.js                     # 内容数据源
 js/content.js                 # 构建 window.CONTENT
@@ -150,7 +150,7 @@ assets/entry/universal-bg-4k.webp
 
 ### 修改联系信息
 
-优先改 `config.js` 的 `contact` 对象。`about.html` 和 `contact.html` 都会读取它。
+优先改 `config.js` 的 `contact` 对象，`contact.html` 会读取它。
 
 ### 修改背景
 

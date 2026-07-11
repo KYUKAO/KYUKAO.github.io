@@ -29,7 +29,6 @@
       'nav.home':      lang === 'zh' ? '首页'  : 'Home',
       'nav.portfolio': lang === 'zh' ? '作品集' : 'Portfolio',
       'nav.resume':    lang === 'zh' ? '简历'  : 'Resume',
-      'nav.about':     lang === 'zh' ? '关于我' : 'About',
       'nav.contact':   lang === 'zh' ? '联系'  : 'Contact',
       'nav.toggle':    lang === 'zh' ? 'EN'    : '中文',
 

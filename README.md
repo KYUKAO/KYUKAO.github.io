@@ -21,7 +21,7 @@ python -m http.server 8000
 | 主页 | `home.html` | 传统个人主页/精选作品 |
 | 作品集 | `portfolio.html` | 动态渲染作品卡片 |
 | 简历 | `resume.html` | 动态渲染教育、工作和项目经历 |
-| 关于 | `about.html` | 动态渲染个人信息、联系方式和兴趣 |
+| 联系 | `contact.html` | 动态渲染个人信息和联系方式 |
 | 联系 | `contact.html` | 从 `config.js` 读取联系方式 |
 | 编辑器 | `tools/editor.html` | 可视化维护内容和排版 |
 
@@ -74,7 +74,7 @@ assets/entry/*          # 入口页和场景背景资源
 <script src="js/i18n.js"></script>
 ```
 
-`home.html` 额外使用 `js/depth-of-field-bg.js` 作为背景；`about.html`、`resume.html`、`portfolio.html`、`contact.html` 使用 `assets/entry/scene-pages.css` 和 `assets/entry/scene-background.js`。
+`home.html` 额外使用 `js/depth-of-field-bg.js` 作为背景；`resume.html`、`portfolio.html`、`contact.html` 使用 `assets/entry/scene-pages.css` 和 `assets/entry/scene-background.js`。
 
 ---
 
@@ -87,7 +87,6 @@ KYUKAO.github.io/
 ├── home.html                       # 主页
 ├── portfolio.html                  # 作品集
 ├── resume.html                     # 简历
-├── about.html                      # 关于
 ├── contact.html                    # 联系
 ├── config.js                       # 主要内容数据源
 ├── js/

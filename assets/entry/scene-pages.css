@@ -20,7 +20,21 @@ body {
   min-height: 100vh;
   color: var(--scene-paper) !important;
   font-family: var(--scene-font) !important;
+  isolation: isolate;
   background: #120704 !important;
+}
+
+/* Blurred first-paint fallback; prevents a sharp image from flashing before
+   the shared depth-of-field layer is mounted by scene-background.js. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -18px;
+  z-index: -5;
+  pointer-events: none;
+  background: url("universal-bg-4k.webp") center center / cover no-repeat;
+  filter: saturate(1.06) brightness(0.82);
+  transform: scale(1.015);
 }
 
 .scene-bg-image,
@@ -38,15 +52,41 @@ body {
   background-image: url("universal-bg-4k.webp");
   background-size: cover;
   background-position: center center;
-  filter: blur(3px) saturate(1.06) brightness(0.82);
+  filter: saturate(1.06) brightness(0.82);
   transform: scale(1.015);
+}
+
+/* Keep the edges legible while adding a softer depth-of-field in the center. */
+.scene-bg-image::after {
+  content: "";
+  position: absolute;
+  inset: -24px;
+  background: inherit;
+  background-position: center center;
+  filter: blur(10px);
+  opacity: 0.52;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 0%, #000 34%, transparent 72%);
+  mask-image: radial-gradient(ellipse at center, #000 0%, #000 34%, transparent 72%);
+  pointer-events: none;
 }
 
 .scene-bg-video,
 .portfolio-bg-video {
   object-fit: cover !important;
-  filter: blur(3px) saturate(1.06) brightness(0.86) !important;
+  filter: saturate(1.06) brightness(0.86) !important;
   transform: scale(1.015) !important;
+}
+
+.scene-bg-video::after,
+.portfolio-bg-video::after {
+  content: "";
+  position: absolute;
+  inset: -24px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 0%, #000 34%, transparent 72%);
+  mask-image: radial-gradient(ellipse at center, #000 0%, #000 34%, transparent 72%);
+  pointer-events: none;
 }
 
 .scene-bg-grade,
@@ -1651,6 +1691,34 @@ body.portfolio-theater .portfolio-shell {
 body.portfolio-theater .intro {
   min-height: 38vh !important;
   padding: 42px 22px 28px !important;
+}
+
+/* Align the first content section across Portfolio, Resume, and Contact. */
+@media (min-width: 761px) {
+  body.portfolio-theater .portfolio-shell {
+    padding-top: 64px !important;
+  }
+
+  body.portfolio-theater .intro {
+    min-height: 38vh !important;
+  }
+
+  body.resume-scene > header {
+    min-height: clamp(280px, calc(38vh - 58px), 400px) !important;
+  }
+
+  body.about-scene .about-hero {
+    min-height: calc(38vh + 64px) !important;
+  }
+}
+
+body.portfolio-theater .works-heading span,
+body.resume-scene .resume-skills-section .section-title,
+body.about-scene .about-info > .block-title:first-child {
+  font-size: clamp(1.65rem, 2.35vw, 2.45rem) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.04em !important;
 }
 
 @media (max-width: 620px) {
