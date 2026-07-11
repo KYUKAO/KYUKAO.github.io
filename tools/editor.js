@@ -103,7 +103,8 @@ let S = {
   },
   workGroupNames: {
     project: { en: 'Complete Projects', zh: '完整项目作品' },
-    art: { en: 'Independent Artworks', zh: '独立美术作品' },
+    tool: { en: 'Tools', zh: '工具作品' },
+    art: { en: 'Independent Works', zh: '独立作品' },
   },
   works: [],
   education: [],
@@ -455,6 +456,11 @@ document.addEventListener('keydown', function(e) {
 // ════════════════════════════════════════════
 //  PANEL SWITCH
 // ════════════════════════════════════════════
+function openPreviewPage(page) {
+  const safePages = ['portfolio.html', 'resume.html', 'about.html', 'contact.html'];
+  if (!safePages.includes(page)) return;
+  window.open('../' + page, '_blank', 'noopener');
+}
 function switchPanel(id, el) {
   document.querySelectorAll('.panel').forEach(p => { p.classList.remove('active'); p.classList.remove('anim'); });
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -684,29 +690,35 @@ const DEFAULT_WORK_LINK_PRESETS = [
 ];
 const WORK_LINK_TYPE_PRESETS = {
   video:  { en: 'Watch Video →', zh: '观看视频 →' },
+  image:  { en: 'View Image →',  zh: '查看图片 →' },
   github: { en: 'GitHub',        zh: 'GitHub' },
   detail: { en: 'View Details →',zh: '查看详情 →' },
   custom: { en: '',              zh: '' },
 };
 let workLinkPresets = DEFAULT_WORK_LINK_PRESETS.map(x => ({ en: x.en, zh: x.zh }));
-const WORK_CATS = ['shader','vfx','tool','render','code'];
+const WORK_CATS = ['shader','pcg','vfx','tool','render','code'];
 const WORK_GROUPS = [
   { id: 'project' },
+  { id: 'tool' },
   { id: 'art' },
 ];
 const WORK_GROUP_NAME_DEFAULTS = {
   project: { en: 'Complete Projects', zh: '完整项目作品' },
-  art: { en: 'Independent Artworks', zh: '独立美术作品' },
+  tool: { en: 'Tools', zh: '工具作品' },
+  art: { en: 'Independent Works', zh: '独立作品' },
 };
 const WORK_VIDEO_EXT_RE = /\.(mp4|webm|mov|m4v|ogv|avi|mkv)(\?.*)?$/i;
+const WORK_IMAGE_EXT_RE = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i;
 let currentWorkIndex = 0;
 let worksSearchKeyword = '';
 let worksGroupFilter = 'all';
+let worksMediaFilter = 'all';
 let workDragFromIndex = -1;
 let uploadedAssetsCache = [];
 
 function inferWorkGroupFromCategory(cat) {
-  return (cat === 'tool' || cat === 'code') ? 'project' : 'art';
+  if (cat === 'tool') return 'tool';
+  return (cat === 'code' || cat === 'pcg') ? 'project' : 'art';
 }
 function normalizeWorkItem(w) {
   if (!w || typeof w !== 'object') return;
@@ -762,10 +774,14 @@ function getWorkGroupName(groupId, lang) {
 function renderWorkGroupNameInputs() {
   const pEn = document.getElementById('work_group_project_en');
   const pZh = document.getElementById('work_group_project_zh');
+  const tEn = document.getElementById('work_group_tool_en');
+  const tZh = document.getElementById('work_group_tool_zh');
   const aEn = document.getElementById('work_group_art_en');
   const aZh = document.getElementById('work_group_art_zh');
   if (pEn) pEn.value = getWorkGroupName('project', 'en');
   if (pZh) pZh.value = getWorkGroupName('project', 'zh');
+  if (tEn) tEn.value = getWorkGroupName('tool', 'en');
+  if (tZh) tZh.value = getWorkGroupName('tool', 'zh');
   if (aEn) aEn.value = getWorkGroupName('art', 'en');
   if (aZh) aZh.value = getWorkGroupName('art', 'zh');
 }
@@ -773,10 +789,14 @@ function saveWorkGroupNamesFromInputs() {
   normalizeWorkGroupNames();
   const pEn = document.getElementById('work_group_project_en');
   const pZh = document.getElementById('work_group_project_zh');
+  const tEn = document.getElementById('work_group_tool_en');
+  const tZh = document.getElementById('work_group_tool_zh');
   const aEn = document.getElementById('work_group_art_en');
   const aZh = document.getElementById('work_group_art_zh');
   if (pEn) S.workGroupNames.project.en = String(pEn.value || '').trim() || WORK_GROUP_NAME_DEFAULTS.project.en;
   if (pZh) S.workGroupNames.project.zh = String(pZh.value || '').trim() || WORK_GROUP_NAME_DEFAULTS.project.zh;
+  if (tEn) S.workGroupNames.tool.en = String(tEn.value || '').trim() || WORK_GROUP_NAME_DEFAULTS.tool.en;
+  if (tZh) S.workGroupNames.tool.zh = String(tZh.value || '').trim() || WORK_GROUP_NAME_DEFAULTS.tool.zh;
   if (aEn) S.workGroupNames.art.en = String(aEn.value || '').trim() || WORK_GROUP_NAME_DEFAULTS.art.en;
   if (aZh) S.workGroupNames.art.zh = String(aZh.value || '').trim() || WORK_GROUP_NAME_DEFAULTS.art.zh;
   renderWorks();
@@ -792,6 +812,7 @@ function getWorkLinkPreset(i) {
 }
 function getWorkLinkPresetByType(type) {
   if (type === 'video') return getWorkLinkPreset(0);
+  if (type === 'image') return WORK_LINK_TYPE_PRESETS.image;
   if (type === 'github') return getWorkLinkPreset(1);
   if (type === 'detail') return getWorkLinkPreset(2);
   return { en: '', zh: '' };
@@ -967,6 +988,7 @@ function inferLinkType(link, li) {
   const href = String(lk.href || '').toLowerCase();
   if (/github\.com/.test(href)) return 'github';
   if (isDirectVideoUrl(href) || getYoutubeEmbedUrl(href) || getVimeoEmbedUrl(href)) return 'video';
+  if (WORK_IMAGE_EXT_RE.test(href)) return 'image';
   if (li === 0) return 'video';
   if (li === 1) return 'github';
   if (li === 2) return 'detail';
@@ -988,7 +1010,7 @@ function getUploadedVideoAssets() {
   return (uploadedAssetsCache || []).filter(a => WORK_VIDEO_EXT_RE.test(String((a && a.name) || '')));
 }
 function getUploadedImageAssets() {
-  return (uploadedAssetsCache || []).filter(a => /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(String((a && a.name) || '')));
+  return (uploadedAssetsCache || []).filter(a => WORK_IMAGE_EXT_RE.test(String((a && a.name) || '')));
 }
 function normMatchText(s) {
   return String(s || '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '');
@@ -1075,7 +1097,9 @@ function renderWorkMediaLibraryPanel() {
     const w = S.works[wi];
     const title = (w.title && (w.title.zh || w.title.en)) || `作品 ${wi + 1}`;
     hintEl.textContent = `当前作品：${title}`;
-    previewEl.innerHTML = buildWorkVideoPreviewHtml(w);
+    previewEl.innerHTML = getWorkVideoPreview(w)
+      ? buildWorkVideoPreviewHtml(w)
+      : (w.image ? '<img class="works-media-thumb" src="' + esc(w.image) + '" alt="' + esc(title) + '">' : '');
   }
 
   const videos = getUploadedVideoAssets();
@@ -1102,7 +1126,7 @@ function renderWorkMediaLibraryPanel() {
     const activeClass = activeHref && activeHref === v.browser_download_url ? ' active' : '';
     const safeUrl = JSON.stringify(v.browser_download_url || '');
     const safeName = JSON.stringify(v.name || '');
-    return `<div class="works-media-item${activeClass}" onclick='applyLibraryVideoByUrl(${safeUrl}, ${safeName})'>
+    return `<div class="works-media-item works-media-video${activeClass}" onclick='applyLibraryVideoByUrl(${safeUrl}, ${safeName})'>
       <video class="works-media-thumb" src="${esc(v.browser_download_url)}" preload="metadata" muted playsinline></video>
       <div class="works-media-meta">
         <div class="name">${esc(v.name)}</div>
@@ -1122,7 +1146,7 @@ function renderWorkMediaLibraryPanel() {
     const activeClass = activeImage && activeImage === v.browser_download_url ? ' active' : '';
     const safeUrl = JSON.stringify(v.browser_download_url || '');
     const safeName = JSON.stringify(v.name || '');
-    return `<div class="works-media-item${activeClass}" onclick='applyLibraryImageByUrl(${safeUrl}, ${safeName})'>
+    return `<div class="works-media-item works-media-image${activeClass}" onclick='applyLibraryImageByUrl(${safeUrl}, ${safeName})'>
       <img class="works-media-thumb" src="${esc(v.browser_download_url)}" alt="${esc(v.name)}" loading="lazy">
       <div class="works-media-meta">
         <div class="name">${esc(v.name)}</div>
@@ -1140,9 +1164,9 @@ function renderWorkMediaLibraryPanel() {
   const kwText = keywords.length ? `（关键词：${keywords.join(' / ')}）` : '';
   listEl.innerHTML = `
     <div style="font-size:11px;color:var(--text-muted);margin:2px 0 6px;">按当前作品相关资源优先排序${kwText}</div>
-    <div style="font-size:11px;color:var(--pink);letter-spacing:.08em;text-transform:uppercase;margin:8px 0 6px;">Videos</div>
+    <div class="works-media-video media-section-label">Videos</div>
     ${videosSorted.length ? videosSorted.map(renderVideoItem).join('') : '<div style="font-size:11px;color:var(--text-muted);padding:6px 0;">暂无视频资源</div>'}
-    <div style="font-size:11px;color:var(--pink);letter-spacing:.08em;text-transform:uppercase;margin:12px 0 6px;">Images</div>
+    <div class="works-media-image media-section-label">Images</div>
     ${imagesSorted.length ? imagesSorted.map(renderImageItem).join('') : '<div style="font-size:11px;color:var(--text-muted);padding:6px 0;">暂无图片资源</div>'}
   `;
 }
@@ -1155,8 +1179,17 @@ async function refreshWorkMediaLibrary(showToast) {
     return false;
   }
   const ok = await fetchUploadedFiles({ silent: !showToast, skipListLoading: true });
-  if (showToast && ok) toast('视频库已刷新。', 'success');
+  if (showToast && ok) toast('媒体库已刷新。', 'success');
   return ok;
+}
+function setWorksMediaFilter(v) {
+  worksMediaFilter = ['all', 'video', 'image'].includes(v) ? v : 'all';
+  const list = document.getElementById('works_media_list');
+  if (list) list.dataset.mediaFilter = worksMediaFilter;
+  document.querySelectorAll('[data-media-filter]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mediaFilter === worksMediaFilter);
+  });
+  renderWorkMediaLibraryPanel();
 }
 function setWorksSearchKeyword(v) {
   worksSearchKeyword = String(v || '').trim();
@@ -1164,7 +1197,7 @@ function setWorksSearchKeyword(v) {
 }
 function setWorksGroupFilter(v) {
   const next = String(v || 'all');
-  worksGroupFilter = ['all', 'project', 'art', 'other'].includes(next) ? next : 'all';
+  worksGroupFilter = ['all', 'project', 'tool', 'art', 'other'].includes(next) ? next : 'all';
   renderWorks();
 }
 function clearWorksFilters() {
@@ -1252,7 +1285,7 @@ function renderWorks() {
   const kw = worksSearchKeyword.toLowerCase();
   const groupOnly = worksGroupFilter;
   const totalCount = S.works.length;
-  const groupBuckets = { project: [], art: [], other: [] };
+  const groupBuckets = { project: [], tool: [], art: [], other: [] };
   S.works.forEach((w, i) => {
     const gid = w.group || inferWorkGroupFromCategory(w.category);
     if (groupOnly !== 'all' && gid !== groupOnly) return;
@@ -1268,7 +1301,7 @@ function renderWorks() {
     if (groupBuckets[gid]) groupBuckets[gid].push({ w, i });
     else groupBuckets.other.push({ w, i });
   });
-  const visibleCount = groupBuckets.project.length + groupBuckets.art.length + groupBuckets.other.length;
+  const visibleCount = groupBuckets.project.length + groupBuckets.tool.length + groupBuckets.art.length + groupBuckets.other.length;
   if (statEl) statEl.textContent = `显示 ${visibleCount} / ${totalCount}`;
 
   const renderCard = (w, i, mount, groupIndex) => {
@@ -1292,6 +1325,7 @@ function renderWorks() {
             <div class="form-group"><label class="form-label">类型</label>
               <select oninput="applyLinkTypePreset(${i},${li},this.value)">
                 <option value="video" ${linkType==='video'?'selected':''}>视频</option>
+                <option value="image" ${linkType==='image'?'selected':''}>图片</option>
                 <option value="github" ${linkType==='github'?'selected':''}>GitHub</option>
                 <option value="detail" ${linkType==='detail'?'selected':''}>详情页</option>
                 <option value="custom" ${linkType==='custom'?'selected':''}>自定义</option>
@@ -1314,7 +1348,7 @@ function renderWorks() {
       <div class="card-header" onclick="onWorkCardHeaderClick(${i})">
         <button class="work-drag-handle" type="button" title="拖拽排序" onclick="event.stopPropagation()">⋮⋮</button>
         <div class="card-number">${groupIndex}</div>
-        <div class="card-title">${w.title.zh||w.title.en||'新作品'}<small> · ${getWorkGroupLabel(w.group)} / ${w.category||'—'}</small></div>
+        <div class="card-title">${w.title.zh||w.title.en||'新作品'}<small><span class="work-meta-pill">${getWorkGroupLabel(w.group)}</span><span class="work-meta-pill">${w.category||'—'}</span><span class="work-meta-pill media">${w.hasVideo?'视频':(w.image?'图片':'无媒体')}</span></small></div>
         <button class="btn btn-danger" onclick="event.stopPropagation();removeWork(${i})">删除</button>
         <span class="card-toggle">▾</span>
       </div>
@@ -1424,6 +1458,7 @@ function renderWorks() {
   };
 
   appendGroup('project', getWorkGroupLabel('project'));
+  appendGroup('tool', getWorkGroupLabel('tool'));
   appendGroup('art', getWorkGroupLabel('art'));
   if (groupBuckets.other.length) {
     const extraTitle = document.createElement('div');
@@ -2137,6 +2172,7 @@ ${s.about.interests.map(it => `      {
 
   workGroupNames: {
     project: { en: ${q((s.workGroupNames && s.workGroupNames.project && s.workGroupNames.project.en) || WORK_GROUP_NAME_DEFAULTS.project.en)}, zh: ${q((s.workGroupNames && s.workGroupNames.project && s.workGroupNames.project.zh) || WORK_GROUP_NAME_DEFAULTS.project.zh)} },
+    tool: { en: ${q((s.workGroupNames && s.workGroupNames.tool && s.workGroupNames.tool.en) || WORK_GROUP_NAME_DEFAULTS.tool.en)}, zh: ${q((s.workGroupNames && s.workGroupNames.tool && s.workGroupNames.tool.zh) || WORK_GROUP_NAME_DEFAULTS.tool.zh)} },
     art: { en: ${q((s.workGroupNames && s.workGroupNames.art && s.workGroupNames.art.en) || WORK_GROUP_NAME_DEFAULTS.art.en)}, zh: ${q((s.workGroupNames && s.workGroupNames.art && s.workGroupNames.art.zh) || WORK_GROUP_NAME_DEFAULTS.art.zh)} },
   },
 
@@ -2154,7 +2190,7 @@ ${s.works.map(w => `    {
       },
       tags: [${(w.tags||[]).map(t=>q(t)).join(', ')}],
       links: [
-${(w.links||[]).map(lk => `        { label: { en: ${q(lk.label.en)}, zh: ${q(lk.label.zh)} }, href: ${q(lk.href)} },`).join('\n')}
+${(w.links||[]).map((lk, li) => `        { type: ${q(inferLinkType(lk, li))}, label: { en: ${q(lk.label.en)}, zh: ${q(lk.label.zh)} }, href: ${q(lk.href)} },`).join('\n')}
       ],
     },`).join('\n')}
   ],

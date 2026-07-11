@@ -148,6 +148,11 @@ const CONFIG = {
      § 4. 作品集
      ============================================================ */
 
+  workGroupNames: {
+    project: { en: 'Complete Projects', zh: '完整项目作品' },
+    tool: { en: 'Tools', zh: '工具作品' },
+    art: { en: 'Independent Works', zh: '独立作品' },
+  },
   works: [
     {
       category: 'shader',
@@ -161,7 +166,7 @@ const CONFIG = {
       },
       tags: ['Shader', 'Shading', 'Showreel'],
       links: [
-        { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/ShadingShowreel.mp4' },
+        { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/ShadingShowreel.mp4' },
       ],
     },
     {
@@ -176,7 +181,7 @@ const CONFIG = {
       },
       tags: ['Shader', 'Iteration'],
       links: [
-        { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/LycirusShader迭代.mp4' },
+        { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/LycirusShader迭代.mp4' },
       ],
     },
     {
@@ -191,7 +196,7 @@ const CONFIG = {
       },
       tags: ['Shader', 'Character'],
       links: [
-        { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/Eye.mp4' },
+        { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/Eye.mp4' },
       ],
     },
     {
@@ -206,7 +211,7 @@ const CONFIG = {
       },
       tags: ['Render', 'Remaster'],
       links: [
-        { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/ShadowMan_Remaster.mp4' },
+        { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/ShadowMan_Remaster.mp4' },
       ],
     },
     {
@@ -221,7 +226,7 @@ const CONFIG = {
       },
       tags: ['PCG', 'Procedural', 'Tool'],
       links: [
-        { label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/PCG.mp4' },
+        { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/PCG.mp4' },
       ],
     },
     {
@@ -236,7 +241,7 @@ const CONFIG = {
       },
       tags: ['Tool', 'Unreal Engine'],
       links: [
-        { label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/UE关卡工具.webp' },
+        { type: 'image', label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/UE关卡工具.webp' },
       ],
     },
     {
@@ -251,7 +256,7 @@ const CONFIG = {
       },
       tags: ['AI Art', 'Tool', 'VibeCoding'],
       links: [
-        { label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/ArtToolFlow.webp' },
+        { type: 'image', label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/ArtToolFlow.webp' },
       ],
     },
   ],
