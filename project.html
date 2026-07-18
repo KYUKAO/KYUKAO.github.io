@@ -144,7 +144,7 @@
       <div class="tag-list" id="tagList" aria-label="Project tags"></div>
     </header>
 
-    <section class="video-frame" aria-label="Project video">
+    <section class="video-frame" id="videoSection" aria-label="Project video">
       <video id="projectVideo" controls autoplay muted playsinline preload="metadata"></video>
     </section>
 
@@ -211,7 +211,7 @@
         var works = typeof CONFIG !== 'undefined' && Array.isArray(CONFIG.works) ? CONFIG.works : [];
         var work = Number.isInteger(projectId) ? works[projectId] : null;
         var video = work ? findVideo(work) : '';
-        if (!work || !work.hasVideo || !video) {
+        if (!work || (!video && !work.pdf)) {
           document.getElementById('projectError').style.display = 'block';
           return;
         }
@@ -221,7 +221,11 @@
         document.title = title + ' | Hanqing Li - KYUKAO';
         document.getElementById('projectTitle').textContent = title;
         document.getElementById('projectDesc').textContent = t(work.desc);
-        document.getElementById('projectVideo').src = video;
+        if (video) {
+          document.getElementById('projectVideo').src = video;
+        } else {
+          document.getElementById('videoSection').hidden = true;
+        }
         document.getElementById('tagList').innerHTML = (work.tags || []).map(function (tag) {
           var span = document.createElement('span');
           span.className = 'tag';

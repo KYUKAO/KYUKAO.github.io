@@ -407,9 +407,10 @@
       }).join('');
 
       var detailId = typeof w.id === 'number' ? w.id : index;
-      var card = document.createElement(w.hasVideo && previewVideo ? 'a' : 'div');
+      var hasDetailPage = (w.hasVideo && previewVideo) || !!w.pdf;
+      var card = document.createElement(hasDetailPage ? 'a' : 'div');
       card.className = 'work-card reveal visible';
-      if (w.hasVideo && previewVideo) {
+      if (hasDetailPage) {
         card.href = 'project.html?id=' + encodeURIComponent(detailId) + '&lang=' + encodeURIComponent(lang);
         card.setAttribute('aria-label', w.title + (lang === 'zh' ? ' - 查看作品详情' : ' - View project details'));
       }
