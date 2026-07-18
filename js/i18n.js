@@ -170,14 +170,17 @@
     return CONFIG.works.map(function (w, index) {
       var links = Array.isArray(w.links) ? w.links : [];
       var tags = Array.isArray(w.tags) ? w.tags : [];
+      var cover = w.cover || {};
       var bgStyle = w.image
-        ? "background-image: url('" + w.image + "'); background-size: cover; background-position: center;"
+        ? "background-image: url('" + w.image + "'); background-size: " + (cover.zoom || 100) + "%; background-position: " + (cover.x == null ? 50 : cover.x) + "% " + (cover.y == null ? 50 : cover.y) + "%;"
         : '';
       return {
         category: w.category || '',
         id: index,
         group: w.group || (w.category === 'tool' ? 'tool' : ((w.category === 'code' || w.category === 'pcg') ? 'project' : 'art')),
         bgStyle: bgStyle,
+        layout: w.layout || {},
+        cover: cover,
         hasVideo: !!w.hasVideo,
         tags: tags,
         title: _t(w.title, lang),
@@ -416,6 +419,11 @@
       }
       card.dataset.category = w.category;
       card.dataset.group = w.group || (w.category === 'tool' ? 'tool' : ((w.category === 'code' || w.category === 'pcg') ? 'project' : 'art'));
+      var layout = w.layout || {};
+      card.dataset.layoutSpan = String(layout.span || '');
+      card.style.setProperty('--portfolio-span', String(layout.span || 4));
+      card.style.setProperty('--portfolio-aspect', String(layout.aspect || '16/9'));
+      card.style.setProperty('--portfolio-text-align', layout.textAlign || 'left');
       card.innerHTML =
         '<div class="work-thumb">' +
           thumbContent +

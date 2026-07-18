@@ -720,10 +720,18 @@ function inferWorkGroupFromCategory(cat) {
   if (cat === 'tool') return 'tool';
   return (cat === 'code' || cat === 'pcg') ? 'project' : 'art';
 }
-function normalizeWorkItem(w) {
+function normalizeWorkItem(w, workIndex) {
   if (!w || typeof w !== 'object') return;
   if (!w.group) w.group = inferWorkGroupFromCategory(w.category);
   if (typeof w.assetKey !== 'string') w.assetKey = '';
+  if (!w.layout || typeof w.layout !== 'object') w.layout = {};
+  w.layout.span = [4, 6, 8, 12].includes(Number(w.layout.span)) ? Number(w.layout.span) : (workIndex === 0 ? 8 : 4);
+  w.layout.aspect = ['16/7', '16/9', '4/3', '1/1'].includes(w.layout.aspect) ? w.layout.aspect : (workIndex < 3 ? '16/7' : '16/9');
+  w.layout.textAlign = ['left', 'center'].includes(w.layout.textAlign) ? w.layout.textAlign : 'left';
+  if (!w.cover || typeof w.cover !== 'object') w.cover = {};
+  w.cover.x = Math.max(0, Math.min(100, Number(w.cover.x == null ? 50 : w.cover.x)));
+  w.cover.y = Math.max(0, Math.min(100, Number(w.cover.y == null ? 50 : w.cover.y)));
+  w.cover.zoom = Math.max(100, Math.min(220, Number(w.cover.zoom == null ? 100 : w.cover.zoom)));
   if (!Array.isArray(w.links)) w.links = [];
   if (!w.links.length) {
     const p = getWorkLinkPresetByType('video');
@@ -747,6 +755,41 @@ function normalizeWorkItem(w) {
   });
   if (legacyEmpty && w.links.length > 1) w.links = [w.links[0]];
 }
+function workCoverStyle(w) {
+  const cover = w.cover || { x: 50, y: 50, zoom: 100 };
+  return `background-image:url(&quot;${esc(w.image || '')}&quot;);background-size:${cover.zoom}%;background-position:${cover.x}% ${cover.y}%;`;
+}
+
+function updateWorkCover(i, key, value) {
+  normalizeWorkItem(S.works[i]);
+  S.works[i].cover[key] = Number(value);
+  const valueEl = document.getElementById(`w_cover_${key}_value_${i}`);
+  if (valueEl) valueEl.textContent = value + (key === 'zoom' ? '%' : '');
+  const preview = document.getElementById(`w_cover_preview_${i}`);
+  if (preview) {
+    preview.style.backgroundSize = S.works[i].cover.zoom + '%';
+    preview.style.backgroundPosition = S.works[i].cover.x + '% ' + S.works[i].cover.y + '%';
+    const cross = preview.querySelector('.work-cover-cross');
+    if (cross) {
+      cross.style.left = S.works[i].cover.x + '%';
+      cross.style.top = S.works[i].cover.y + '%';
+    }
+  }
+}
+
+function updateWorkLayoutAspect(i, value) {
+  S.works[i].layout.aspect = value;
+  const preview = document.getElementById(`w_cover_preview_${i}`);
+  if (preview) preview.style.aspectRatio = value;
+}
+
+function setWorkCoverFocus(event, i) {
+  const rect = event.currentTarget.getBoundingClientRect();
+  updateWorkCover(i, 'x', Math.round(((event.clientX - rect.left) / rect.width) * 100));
+  updateWorkCover(i, 'y', Math.round(((event.clientY - rect.top) / rect.height) * 100));
+  snapshot();
+}
+
 function normalizeWorkGroupNames() {
   if (!S.workGroupNames || typeof S.workGroupNames !== 'object') S.workGroupNames = {};
   WORK_GROUPS.forEach(g => {
@@ -760,7 +803,7 @@ function normalizeWorkGroupNames() {
 }
 function normalizeWorks() {
   normalizeWorkGroupNames();
-  (S.works || []).forEach(normalizeWorkItem);
+  (S.works || []).forEach((work, index) => normalizeWorkItem(work, index));
 }
 function getWorkGroupLabel(groupId) {
   const g = S.workGroupNames && S.workGroupNames[groupId];
@@ -1375,6 +1418,36 @@ function renderWorks() {
         <div class="form-group"><label class="form-label">封面图地址（在右侧资源库点图片自动绑定）</label>
           <input type="text" value="${esc(w.image)}" placeholder="点击右侧图片后自动填充" readonly style="opacity:.9;">
         </div>
+        <div class="work-layout-editor">
+          <div class="work-cover-preview" id="w_cover_preview_${i}" style="aspect-ratio:${w.layout.aspect};${workCoverStyle(w)}" onclick="setWorkCoverFocus(event,${i})" title="&#x70B9;&#x51FB;&#x753B;&#x9762;&#x8BBE;&#x7F6E;&#x5C01;&#x9762;&#x7126;&#x70B9;">
+            <span class="work-cover-cross" style="left:${w.cover.x}%;top:${w.cover.y}%"></span>
+            ${w.image ? '' : '<span class="work-cover-empty">&#x8BF7;&#x5148;&#x4ECE;&#x53F3;&#x4FA7;&#x5A92;&#x4F53;&#x5E93;&#x9009;&#x62E9;&#x5C01;&#x9762;</span>'}
+          </div>
+          <div class="work-layout-controls">
+            <div class="bilingual">
+              <div class="form-group"><label class="form-label">&#x5361;&#x7247;&#x5BBD;&#x5EA6;</label>
+                <select oninput="S.works[${i}].layout.span=Number(this.value)">
+                  <option value="4" ${w.layout.span===4?'selected':''}>1/3 - &#x6807;&#x51C6;</option>
+                  <option value="6" ${w.layout.span===6?'selected':''}>1/2 - &#x4E2D;&#x7B49;</option>
+                  <option value="8" ${w.layout.span===8?'selected':''}>2/3 - &#x4E3B;&#x89C6;&#x89C9;</option>
+                  <option value="12" ${w.layout.span===12?'selected':''}>&#x6574;&#x884C; - &#x6A2A;&#x5E45;</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">&#x5C01;&#x9762;&#x6BD4;&#x4F8B;</label>
+                <select oninput="updateWorkLayoutAspect(${i},this.value)">
+                  <option value="16/7" ${w.layout.aspect==='16/7'?'selected':''}>&#x8D85;&#x5BBD; 16:7</option>
+                  <option value="16/9" ${w.layout.aspect==='16/9'?'selected':''}>&#x6A2A;&#x5411; 16:9</option>
+                  <option value="4/3" ${w.layout.aspect==='4/3'?'selected':''}>&#x7ECF;&#x5178; 4:3</option>
+                  <option value="1/1" ${w.layout.aspect==='1/1'?'selected':''}>&#x65B9;&#x5F62; 1:1</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group"><label class="form-label">&#x6A2A;&#x5411;&#x7126;&#x70B9; <b id="w_cover_x_value_${i}">${w.cover.x}</b></label><input type="range" min="0" max="100" value="${w.cover.x}" oninput="updateWorkCover(${i},'x',this.value)"></div>
+            <div class="form-group"><label class="form-label">&#x7EB5;&#x5411;&#x7126;&#x70B9; <b id="w_cover_y_value_${i}">${w.cover.y}</b></label><input type="range" min="0" max="100" value="${w.cover.y}" oninput="updateWorkCover(${i},'y',this.value)"></div>
+            <div class="form-group"><label class="form-label">&#x5C01;&#x9762;&#x7F29;&#x653E; <b id="w_cover_zoom_value_${i}">${w.cover.zoom}%</b></label><input type="range" min="100" max="220" value="${w.cover.zoom}" oninput="updateWorkCover(${i},'zoom',this.value)"></div>
+            <div class="form-group"><label class="form-label">&#x6587;&#x5B57;&#x5BF9;&#x9F50;</label><select oninput="S.works[${i}].layout.textAlign=this.value"><option value="left" ${w.layout.textAlign==='left'?'selected':''}>&#x5DE6;&#x5BF9;&#x9F50;</option><option value="center" ${w.layout.textAlign==='center'?'selected':''}>&#x5C45;&#x4E2D;</option></select></div>
+          </div>
+        </div>
         <div class="form-group"><label class="form-label">资源关键词（用于自动筛选相关视频/图片）</label>
           <input type="text" value="${esc(w.assetKey || '')}" placeholder="例如：projectA 或 stylized_forest" oninput="S.works[${i}].assetKey=this.value; if(currentWorkIndex===${i})renderWorkMediaLibraryPanel()">
         </div>
@@ -1473,7 +1546,7 @@ function renderWorks() {
   renderWorkMediaLibraryPanel();
 }
 function addWork() {
-  S.works.push({group:'project',category:'shader',hasVideo:false,image:'',assetKey:'',title:{en:'',zh:''},desc:{en:'',zh:''},tags:[],links:[]});
+  S.works.push({group:'project',category:'shader',hasVideo:false,image:'',assetKey:'',layout:{span:4,aspect:'16/9',textAlign:'left'},cover:{x:50,y:50,zoom:100},title:{en:'',zh:''},desc:{en:'',zh:''},tags:[],links:[]});
   currentWorkIndex = S.works.length - 1;
   worksSearchKeyword = '';
   worksGroupFilter = 'all';
@@ -2183,6 +2256,8 @@ ${s.works.map(w => `    {
       hasVideo: ${w.hasVideo},
       image: ${q(w.image)},
       assetKey: ${q(w.assetKey || '')},
+      layout: { span: ${Number(w.layout && w.layout.span) || 4}, aspect: ${q(w.layout && w.layout.aspect || '16/9')}, textAlign: ${q(w.layout && w.layout.textAlign || 'left')} },
+      cover: { x: ${Number(w.cover && w.cover.x == null ? 50 : w.cover.x)}, y: ${Number(w.cover && w.cover.y == null ? 50 : w.cover.y)}, zoom: ${Number(w.cover && w.cover.zoom) || 100} },
       title: { en: ${q(w.title.en)}, zh: ${q(w.title.zh)} },
       desc:  {
         en: ${q(w.desc.en)},

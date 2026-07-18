@@ -163,14 +163,17 @@
   /* ── Build works array for a given language ── */
   function buildWorks(lang) {
     return CONFIG.works.map(function (w, index) {
+      var cover = w.cover || {};
       var bgStyle = w.image
-        ? "background-image: url('" + w.image + "'); background-size: cover; background-position: center;"
+        ? "background-image: url('" + w.image + "'); background-size: " + (cover.zoom || 100) + "%; background-position: " + (cover.x == null ? 50 : cover.x) + "% " + (cover.y == null ? 50 : cover.y) + "%;"
         : '';
       return {
         category: w.category,
         id:       index,
         group:    w.group || (w.category === 'tool' ? 'tool' : ((w.category === 'code' || w.category === 'pcg') ? 'project' : 'art')),
         bgStyle:  bgStyle,
+        layout:   w.layout || {},
+        cover:    cover,
         hasVideo: !!w.hasVideo,
         tags:     w.tags,
         title:    t(w.title, lang),

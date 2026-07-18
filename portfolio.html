@@ -573,14 +573,10 @@
     body.portfolio-theater .filter-bar { justify-content: flex-start !important; margin: 0 0 28px !important; padding: 0 !important; }
     body.portfolio-theater .portfolio-frame { grid-template-columns: repeat(12, minmax(0, 1fr)) !important; gap: 22px !important; align-items: stretch !important; }
     body.portfolio-theater .work-card { display: grid !important; grid-template-rows: auto minmax(124px, auto) !important; clip-path: polygon(0 5%, 3.5% 0, 96.5% 0, 100% 5%, 100% 95%, 96.5% 100%, 3.5% 100%, 0 95%) !important; }
-    body.portfolio-theater .work-card.is-portfolio-feature { grid-column: span 8 !important; grid-row: span 2 !important; }
-    body.portfolio-theater .work-card.is-portfolio-secondary { grid-column: span 4 !important; }
-    body.portfolio-theater .work-card.is-portfolio-standard { grid-column: span 4 !important; margin-top: 10px !important; }
+    body.portfolio-theater .work-card { grid-column: span var(--portfolio-span, 4) !important; }
     body.portfolio-theater .work-card.is-filter-hidden { display: none !important; }
-    body.portfolio-theater .work-card.is-portfolio-feature .work-thumb { aspect-ratio: 16 / 8.7 !important; }
-    body.portfolio-theater .work-card.is-portfolio-secondary .work-thumb { aspect-ratio: 16 / 7.35 !important; }
-    body.portfolio-theater .work-card.is-portfolio-standard .work-thumb { aspect-ratio: 16 / 9 !important; }
-    body.portfolio-theater .work-info { display: block !important; height: auto !important; min-height: 124px !important; padding: 17px 20px 18px !important; text-align: left !important; }
+    body.portfolio-theater .work-card .work-thumb { aspect-ratio: var(--portfolio-aspect, 16/9) !important; }
+    body.portfolio-theater .work-info { display: block !important; height: auto !important; min-height: 124px !important; padding: 17px 20px 18px !important; text-align: var(--portfolio-text-align, left) !important; }
     body.portfolio-theater .work-title { margin: 0 !important; font-size: clamp(1.2rem, 1.65vw, 1.75rem) !important; line-height: 1.08 !important; letter-spacing: .06em !important; }
     body.portfolio-theater .work-desc { display: block !important; margin: 9px 0 0 !important; color: rgba(245, 213, 157, .64) !important; font-size: .76rem !important; line-height: 1.58 !important; }
     body.portfolio-theater .work-tags { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; margin-bottom: 10px !important; }
@@ -659,8 +655,8 @@
 
   <script src="config.js?v=20260718a"></script>
   <script src="js/typography.js?v=20260528d"></script>
-  <script src="js/content.js?v=20260718a"></script>
-  <script src="js/i18n.js?v=20260718a"></script>
+  <script src="js/content.js?v=20260718b"></script>
+  <script src="js/i18n.js?v=20260718b"></script>
   <script src="assets/entry/scene-background.js?v=20260711"></script>
   <script>
     var revealObserver = new IntersectionObserver(function (entries) {
@@ -679,6 +675,10 @@
         card.classList.toggle('is-portfolio-feature', index === 0);
         card.classList.toggle('is-portfolio-secondary', index === 1 || index === 2);
         card.classList.toggle('is-portfolio-standard', index >= 3);
+        if (!card.dataset.layoutSpan) {
+          card.style.setProperty('--portfolio-span', index === 0 ? '8' : '4');
+          card.style.setProperty('--portfolio-aspect', index === 0 ? '16/8.7' : (index < 3 ? '16/7.35' : '16/9'));
+        }
         var video = card.querySelector('.work-thumb-video');
         if (video && !video.dataset.hoverBound) {
           video.pause();
