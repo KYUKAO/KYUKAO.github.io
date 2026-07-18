@@ -251,7 +251,7 @@
       var previewVideo = _getPreviewVideoUrl(w.links);
       var tag = Array.isArray(w.tags) && w.tags.length ? w.tags[0] : '';
       return '<a class="work-card reveal visible" href="portfolio.html">' +
-        '<video class="work-card-video" src="' + _escAttr(previewVideo) + '" muted playsinline loop autoplay preload="metadata"></video>' +
+        '<div class="work-card-video work-card-video-placeholder" aria-hidden="true"></div>' +
         '<div class="work-card-overlay">' +
           '<p class="work-card-tag">' + tag + '</p>' +
           '<p class="work-card-title">' + w.title + '</p>' +
@@ -379,13 +379,11 @@
 
     works.forEach(function (w) {
       var previewVideo = getPreviewVideoUrl(w.links);
-      var thumbContent = previewVideo
-        ? '<video class="work-thumb-video" src="' + _escAttr(previewVideo) + '" muted playsinline loop preload="metadata"></video>'
-        : (w.bgStyle
-          ? '<div class="work-thumb-bg has-image" style="' + w.bgStyle + '" aria-label="' + _escAttr(w.title) + '"></div>'
-          : w.bgText
-          ? '<div class="work-thumb-bg" style="' + w.bgStyle + '">' + w.bgText + '</div>'
-          : '<div class="work-thumb-bg" style="' + w.bgStyle + '">[ 替换为作品截图 ]</div>');
+      var thumbContent = w.bgStyle
+        ? '<div class="work-thumb-bg has-image" style="' + w.bgStyle + '" aria-label="' + _escAttr(w.title) + '"></div>'
+        : w.bgText
+        ? '<div class="work-thumb-bg" style="' + w.bgStyle + '">' + w.bgText + '</div>'
+        : '<div class="work-thumb-bg" style="' + w.bgStyle + '">' + _escAttr(w.title) + '</div>';
 
       var videoBadge = (w.hasVideo && previewVideo)
         ? '<span class="video-badge">VIDEO</span><a href="' + _escAttr(previewVideo) + '" class="play-icon js-video-open" data-video-url="' + _escAttr(previewVideo) + '" aria-label="播放视频"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></a>'

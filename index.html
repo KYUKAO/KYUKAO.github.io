@@ -885,7 +885,7 @@
   <iframe class="portfolio-embed" id="portfolioEmbed" data-src="portfolio.html" title="KYUKAO portfolio"></iframe>
   <main class="entry-stage" aria-label="KYUKAO portfolio entrance">
     <div class="video-layer" aria-hidden="true">
-      <video id="openingOne" class="opening-video is-active" src="assets/entry/video/opening-1-ui.mp4" preload="auto" autoplay playsinline muted></video>
+      <video id="openingOne" class="opening-video is-active" src="assets/entry/video/opening-1-ui.mp4" preload="metadata" autoplay playsinline muted></video>
     </div>
 
     <div class="grade" aria-hidden="true"></div>
@@ -932,11 +932,18 @@
       frameDocument.documentElement.dataset.transitionWired = 'true';
       frameDocument.addEventListener('click', (event) => {
         const link = event.target.closest('a[href]');
-        if (!link || link.target || link.hasAttribute('download')) return;
+        if (
+          event.defaultPrevented ||
+          !link ||
+          link.target ||
+          link.hasAttribute('download') ||
+          link.classList.contains('js-video-open') ||
+          link.hasAttribute('data-video-url')
+        ) return;
         const href = link.getAttribute('href');
         if (!href || href.charAt(0) === '#' || /^(mailto:|tel:|https?:\/\/)/i.test(href)) return;
         setFrameTransition(true);
-      }, true);
+      });
       frameWindow.addEventListener('pagehide', () => setFrameTransition(true), { once: true });
     };
 
@@ -946,7 +953,6 @@
     const transitionWash = document.getElementById('transitionWash');
     const fallback = document.getElementById('fallback');
     let hasStarted = false;
-    let queuedStart = false;
     let openingOneComplete = false;
     const transitionLeadTime = 0.5;
     startLayer.classList.add('is-loading');
@@ -962,6 +968,9 @@
     const goToPortfolio = () => {
       if (hasStarted) return;
       hasStarted = true;
+      openingOne.pause();
+      openingOne.removeAttribute('src');
+      openingOne.load();
       loadPortfolio();
       startLayer.classList.add('is-hidden');
       brand.classList.add('is-hidden');
@@ -991,17 +1000,12 @@
     openingOne.addEventListener('loadeddata', () => {
       openingOne.classList.add('is-loaded');
       startLayer.classList.remove('is-loading');
-      // Start the portfolio only after the opening video has its first frame ready,
-      // so the two resources do not compete during the most sensitive startup phase.
-      loadPortfolio();
     }, { once: true });
 
     const startExperience = async () => {
       if (hasStarted) return;
       if (!openingOneComplete) {
-        queuedStart = true;
-        startLayer.classList.add('is-waiting');
-        return;
+        openingOneComplete = true;
       }
       goToPortfolio();
     };
@@ -1010,10 +1014,6 @@
       if (openingOneComplete) return;
       openingOneComplete = true;
       startLayer.classList.add('is-waiting');
-      if (queuedStart) {
-        startExperience();
-        return;
-      }
       goToPortfolio();
     };
 
