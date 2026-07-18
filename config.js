@@ -236,7 +236,7 @@ const CONFIG = {
       category: 'tool',
       group: 'tool',
       hasVideo: false,
-      image: 'assets/uploads/UE关卡工具.webp',
+      image: 'assets/uploads/previews/tower-of-fantasy.webp',
       title: { en: 'Tower Of Fantasy', zh: '幻塔' },
       desc:  {
         en: 'A Unreal Engine level tool showcase for improving scene-building workflow and iteration efficiency.',
