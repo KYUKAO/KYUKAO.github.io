@@ -248,21 +248,6 @@ const CONFIG = {
         { type: 'image', label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/UE关卡工具.webp' },
       ],
     },
-    {
-      category: 'tool',
-      group: 'tool',
-      hasVideo: false,
-      image: 'assets/uploads/ArtToolFlow.webp',
-      title: { en: 'VibeCoding Tool: AI Art Tool Canvas', zh: 'VibeCoding工具：AI美术工具画布' },
-      desc:  {
-        en: 'An AI art tool canvas for VibeCoding workflows, showing tool structure and creative production flow.',
-        zh: '面向 VibeCoding 工作流的 AI 美术工具画布，展示工具结构与创作流程。',
-      },
-      tags: ['AI Art', 'Tool', 'VibeCoding'],
-      links: [
-        { type: 'image', label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/ArtToolFlow.webp' },
-      ],
-    },
   ],
 
 
