@@ -560,7 +560,41 @@
     .portfolio-theater .work-card.is-filter-hidden {
       display: none !important;
     }
-  </style>
+
+    /* Editorial portfolio hierarchy: one lead case, two supporting cases. */
+    body.portfolio-theater .portfolio-shell { width: min(1440px, calc(100vw - 64px)) !important; }
+    body.portfolio-theater .intro { min-height: 32vh !important; padding-bottom: 34px !important; }
+    body.portfolio-theater .intro__inner { width: min(880px, 100%) !important; }
+    body.portfolio-theater .intro__copy { width: min(760px, 100%) !important; font-size: clamp(.9rem, 1.18vw, 1.02rem) !important; line-height: 1.72 !important; }
+    body.portfolio-theater .works-heading { margin-bottom: 22px !important; }
+    body.portfolio-theater .filter-bar { justify-content: flex-start !important; margin: 0 0 28px !important; padding: 0 !important; }
+    body.portfolio-theater .portfolio-frame { grid-template-columns: repeat(12, minmax(0, 1fr)) !important; gap: 22px !important; align-items: stretch !important; }
+    body.portfolio-theater .work-card { display: grid !important; grid-template-rows: auto minmax(124px, auto) !important; clip-path: polygon(0 5%, 3.5% 0, 96.5% 0, 100% 5%, 100% 95%, 96.5% 100%, 3.5% 100%, 0 95%) !important; }
+    body.portfolio-theater .work-card.is-portfolio-feature { grid-column: span 8 !important; grid-row: span 2 !important; }
+    body.portfolio-theater .work-card.is-portfolio-secondary { grid-column: span 4 !important; }
+    body.portfolio-theater .work-card.is-portfolio-standard { grid-column: span 4 !important; margin-top: 10px !important; }
+    body.portfolio-theater .work-card.is-filter-hidden { display: none !important; }
+    body.portfolio-theater .work-card.is-portfolio-feature .work-thumb { aspect-ratio: 16 / 8.7 !important; }
+    body.portfolio-theater .work-card.is-portfolio-secondary .work-thumb { aspect-ratio: 16 / 7.35 !important; }
+    body.portfolio-theater .work-card.is-portfolio-standard .work-thumb { aspect-ratio: 16 / 9 !important; }
+    body.portfolio-theater .work-info { display: block !important; height: auto !important; min-height: 124px !important; padding: 17px 20px 18px !important; text-align: left !important; }
+    body.portfolio-theater .work-title { margin: 0 !important; font-size: clamp(1.2rem, 1.65vw, 1.75rem) !important; line-height: 1.08 !important; letter-spacing: .06em !important; }
+    body.portfolio-theater .work-desc { display: block !important; margin: 9px 0 0 !important; color: rgba(245, 213, 157, .64) !important; font-size: .76rem !important; line-height: 1.58 !important; }
+    body.portfolio-theater .work-tags { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; margin-bottom: 10px !important; }
+    body.portfolio-theater .work-tag { padding: 4px 7px !important; border: 1px solid rgba(226, 176, 94, .26) !important; color: rgba(245, 213, 157, .68) !important; font-size: .57rem !important; letter-spacing: .07em !important; text-transform: uppercase !important; }
+    @media (max-width: 980px) {
+      body.portfolio-theater .portfolio-frame { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+      body.portfolio-theater .work-card.is-portfolio-feature { grid-column: 1 / -1 !important; }
+      body.portfolio-theater .work-card.is-portfolio-secondary, body.portfolio-theater .work-card.is-portfolio-standard { grid-column: span 1 !important; }
+    }
+    @media (max-width: 620px) {
+      body.portfolio-theater .portfolio-shell { width: min(100% - 32px, 560px) !important; }
+      body.portfolio-theater .intro { min-height: 36vh !important; }
+      body.portfolio-theater .filter-bar { justify-content: center !important; }
+      body.portfolio-theater .portfolio-frame { grid-template-columns: 1fr !important; }
+      body.portfolio-theater .work-card.is-portfolio-feature, body.portfolio-theater .work-card.is-portfolio-secondary, body.portfolio-theater .work-card.is-portfolio-standard { grid-column: 1 !important; margin-top: 0 !important; }
+      body.portfolio-theater .work-card .work-thumb { aspect-ratio: 16 / 9 !important; }
+    }  </style>
 </head>
 <body class="portfolio-theater scene-page">
   <div class="portfolio-bg-grade" aria-hidden="true"></div>
@@ -639,8 +673,9 @@
       var cards = Array.from(document.querySelectorAll('#workGridProject .work-card, #workGridTool .work-card, #workGridArt .work-card'));
       cards.forEach(function (card, index) {
         card.style.transitionDelay = Math.min(index, 3) * 90 + 'ms';
-        card.classList.toggle('is-portfolio-picked', index < 4);
-        card.classList.toggle('is-portfolio-extra', index >= 4);
+        card.classList.toggle('is-portfolio-feature', index === 0);
+        card.classList.toggle('is-portfolio-secondary', index === 1 || index === 2);
+        card.classList.toggle('is-portfolio-standard', index >= 3);
         var video = card.querySelector('.work-thumb-video');
         if (video && !video.dataset.hoverBound) {
           video.pause();
