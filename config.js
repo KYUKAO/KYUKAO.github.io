@@ -158,7 +158,7 @@ const CONFIG = {
       category: 'shader',
       group: 'project',
       hasVideo: true,
-      image: '',
+      image: 'assets/uploads/previews/pbr-shaders.webp',
       title: { en: 'PBR Shaders', zh: 'PBR Shaders' },
       desc:  {
         en: 'A scene-based shader showreel focused on real-time material and rendering presentation.',
@@ -174,7 +174,7 @@ const CONFIG = {
       category: 'shader',
       group: 'art',
       hasVideo: true,
-      image: '',
+      image: 'assets/uploads/previews/lycirus-shader.webp',
       title: { en: 'Lycirus Shader Iteration', zh: 'Lycirus Shader 迭代' },
       desc:  {
         en: 'An iterative shader study for Lycirus, exploring stylized surface response and presentation polish.',
@@ -190,14 +190,13 @@ const CONFIG = {
       category: 'shader',
       group: 'art',
       hasVideo: true,
-      image: '',
+      image: 'assets/uploads/previews/eye-shader.webp',
       title: { en: 'Eye Shader Study', zh: '眼球着色器研究' },
       desc:  {
         en: 'A real-time eye material study focused on iris depth, corneal highlight, and character readability.',
         zh: '实时眼球材质研究，聚焦虹膜层次、角膜高光与角色表现力。',
       },
       tags: ['Shader', 'Character'],
-      pdf: 'assets/uploads/Project3_Compressed.pdf',
       links: [
         { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/Eye.mp4' },
       ],
@@ -206,14 +205,13 @@ const CONFIG = {
       category: 'render',
       group: 'art',
       hasVideo: true,
-      image: '',
+      image: 'assets/uploads/previews/shadow-man.webp',
       title: { en: 'Shadow Man', zh: 'Shadow Man' },
       desc:  {
         en: 'A remastered presentation of ShadowMan, refining atmosphere, rendering, and scene mood.',
         zh: 'ShadowMan 的重制展示，重点优化氛围、渲染表现与场景情绪。',
       },
       tags: ['Render', 'Remaster'],
-      pdf: 'assets/uploads/Project4_Compressed.pdf',
       links: [
         { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/ShadowMan_Remaster.mp4' },
       ],
@@ -222,14 +220,14 @@ const CONFIG = {
       category: 'pcg',
       group: 'project',
       hasVideo: true,
-      image: '',
+      image: 'assets/uploads/previews/pcg-showcase.webp',
       title: { en: 'PCG Showcase', zh: 'PCG 程序化生成展示' },
       desc:  {
         en: 'A procedural content generation showcase focused on repeatable scene-building and real-time presentation.',
         zh: '程序化内容生成展示，聚焦可复用的场景构建流程与实时呈现效果。',
       },
       tags: ['PCG', 'Procedural', 'Tool'],
-      pdf: 'assets/uploads/PCG.pdf',
+      pdf: 'assets/uploads/Project3_Compressed.pdf',
       links: [
         { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/PCG.mp4' },
       ],
@@ -239,12 +237,13 @@ const CONFIG = {
       group: 'tool',
       hasVideo: false,
       image: 'assets/uploads/UE关卡工具.webp',
-      title: { en: 'UE Level Tool', zh: 'UE 关卡工具' },
+      title: { en: 'Tower Of Fantasy', zh: '幻塔' },
       desc:  {
         en: 'A Unreal Engine level tool showcase for improving scene-building workflow and iteration efficiency.',
         zh: 'Unreal Engine 关卡工具展示，用于提升场景搭建流程与迭代效率。',
       },
       tags: ['Tool', 'Unreal Engine'],
+      pdf: 'assets/uploads/Project4_Compressed.pdf',
       links: [
         { type: 'image', label: { en: 'View Image →', zh: '查看图片 →' }, href: 'assets/uploads/UE关卡工具.webp' },
       ],
