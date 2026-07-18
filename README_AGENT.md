@@ -33,8 +33,8 @@ js/typography.js              # 注入全站排版 CSS
 js/depth-of-field-bg.js       # home.html 背景 Canvas
 assets/entry/                 # 入口页与场景背景资源
 assets/uploads/               # 作品媒体资源
-tools/editor.html             # 编辑器界面
-tools/editor.js               # 编辑器逻辑
+local-editor/index.html       # 编辑器界面
+local-editor/editor.js        # 编辑器逻辑
 ```
 
 ---
@@ -163,6 +163,6 @@ assets/entry/universal-bg-4k.webp
 ## 注意事项
 
 - 没有测试框架，改动后需要用浏览器手动验证关键页面。
-- `tools/editor.js` 会解析 `config.js` 字符串，调整 `config.js` 顶层格式时要谨慎。
+- `local-editor/editor.js` 会解析 `config.js` 字符串，调整 `config.js` 顶层格式时要谨慎。
 - `showSaveFilePicker` 只在部分现代浏览器可用，其他浏览器会降级为下载文件。
 - 不要把临时日志提交进仓库；`.gitignore` 已忽略 `*.log`。

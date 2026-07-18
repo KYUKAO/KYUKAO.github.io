@@ -23,7 +23,7 @@ python -m http.server 8000
 | 简历 | `resume.html` | 动态渲染教育、工作和项目经历 |
 | 联系 | `contact.html` | 动态渲染个人信息和联系方式 |
 | 联系 | `contact.html` | 从 `config.js` 读取联系方式 |
-| 编辑器 | `tools/editor.html` | 可视化维护内容和排版 |
+| 编辑器 | `local-editor/index.html` | 可视化维护内容和排版 |
 
 ---
 
@@ -33,7 +33,7 @@ python -m http.server 8000
 
 ### 编辑流程
 
-1. 用本地服务器打开 `tools/editor.html`。
+1. 双击 `local-editor/start-editor.bat`，或用本地服务器打开 `local-editor/index.html`。
 2. 修改内容或排版。
 3. 点击顶部的「导出 config.js」或「导出 typography.js」。
 4. 使用“直接保存”（Chrome/Edge）或下载后替换项目中的对应文件。
@@ -94,9 +94,10 @@ KYUKAO.github.io/
 │   ├── i18n.js                     # 语言切换与动态渲染
 │   ├── typography.js               # 排版配置与注入
 │   └── depth-of-field-bg.js        # home.html 背景 Canvas
-├── tools/
-│   ├── editor.html                 # 可视化编辑器
-│   └── editor.js                   # 编辑器逻辑
+├── local-editor/
+│   ├── index.html                  # 可视化编辑器入口
+│   ├── editor.js                   # 编辑器逻辑
+│   └── start-editor.bat            # Windows 一键启动
 ├── assets/
 │   ├── entry/                      # 入口页视频、门框、预览图、场景背景
 │   └── uploads/                    # 作品图片、视频和 PDF
@@ -121,7 +122,7 @@ KYUKAO.github.io/
 ## 常见问题
 
 **编辑器打开后内容为空？**
-请通过本地服务器访问 `tools/editor.html`，不要直接双击 HTML 文件。
+请双击 `local-editor/start-editor.bat`，或通过本地服务器访问 `local-editor/index.html`。
 
 **导出后页面没有变化？**
 确认替换的是项目根目录下的 `config.js` 或 `js/typography.js`，并强制刷新浏览器缓存。
