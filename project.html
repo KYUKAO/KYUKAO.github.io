@@ -5,129 +5,94 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="KYUKAO project case study" />
   <title>Project | Hanqing Li - KYUKAO</title>
-  <link rel="stylesheet" href="assets/entry/scene-pages.css?v=20260711e" />
+  <link rel="stylesheet" href="assets/entry/scene-pages.css?v=20260718" />
   <link rel="preload" as="image" href="assets/entry/universal-bg-4k.webp" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
-
     :root {
       --gold: #d7a85f;
-      --gold-soft: rgba(226, 176, 94, 0.55);
-      --gold-dim: rgba(226, 176, 94, 0.2);
+      --gold-soft: rgba(226,176,94,.55);
+      --gold-dim: rgba(226,176,94,.2);
       --paper: #f5d59d;
-      --muted: rgba(245, 213, 157, 0.68);
-      --panel: rgba(21, 11, 8, 0.76);
+      --muted: rgba(245,213,157,.68);
+      --panel: rgba(21,11,8,.78);
       --font: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
       --display: "Cormorant Garamond", Georgia, serif;
     }
-
     *, *::before, *::after { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body {
-      min-height: 100vh;
-      margin: 0;
-      color: var(--paper);
-      font-family: var(--font);
-      background: #090504;
-    }
+    body { min-height: 100vh; margin: 0; color: var(--paper); font-family: var(--font); background: #090504; }
     a { color: inherit; text-decoration: none; }
     button { font: inherit; }
-
-    .page-grade {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      background:
-        radial-gradient(circle at 50% 18%, rgba(226, 176, 94, 0.1), transparent 28%),
-        linear-gradient(180deg, rgba(7, 3, 2, 0.12), rgba(7, 3, 2, 0.58));
-    }
-
-    .top-nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 22px 32px;
-      background: linear-gradient(180deg, rgba(7, 3, 2, 0.9), transparent);
-      pointer-events: none;
-    }
+    .page-grade { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(circle at 50% 12%,rgba(226,176,94,.1),transparent 28%),linear-gradient(180deg,rgba(7,3,2,.12),rgba(7,3,2,.62)); }
+    .read-progress { position: fixed; inset: 0 auto auto 0; z-index: 50; width: 0; height: 2px; background: var(--gold); box-shadow: 0 0 14px rgba(226,176,94,.65); }
+    .top-nav { position: fixed; inset: 0 0 auto; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; background: linear-gradient(180deg,rgba(7,3,2,.94),rgba(7,3,2,.48),transparent); pointer-events: none; }
     .top-nav a, .top-nav button { pointer-events: auto; }
-    .nav-logo {
-      font-family: var(--display);
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-shadow: 0 0 18px rgba(226, 176, 94, 0.32);
-    }
-    .nav-actions { display: flex; align-items: center; gap: 12px; }
-    .nav-back, .lang-button, .document-button {
-      border: 1px solid var(--gold-soft);
-      color: var(--paper);
-      background: rgba(21, 11, 8, 0.68);
-      transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
-    }
-    .nav-back, .lang-button { padding: 9px 13px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+    .nav-logo { font-family: var(--display); font-size: 1.25rem; font-weight: 700; letter-spacing: .08em; text-shadow: 0 0 18px rgba(226,176,94,.32); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-back, .lang-button, .document-button { border: 1px solid var(--gold-soft); color: var(--paper); background: rgba(21,11,8,.72); transition: background 180ms ease,border-color 180ms ease; }
+    .nav-back, .lang-button { padding: 9px 13px; font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
     .lang-button { cursor: pointer; }
-    .nav-back:hover, .lang-button:hover, .document-button:hover { background: rgba(72, 35, 15, 0.74); border-color: var(--gold); }
-
-    .project-shell { width: min(1180px, calc(100vw - 40px)); margin: 0 auto; padding: 118px 0 80px; }
-    .project-header { width: min(860px, 100%); margin: 0 auto 34px; text-align: center; }
-    .project-kicker { margin: 0 0 12px; color: var(--gold); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; }
-    .project-title { margin: 0; font-family: var(--display); font-size: clamp(2.7rem, 7vw, 6rem); font-weight: 600; line-height: 0.95; text-shadow: 0 0 28px rgba(226, 176, 94, 0.22); }
-    .project-desc { width: min(680px, 100%); margin: 22px auto 0; color: var(--muted); font-size: clamp(0.9rem, 1.4vw, 1.05rem); line-height: 1.8; }
-    .tag-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
-    .tag { padding: 6px 10px; border: 1px solid var(--gold-dim); color: var(--muted); background: rgba(21, 11, 8, 0.48); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; }
-
-    .video-frame {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--gold-soft);
-      background: #000;
-      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.62), inset 0 0 0 1px rgba(255, 233, 178, 0.08);
-      clip-path: polygon(0 3%, 2% 0, 98% 0, 100% 3%, 100% 97%, 98% 100%, 2% 100%, 0 97%);
-    }
-    .video-frame video { display: block; width: 100%; max-height: 78vh; aspect-ratio: 16 / 9; object-fit: contain; background: #000; }
-
-    .content-section { margin-top: 70px; }
-    .section-heading { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 18px; margin-bottom: 24px; color: var(--gold); }
-    .section-heading::before, .section-heading::after { content: ""; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-soft)); }
-    .section-heading::after { background: linear-gradient(90deg, var(--gold-soft), transparent); }
-    .section-heading h2 { margin: 0; font-family: var(--display); font-size: clamp(1.8rem, 3vw, 2.6rem); letter-spacing: 0.1em; text-align: center; }
-
-    .document-panel { padding: 18px; border: 1px solid var(--gold-soft); background: var(--panel); box-shadow: 0 24px 50px rgba(0, 0, 0, 0.42); }
-    .document-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 2px 2px 16px; }
-    .document-note { margin: 0; color: var(--muted); font-size: 0.78rem; line-height: 1.5; }
-    .document-button { flex: 0 0 auto; padding: 10px 14px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-    .pdf-viewer { width: 100%; height: min(82vh, 920px); min-height: 620px; border: 0; background: #efece5; }
-    .pdf-fallback { display: grid; min-height: 320px; place-items: center; padding: 36px; color: #33261d; text-align: center; background: #efece5; }
-    .pdf-fallback a { color: #71470f; text-decoration: underline; }
-    .empty-document { padding: 52px 22px; color: var(--muted); text-align: center; }
-    .project-error { display: none; width: min(680px, 100%); margin: 18vh auto 0; padding: 42px; border: 1px solid var(--gold-soft); background: var(--panel); text-align: center; }
-    .project-error h1 { font-family: var(--display); font-size: 2.5rem; }
-    .project-error a { color: var(--gold); text-decoration: underline; }
-
-    @media (max-width: 680px) {
-      .top-nav { padding: 16px 18px; }
+    .nav-back:hover, .lang-button:hover, .document-button:hover { border-color: var(--gold); background: rgba(72,35,15,.78); }
+    .project-shell { width: min(1440px,calc(100vw - 48px)); margin: 0 auto; padding: 88px 0 80px; }
+    .video-wrap { margin: 0 auto; }
+    .video-label { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 10px; color: var(--muted); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; }
+    .video-label span:first-child { color: var(--gold); }
+    .video-frame { position: relative; overflow: hidden; border: 1px solid var(--gold-soft); background: #000; box-shadow: 0 28px 60px rgba(0,0,0,.62),inset 0 0 0 1px rgba(255,233,178,.08); clip-path: polygon(0 2.6%,1.8% 0,98.2% 0,100% 2.6%,100% 97.4%,98.2% 100%,1.8% 100%,0 97.4%); }
+    .video-frame video { display: block; width: 100%; max-height: calc(100vh - 110px); aspect-ratio: 16/9; object-fit: contain; background: #000; }
+    .project-header { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(320px,.9fr); gap: 64px; align-items: end; margin: 54px 0 66px; padding-bottom: 34px; border-bottom: 1px solid var(--gold-dim); }
+    .project-kicker { margin: 0 0 10px; color: var(--gold); font-size: .68rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+    .project-title { margin: 0; font-family: var(--display); font-size: clamp(3rem,6.5vw,6.5rem); font-weight: 600; line-height: .88; text-shadow: 0 0 28px rgba(226,176,94,.22); }
+    .project-desc { margin: 0; color: var(--muted); font-size: clamp(.9rem,1.25vw,1.04rem); line-height: 1.75; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .tag { padding: 6px 10px; border: 1px solid var(--gold-dim); color: var(--muted); background: rgba(21,11,8,.48); font-size: .64rem; letter-spacing: .08em; text-transform: uppercase; }
+    .content-section { margin-top: 68px; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 20px; padding-top: 22px; border-top: 1px solid var(--gold-dim); }
+    .section-head h2 { margin: 0; color: var(--paper); font-family: var(--display); font-size: clamp(2rem,3vw,3rem); font-weight: 600; }
+    .section-head p { max-width: 520px; margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.6; text-align: right; }
+    .document-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 12px; }
+    .document-note { margin: 0; color: var(--muted); font-size: .72rem; }
+    .document-button { flex: 0 0 auto; padding: 9px 13px; font-size: .66rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .pdf-pages { display: grid; gap: 20px; }
+    .pdf-page { margin: 0; scroll-margin-top: 80px; }
+    .pdf-page-frame { overflow: hidden; border: 1px solid var(--gold-dim); background: #050302; box-shadow: 0 24px 54px rgba(0,0,0,.48); }
+    .pdf-page img { display: block; width: 100%; height: auto; aspect-ratio: 1590.95/566.22; object-fit: contain; cursor: zoom-in; }
+    .pdf-page figcaption { display: flex; justify-content: space-between; gap: 20px; padding: 8px 3px 0; color: rgba(245,213,157,.42); font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; }
+    .pdf-page figcaption span:first-child { color: var(--gold); }
+    .project-switcher { display: grid; grid-template-columns: 1fr 1fr; margin-top: 68px; border-block: 1px solid var(--gold-dim); }
+    .switch-link { padding: 22px 0; }
+    .switch-link:last-child { text-align: right; }
+    .switch-link span { display: block; margin-bottom: 6px; color: var(--muted); font-size: .58rem; letter-spacing: .12em; text-transform: uppercase; }
+    .switch-link strong { font-family: var(--display); font-size: 1.35rem; font-weight: 600; }
+    .lightbox { position: fixed; inset: 0; z-index: 80; display: none; padding: 60px 22px 24px; overflow: auto; background: rgba(0,0,0,.95); }
+    .lightbox.open { display: block; }
+    .lightbox img { display: block; width: min(1900px,100%); height: auto; margin: auto; }
+    .lightbox-close { position: fixed; top: 14px; right: 18px; padding: 8px 11px; border: 1px solid var(--gold-soft); color: var(--paper); background: #130b08; cursor: pointer; }
+    .project-error { display: none; width: min(680px,100%); margin: 18vh auto 0; padding: 42px; border: 1px solid var(--gold-soft); background: var(--panel); text-align: center; }
+    @media (max-width:760px) {
+      .top-nav { padding: 15px 17px; }
       .nav-logo { display: none; }
       .nav-actions { width: 100%; justify-content: space-between; }
-      .project-shell { width: min(94vw, 560px); padding-top: 96px; }
-      .project-header { margin-bottom: 24px; }
-      .content-section { margin-top: 48px; }
-      .document-panel { padding: 10px; }
-      .document-toolbar { align-items: flex-start; flex-direction: column; padding: 4px 4px 12px; }
+      .project-shell { width: min(100% - 32px,600px); padding-top: 76px; }
+      .video-frame { margin-inline: -16px; clip-path: none; border-inline: 0; }
+      .project-header { grid-template-columns: 1fr; gap: 22px; margin: 38px 0 48px; }
+      .project-title { font-size: clamp(2.8rem,15vw,4.8rem); }
+      .section-head { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .section-head p { text-align: left; }
+      .document-toolbar { align-items: flex-start; flex-direction: column; }
       .document-button { width: 100%; text-align: center; }
-      .pdf-viewer { min-height: 72vh; }
+      .pdf-pages { gap: 16px; margin-inline: -16px; }
+      .pdf-page-frame { overflow-x: auto; border-inline: 0; }
+      .pdf-page img { width: 960px; max-width: none; }
+      .pdf-page figcaption { padding-inline: 16px; }
+      .project-switcher { grid-template-columns: 1fr; }
+      .switch-link:last-child { border-top: 1px solid var(--gold-dim); text-align: left; }
     }
   </style>
 </head>
 <body class="scene-page">
   <div class="page-grade" aria-hidden="true"></div>
-
+  <div class="read-progress" id="readProgress" aria-hidden="true"></div>
   <nav class="top-nav" aria-label="Project navigation">
     <a class="nav-logo" href="portfolio.html">KYUKAO</a>
     <div class="nav-actions">
@@ -135,125 +100,58 @@
       <button class="lang-button" id="langButton" type="button" aria-label="Switch language">EN</button>
     </div>
   </nav>
-
   <main class="project-shell" id="projectContent" hidden>
+    <section class="video-wrap" id="videoSection" aria-label="Project video">
+      <div class="video-label"><span id="videoLabel">Project Film</span><span>Hanqing Li · KYUKAO</span></div>
+      <div class="video-frame"><video id="projectVideo" controls autoplay muted playsinline preload="metadata"></video></div>
+    </section>
     <header class="project-header">
-      <p class="project-kicker" id="projectKicker">Project Case Study</p>
-      <h1 class="project-title" id="projectTitle"></h1>
-      <p class="project-desc" id="projectDesc"></p>
-      <div class="tag-list" id="tagList" aria-label="Project tags"></div>
+      <div><p class="project-kicker" id="projectKicker">Project Case Study</p><h1 class="project-title" id="projectTitle"></h1></div>
+      <div><p class="project-desc" id="projectDesc"></p><div class="tag-list" id="tagList"></div></div>
     </header>
-
-    <section class="video-frame" id="videoSection" aria-label="Project video">
-      <video id="projectVideo" controls autoplay muted playsinline preload="metadata"></video>
-    </section>
-
     <section class="content-section" id="documentSection">
-      <div class="section-heading"><h2 id="documentTitle">Project Document</h2></div>
-      <div class="document-panel">
-        <div class="document-toolbar">
-          <p class="document-note" id="documentNote">完整项目资料可在下方浏览。</p>
-          <a class="document-button" id="openPdf" href="#" target="_blank" rel="noopener">单独打开 PDF ↗</a>
-        </div>
-        <object class="pdf-viewer" id="pdfViewer" type="application/pdf">
-          <div class="pdf-fallback"><p id="pdfFallback">当前浏览器无法嵌入 PDF。<br /><a id="pdfFallbackLink" href="#" target="_blank" rel="noopener">点击这里打开文档</a></p></div>
-        </object>
-      </div>
+      <div class="section-head"><h2 id="documentTitle">Project Presentation</h2><p id="documentIntro">完整项目演示按原始版式连续呈现，点击任意页面可放大查看。</p></div>
+      <div class="document-toolbar"><p class="document-note" id="documentNote">桌面端按原比例展示；手机端可左右滑动每一页。</p><a class="document-button" id="openPdf" href="#" target="_blank" rel="noopener">打开原始 PDF ↗</a></div>
+      <div class="pdf-pages" id="pdfPages"></div>
     </section>
+    <nav class="project-switcher" id="projectSwitcher" aria-label="More projects"></nav>
   </main>
-
-  <section class="project-error" id="projectError">
-    <h1>Project not found</h1>
-    <p><a href="portfolio.html">Return to portfolio</a></p>
-  </section>
-
+  <section class="project-error" id="projectError"><h1>Project not found</h1><p><a href="portfolio.html">Return to portfolio</a></p></section>
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true"><button class="lightbox-close" id="lightboxClose" type="button">关闭 ×</button><img id="lightboxImage" alt="" /></div>
   <script src="config.js?v=20260718a"></script>
   <script src="assets/entry/scene-background.js?v=20260711"></script>
   <script>
-    (function () {
+    (function(){
       'use strict';
-
-      var params = new URLSearchParams(window.location.search);
-      var projectId = Number(params.get('id'));
-      var savedLang = '';
-      try { savedLang = localStorage.getItem('lang') || ''; } catch (e) {}
-      var lang = params.get('lang') === 'en' || params.get('lang') === 'zh' ? params.get('lang') : (savedLang === 'en' ? 'en' : 'zh');
-
-      function t(field) {
-        if (!field) return '';
-        if (typeof field === 'string') return field;
-        return field[lang] || field.en || '';
+      var pageSets={
+        'assets/uploads/Project1_Compressed.pdf':['pbr',7],
+        'assets/uploads/Project2_Compressed.pdf':['lycoris',6],
+        'assets/uploads/Project3_Compressed.pdf':['pcg',5],
+        'assets/uploads/Project4_Compressed.pdf':['tof',5]
+      };
+      var params=new URLSearchParams(location.search), projectId=Number(params.get('id')), saved='';
+      try{saved=localStorage.getItem('lang')||'';}catch(e){}
+      var lang=params.get('lang')==='en'||params.get('lang')==='zh'?params.get('lang'):(saved==='en'?'en':'zh');
+      var works=typeof CONFIG!=='undefined'&&Array.isArray(CONFIG.works)?CONFIG.works:[], work=Number.isInteger(projectId)?works[projectId]:null;
+      function t(v){return typeof v==='string'?v:(v?(v[lang]||v.en||''):'');}
+      function esc(v){return String(v||'').replace(/[&<>\"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c];});}
+      function findVideo(item){var links=item.links||[];for(var i=0;i<links.length;i++){if(/\.(mp4|webm|mov|m4v|ogv)(\?.*)?$/i.test(links[i].href||''))return links[i].href;}return'';}
+      function switchLink(index,label){return'<a class="switch-link" href="project.html?id='+index+'&lang='+lang+'"><span>'+label+'</span><strong>'+esc(t(works[index].title))+'</strong></a>';}
+      function setCopy(){var zh=lang==='zh';document.documentElement.lang=zh?'zh-CN':'en';document.getElementById('backLabel').textContent=zh?'作品集':'Portfolio';document.getElementById('projectKicker').textContent=zh?'作品详情':'Project Case Study';document.getElementById('videoLabel').textContent=zh?'项目视频':'Project Film';document.getElementById('documentTitle').textContent=zh?'项目演示':'Project Presentation';document.getElementById('documentIntro').textContent=zh?'完整项目演示按原始版式连续呈现，点击任意页面可放大查看。':'The complete presentation is shown in its original layout. Select any page to view it at full size.';document.getElementById('documentNote').textContent=zh?'桌面端按原比例展示；手机端可左右滑动每一页。':'Shown at the original ratio on desktop; swipe horizontally on mobile.';document.getElementById('openPdf').textContent=zh?'打开原始 PDF ↗':'Open original PDF ↗';document.getElementById('langButton').textContent=zh?'EN':'中文';document.getElementById('lightboxClose').textContent=zh?'关闭 ×':'Close ×';document.getElementById('backLink').href='portfolio.html?lang='+lang;}
+      function render(){
+        if(!work){document.getElementById('projectError').style.display='block';return;}
+        setCopy();var title=t(work.title),video=findVideo(work),set=pageSets[work.pdf],zh=lang==='zh';
+        document.title=title+' | Hanqing Li - KYUKAO';document.getElementById('projectTitle').textContent=title;document.getElementById('projectDesc').textContent=t(work.desc);
+        document.getElementById('tagList').innerHTML=(work.tags||[]).map(function(tag){return'<span class="tag">'+esc(tag)+'</span>';}).join('');
+        if(video){document.getElementById('projectVideo').src=video;}else{document.getElementById('videoSection').hidden=true;}
+        if(set){document.getElementById('openPdf').href=work.pdf;document.getElementById('pdfPages').innerHTML=Array.from({length:set[1]},function(_,i){var p=i+1,src='assets/uploads/pdf-pages/'+set[0]+'/page-'+p+'.webp';return'<figure class="pdf-page"><div class="pdf-page-frame"><img src="'+src+'" alt="'+esc(title)+' - '+(zh?'第 '+p+' 页':'Page '+p)+'" '+(p===1?'fetchpriority="high"':'loading="lazy"')+' /></div><figcaption><span>Page '+String(p).padStart(2,'0')+'</span><span>Original presentation layout</span></figcaption></figure>';}).join('');}else{document.getElementById('documentSection').hidden=true;}
+        document.getElementById('projectSwitcher').innerHTML=switchLink((projectId-1+works.length)%works.length,zh?'上一个项目':'Previous project')+switchLink((projectId+1)%works.length,zh?'下一个项目':'Next project');document.getElementById('projectContent').hidden=false;
       }
-
-      function findVideo(work) {
-        var links = Array.isArray(work.links) ? work.links : [];
-        for (var i = 0; i < links.length; i++) {
-          if (links[i] && /\.(mp4|webm|mov|m4v|ogv)(\?.*)?$/i.test(links[i].href || '')) return links[i].href;
-        }
-        return '';
-      }
-
-      function setCopy() {
-        var isZh = lang === 'zh';
-        document.documentElement.lang = isZh ? 'zh-CN' : 'en';
-        document.getElementById('backLabel').textContent = isZh ? '作品集' : 'Portfolio';
-        document.getElementById('projectKicker').textContent = isZh ? '作品详情' : 'Project Case Study';
-        document.getElementById('documentTitle').textContent = isZh ? '项目文档' : 'Project Document';
-        document.getElementById('documentNote').textContent = isZh ? '完整项目资料可在下方浏览。' : 'Browse the complete project document below.';
-        document.getElementById('openPdf').textContent = isZh ? '单独打开 PDF ↗' : 'Open PDF ↗';
-        document.getElementById('pdfFallback').childNodes[0].nodeValue = isZh ? '当前浏览器无法嵌入 PDF。' : 'This browser cannot display the embedded PDF.';
-        document.getElementById('pdfFallbackLink').textContent = isZh ? '点击这里打开文档' : 'Open the document here';
-        document.getElementById('langButton').textContent = isZh ? 'EN' : '中文';
-        document.getElementById('backLink').href = 'portfolio.html?lang=' + lang;
-      }
-
-      function render() {
-        var works = typeof CONFIG !== 'undefined' && Array.isArray(CONFIG.works) ? CONFIG.works : [];
-        var work = Number.isInteger(projectId) ? works[projectId] : null;
-        var video = work ? findVideo(work) : '';
-        if (!work || (!video && !work.pdf)) {
-          document.getElementById('projectError').style.display = 'block';
-          return;
-        }
-
-        setCopy();
-        var title = t(work.title);
-        document.title = title + ' | Hanqing Li - KYUKAO';
-        document.getElementById('projectTitle').textContent = title;
-        document.getElementById('projectDesc').textContent = t(work.desc);
-        if (video) {
-          document.getElementById('projectVideo').src = video;
-        } else {
-          document.getElementById('videoSection').hidden = true;
-        }
-        document.getElementById('tagList').innerHTML = (work.tags || []).map(function (tag) {
-          var span = document.createElement('span');
-          span.className = 'tag';
-          span.textContent = tag;
-          return span.outerHTML;
-        }).join('');
-
-        if (work.pdf) {
-          document.getElementById('pdfViewer').data = work.pdf + '#view=FitH';
-          document.getElementById('openPdf').href = work.pdf;
-          document.getElementById('pdfFallbackLink').href = work.pdf;
-        } else {
-          document.getElementById('documentSection').hidden = true;
-        }
-
-        document.getElementById('projectContent').hidden = false;
-      }
-
-      document.getElementById('langButton').addEventListener('click', function () {
-        lang = lang === 'zh' ? 'en' : 'zh';
-        try { localStorage.setItem('lang', lang); } catch (e) {}
-        var url = new URL(window.location.href);
-        url.searchParams.set('lang', lang);
-        window.history.replaceState(null, '', url.pathname + url.search);
-        render();
-      });
-
-      render();
+      document.getElementById('langButton').addEventListener('click',function(){lang=lang==='zh'?'en':'zh';try{localStorage.setItem('lang',lang);}catch(e){}var url=new URL(location.href);url.searchParams.set('lang',lang);history.replaceState(null,'',url.pathname+url.search);render();});
+      document.addEventListener('click',function(e){var img=e.target.closest('.pdf-page img');if(img){document.getElementById('lightboxImage').src=img.src;document.getElementById('lightboxImage').alt=img.alt;document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden';}});
+      function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+      document.getElementById('lightboxClose').addEventListener('click',closeLightbox);document.getElementById('lightbox').addEventListener('click',function(e){if(e.target===e.currentTarget)closeLightbox();});document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox();});
+      addEventListener('scroll',function(){var d=document.documentElement,a=d.scrollHeight-d.clientHeight;document.getElementById('readProgress').style.width=(a?d.scrollTop/a*100:0)+'%';},{passive:true});render();
     })();
   </script>
 </body>

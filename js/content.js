@@ -78,7 +78,9 @@
       'portfolio.title': lang === 'zh' ? '作品集' : 'Portfolio',
       'portfolio.intro.role': t(C.role, lang),
       'portfolio.intro.name': lang === 'zh' ? C.name.zh : C.name.en,
-      'portfolio.intro.copy': 'Shaders / Tools / Animation / PCG',
+      'portfolio.intro.copy': lang === 'zh'
+        ? '我是一名来自上海的技术美术师，专注于 Shader、程序化内容生成、实时渲染与美术工具开发，在视觉表现与工程实现之间搭建可靠的制作流程。'
+        : 'I am a technical artist based in Shanghai, focused on shaders, procedural content, real-time rendering, and art tools that bridge visual direction with production-ready engineering.',
       'portfolio.works': lang === 'zh' ? '作品集' : 'Works',
       'portfolio.desc':  lang === 'zh'
         ? 'Shader、特效、工具开发与渲染实验——技术与美学的交叉探索。'
