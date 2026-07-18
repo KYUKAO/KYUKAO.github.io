@@ -167,7 +167,7 @@
 
   function _buildWorksFromConfig(lang) {
     if (typeof CONFIG === 'undefined' || !Array.isArray(CONFIG.works)) return [];
-    return CONFIG.works.map(function (w) {
+    return CONFIG.works.map(function (w, index) {
       var links = Array.isArray(w.links) ? w.links : [];
       var tags = Array.isArray(w.tags) ? w.tags : [];
       var bgStyle = w.image
@@ -175,12 +175,14 @@
         : '';
       return {
         category: w.category || '',
+        id: index,
         group: w.group || (w.category === 'tool' ? 'tool' : ((w.category === 'code' || w.category === 'pcg') ? 'project' : 'art')),
         bgStyle: bgStyle,
         hasVideo: !!w.hasVideo,
         tags: tags,
         title: _t(w.title, lang),
         desc: _t(w.desc, lang),
+        pdf: w.pdf || '',
         links: links.map(function (l) {
           return {
             type: (l && l.type) || '',
@@ -377,7 +379,7 @@
       return '';
     }
 
-    works.forEach(function (w) {
+    works.forEach(function (w, index) {
       var previewVideo = getPreviewVideoUrl(w.links);
       var thumbContent = w.bgStyle
         ? '<div class="work-thumb-bg has-image" style="' + w.bgStyle + '" aria-label="' + _escAttr(w.title) + '"></div>'
@@ -386,7 +388,7 @@
         : '<div class="work-thumb-bg" style="' + w.bgStyle + '">' + _escAttr(w.title) + '</div>';
 
       var videoBadge = (w.hasVideo && previewVideo)
-        ? '<span class="video-badge">VIDEO</span><a href="' + _escAttr(previewVideo) + '" class="play-icon js-video-open" data-video-url="' + _escAttr(previewVideo) + '" aria-label="播放视频"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></a>'
+        ? '<span class="video-badge">VIDEO</span><span class="play-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>'
         : '';
 
       var tagsHtml = (Array.isArray(w.tags) ? w.tags : []).map(function (t) {
@@ -404,8 +406,13 @@
         return '<a href="' + _escAttr(href) + '" class="work-link" target="_blank" rel="noopener">' + l.label + '</a>';
       }).join('');
 
-      var card = document.createElement('div');
+      var detailId = typeof w.id === 'number' ? w.id : index;
+      var card = document.createElement(w.hasVideo && previewVideo ? 'a' : 'div');
       card.className = 'work-card reveal visible';
+      if (w.hasVideo && previewVideo) {
+        card.href = 'project.html?id=' + encodeURIComponent(detailId) + '&lang=' + encodeURIComponent(lang);
+        card.setAttribute('aria-label', w.title + (lang === 'zh' ? ' - 查看作品详情' : ' - View project details'));
+      }
       card.dataset.category = w.category;
       card.dataset.group = w.group || (w.category === 'tool' ? 'tool' : ((w.category === 'code' || w.category === 'pcg') ? 'project' : 'art'));
       card.innerHTML =

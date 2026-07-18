@@ -165,6 +165,7 @@ const CONFIG = {
         zh: '以场景展示为主的 Shader 作品集，聚焦实时材质与渲染表现。',
       },
       tags: ['Shader', 'Shading', 'Showreel'],
+      pdf: 'assets/uploads/Project1_Compressed.pdf',
       links: [
         { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/ShadingShowreel.mp4' },
       ],
@@ -180,6 +181,7 @@ const CONFIG = {
         zh: '围绕 Lycirus 的 Shader 迭代研究，探索风格化表面响应与展示效果。',
       },
       tags: ['Shader', 'Iteration'],
+      pdf: 'assets/uploads/Project2_Compressed.pdf',
       links: [
         { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/LycirusShader迭代.mp4' },
       ],
@@ -195,6 +197,7 @@ const CONFIG = {
         zh: '实时眼球材质研究，聚焦虹膜层次、角膜高光与角色表现力。',
       },
       tags: ['Shader', 'Character'],
+      pdf: 'assets/uploads/Project3_Compressed.pdf',
       links: [
         { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/Eye.mp4' },
       ],
@@ -210,6 +213,7 @@ const CONFIG = {
         zh: 'ShadowMan 的重制展示，重点优化氛围、渲染表现与场景情绪。',
       },
       tags: ['Render', 'Remaster'],
+      pdf: 'assets/uploads/Project4_Compressed.pdf',
       links: [
         { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/ShadowMan_Remaster.mp4' },
       ],
@@ -225,6 +229,7 @@ const CONFIG = {
         zh: '程序化内容生成展示，聚焦可复用的场景构建流程与实时呈现效果。',
       },
       tags: ['PCG', 'Procedural', 'Tool'],
+      pdf: 'assets/uploads/PCG.pdf',
       links: [
         { type: 'video', label: { en: 'Watch Video →', zh: '观看视频 →' }, href: 'assets/uploads/PCG.mp4' },
       ],

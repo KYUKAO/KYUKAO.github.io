@@ -160,18 +160,20 @@
 
   /* ── Build works array for a given language ── */
   function buildWorks(lang) {
-    return CONFIG.works.map(function (w) {
+    return CONFIG.works.map(function (w, index) {
       var bgStyle = w.image
         ? "background-image: url('" + w.image + "'); background-size: cover; background-position: center;"
         : '';
       return {
         category: w.category,
+        id:       index,
         group:    w.group || (w.category === 'tool' ? 'tool' : ((w.category === 'code' || w.category === 'pcg') ? 'project' : 'art')),
         bgStyle:  bgStyle,
         hasVideo: !!w.hasVideo,
         tags:     w.tags,
         title:    t(w.title, lang),
         desc:     t(w.desc,  lang),
+        pdf:      w.pdf || '',
         links:    w.links.map(function (l) {
           return { type: l.type || '', label: t(l.label, lang), href: l.href };
         }),

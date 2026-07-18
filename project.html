@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="KYUKAO project case study" />
+  <title>Project | Hanqing Li - KYUKAO</title>
+  <link rel="stylesheet" href="assets/entry/scene-pages.css?v=20260711e" />
+  <link rel="preload" as="image" href="assets/entry/universal-bg-4k.webp" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --gold: #d7a85f;
+      --gold-soft: rgba(226, 176, 94, 0.55);
+      --gold-dim: rgba(226, 176, 94, 0.2);
+      --paper: #f5d59d;
+      --muted: rgba(245, 213, 157, 0.68);
+      --panel: rgba(21, 11, 8, 0.76);
+      --font: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --display: "Cormorant Garamond", Georgia, serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--paper);
+      font-family: var(--font);
+      background: #090504;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+
+    .page-grade {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(226, 176, 94, 0.1), transparent 28%),
+        linear-gradient(180deg, rgba(7, 3, 2, 0.12), rgba(7, 3, 2, 0.58));
+    }
+
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 32px;
+      background: linear-gradient(180deg, rgba(7, 3, 2, 0.9), transparent);
+      pointer-events: none;
+    }
+    .top-nav a, .top-nav button { pointer-events: auto; }
+    .nav-logo {
+      font-family: var(--display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 18px rgba(226, 176, 94, 0.32);
+    }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .nav-back, .lang-button, .document-button {
+      border: 1px solid var(--gold-soft);
+      color: var(--paper);
+      background: rgba(21, 11, 8, 0.68);
+      transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+    }
+    .nav-back, .lang-button { padding: 9px 13px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+    .lang-button { cursor: pointer; }
+    .nav-back:hover, .lang-button:hover, .document-button:hover { background: rgba(72, 35, 15, 0.74); border-color: var(--gold); }
+
+    .project-shell { width: min(1180px, calc(100vw - 40px)); margin: 0 auto; padding: 118px 0 80px; }
+    .project-header { width: min(860px, 100%); margin: 0 auto 34px; text-align: center; }
+    .project-kicker { margin: 0 0 12px; color: var(--gold); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; }
+    .project-title { margin: 0; font-family: var(--display); font-size: clamp(2.7rem, 7vw, 6rem); font-weight: 600; line-height: 0.95; text-shadow: 0 0 28px rgba(226, 176, 94, 0.22); }
+    .project-desc { width: min(680px, 100%); margin: 22px auto 0; color: var(--muted); font-size: clamp(0.9rem, 1.4vw, 1.05rem); line-height: 1.8; }
+    .tag-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
+    .tag { padding: 6px 10px; border: 1px solid var(--gold-dim); color: var(--muted); background: rgba(21, 11, 8, 0.48); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .video-frame {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--gold-soft);
+      background: #000;
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.62), inset 0 0 0 1px rgba(255, 233, 178, 0.08);
+      clip-path: polygon(0 3%, 2% 0, 98% 0, 100% 3%, 100% 97%, 98% 100%, 2% 100%, 0 97%);
+    }
+    .video-frame video { display: block; width: 100%; max-height: 78vh; aspect-ratio: 16 / 9; object-fit: contain; background: #000; }
+
+    .content-section { margin-top: 70px; }
+    .section-heading { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 18px; margin-bottom: 24px; color: var(--gold); }
+    .section-heading::before, .section-heading::after { content: ""; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-soft)); }
+    .section-heading::after { background: linear-gradient(90deg, var(--gold-soft), transparent); }
+    .section-heading h2 { margin: 0; font-family: var(--display); font-size: clamp(1.8rem, 3vw, 2.6rem); letter-spacing: 0.1em; text-align: center; }
+
+    .document-panel { padding: 18px; border: 1px solid var(--gold-soft); background: var(--panel); box-shadow: 0 24px 50px rgba(0, 0, 0, 0.42); }
+    .document-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 2px 2px 16px; }
+    .document-note { margin: 0; color: var(--muted); font-size: 0.78rem; line-height: 1.5; }
+    .document-button { flex: 0 0 auto; padding: 10px 14px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+    .pdf-viewer { width: 100%; height: min(82vh, 920px); min-height: 620px; border: 0; background: #efece5; }
+    .pdf-fallback { display: grid; min-height: 320px; place-items: center; padding: 36px; color: #33261d; text-align: center; background: #efece5; }
+    .pdf-fallback a { color: #71470f; text-decoration: underline; }
+    .empty-document { padding: 52px 22px; color: var(--muted); text-align: center; }
+    .project-error { display: none; width: min(680px, 100%); margin: 18vh auto 0; padding: 42px; border: 1px solid var(--gold-soft); background: var(--panel); text-align: center; }
+    .project-error h1 { font-family: var(--display); font-size: 2.5rem; }
+    .project-error a { color: var(--gold); text-decoration: underline; }
+
+    @media (max-width: 680px) {
+      .top-nav { padding: 16px 18px; }
+      .nav-logo { display: none; }
+      .nav-actions { width: 100%; justify-content: space-between; }
+      .project-shell { width: min(94vw, 560px); padding-top: 96px; }
+      .project-header { margin-bottom: 24px; }
+      .content-section { margin-top: 48px; }
+      .document-panel { padding: 10px; }
+      .document-toolbar { align-items: flex-start; flex-direction: column; padding: 4px 4px 12px; }
+      .document-button { width: 100%; text-align: center; }
+      .pdf-viewer { min-height: 72vh; }
+    }
+  </style>
+</head>
+<body class="scene-page">
+  <div class="page-grade" aria-hidden="true"></div>
+
+  <nav class="top-nav" aria-label="Project navigation">
+    <a class="nav-logo" href="portfolio.html">KYUKAO</a>
+    <div class="nav-actions">
+      <a class="nav-back" id="backLink" href="portfolio.html">← <span id="backLabel">作品集</span></a>
+      <button class="lang-button" id="langButton" type="button" aria-label="Switch language">EN</button>
+    </div>
+  </nav>
+
+  <main class="project-shell" id="projectContent" hidden>
+    <header class="project-header">
+      <p class="project-kicker" id="projectKicker">Project Case Study</p>
+      <h1 class="project-title" id="projectTitle"></h1>
+      <p class="project-desc" id="projectDesc"></p>
+      <div class="tag-list" id="tagList" aria-label="Project tags"></div>
+    </header>
+
+    <section class="video-frame" aria-label="Project video">
+      <video id="projectVideo" controls autoplay muted playsinline preload="metadata"></video>
+    </section>
+
+    <section class="content-section" id="documentSection">
+      <div class="section-heading"><h2 id="documentTitle">Project Document</h2></div>
+      <div class="document-panel">
+        <div class="document-toolbar">
+          <p class="document-note" id="documentNote">完整项目资料可在下方浏览。</p>
+          <a class="document-button" id="openPdf" href="#" target="_blank" rel="noopener">单独打开 PDF ↗</a>
+        </div>
+        <object class="pdf-viewer" id="pdfViewer" type="application/pdf">
+          <div class="pdf-fallback"><p id="pdfFallback">当前浏览器无法嵌入 PDF。<br /><a id="pdfFallbackLink" href="#" target="_blank" rel="noopener">点击这里打开文档</a></p></div>
+        </object>
+      </div>
+    </section>
+  </main>
+
+  <section class="project-error" id="projectError">
+    <h1>Project not found</h1>
+    <p><a href="portfolio.html">Return to portfolio</a></p>
+  </section>
+
+  <script src="config.js?v=20260718a"></script>
+  <script src="assets/entry/scene-background.js?v=20260711"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var params = new URLSearchParams(window.location.search);
+      var projectId = Number(params.get('id'));
+      var savedLang = '';
+      try { savedLang = localStorage.getItem('lang') || ''; } catch (e) {}
+      var lang = params.get('lang') === 'en' || params.get('lang') === 'zh' ? params.get('lang') : (savedLang === 'en' ? 'en' : 'zh');
+
+      function t(field) {
+        if (!field) return '';
+        if (typeof field === 'string') return field;
+        return field[lang] || field.en || '';
+      }
+
+      function findVideo(work) {
+        var links = Array.isArray(work.links) ? work.links : [];
+        for (var i = 0; i < links.length; i++) {
+          if (links[i] && /\.(mp4|webm|mov|m4v|ogv)(\?.*)?$/i.test(links[i].href || '')) return links[i].href;
+        }
+        return '';
+      }
+
+      function setCopy() {
+        var isZh = lang === 'zh';
+        document.documentElement.lang = isZh ? 'zh-CN' : 'en';
+        document.getElementById('backLabel').textContent = isZh ? '作品集' : 'Portfolio';
+        document.getElementById('projectKicker').textContent = isZh ? '作品详情' : 'Project Case Study';
+        document.getElementById('documentTitle').textContent = isZh ? '项目文档' : 'Project Document';
+        document.getElementById('documentNote').textContent = isZh ? '完整项目资料可在下方浏览。' : 'Browse the complete project document below.';
+        document.getElementById('openPdf').textContent = isZh ? '单独打开 PDF ↗' : 'Open PDF ↗';
+        document.getElementById('pdfFallback').childNodes[0].nodeValue = isZh ? '当前浏览器无法嵌入 PDF。' : 'This browser cannot display the embedded PDF.';
+        document.getElementById('pdfFallbackLink').textContent = isZh ? '点击这里打开文档' : 'Open the document here';
+        document.getElementById('langButton').textContent = isZh ? 'EN' : '中文';
+        document.getElementById('backLink').href = 'portfolio.html?lang=' + lang;
+      }
+
+      function render() {
+        var works = typeof CONFIG !== 'undefined' && Array.isArray(CONFIG.works) ? CONFIG.works : [];
+        var work = Number.isInteger(projectId) ? works[projectId] : null;
+        var video = work ? findVideo(work) : '';
+        if (!work || !work.hasVideo || !video) {
+          document.getElementById('projectError').style.display = 'block';
+          return;
+        }
+
+        setCopy();
+        var title = t(work.title);
+        document.title = title + ' | Hanqing Li - KYUKAO';
+        document.getElementById('projectTitle').textContent = title;
+        document.getElementById('projectDesc').textContent = t(work.desc);
+        document.getElementById('projectVideo').src = video;
+        document.getElementById('tagList').innerHTML = (work.tags || []).map(function (tag) {
+          var span = document.createElement('span');
+          span.className = 'tag';
+          span.textContent = tag;
+          return span.outerHTML;
+        }).join('');
+
+        if (work.pdf) {
+          document.getElementById('pdfViewer').data = work.pdf + '#view=FitH';
+          document.getElementById('openPdf').href = work.pdf;
+          document.getElementById('pdfFallbackLink').href = work.pdf;
+        } else {
+          document.getElementById('documentSection').hidden = true;
+        }
+
+        document.getElementById('projectContent').hidden = false;
+      }
+
+      document.getElementById('langButton').addEventListener('click', function () {
+        lang = lang === 'zh' ? 'en' : 'zh';
+        try { localStorage.setItem('lang', lang); } catch (e) {}
+        var url = new URL(window.location.href);
+        url.searchParams.set('lang', lang);
+        window.history.replaceState(null, '', url.pathname + url.search);
+        render();
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
